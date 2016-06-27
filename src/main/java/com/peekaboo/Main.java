@@ -9,15 +9,11 @@ public class Main {
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("config/root.xml");
         UserRepository userRepository = context.getBean(UserRepository.class);
-
         User user = new User();
-        user.setLogin("Vlad");
+        user.setUsername("Vlad");
         userRepository.create(user);
-
         System.out.println("User were created");
         System.out.println("Fetching user with id 1");
         System.out.println(userRepository.getByKey(1l));
-
-
     }
 }

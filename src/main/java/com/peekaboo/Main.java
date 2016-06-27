@@ -11,13 +11,12 @@ public class Main {
         UserRepository userRepository = context.getBean(UserRepository.class);
 
         User user = new User();
-        user.setName("Vlad");
+        user.setLogin("Vlad");
         userRepository.create(user);
 
         System.out.println("User were created");
         System.out.println("Fetching user with id 1");
         System.out.println(userRepository.getByKey(1l));
-
 
 
     }

@@ -2,7 +2,6 @@ package com.peekaboo;
 
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.UserService;
-import com.peekaboo.repository.UserRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

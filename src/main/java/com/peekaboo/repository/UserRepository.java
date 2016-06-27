@@ -1,6 +1,6 @@
 package com.peekaboo.repository;
 
-import com.peekaboo.entity.User;
+import com.peekaboo.model.entity.User;
 
 public interface UserRepository {
 

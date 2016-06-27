@@ -1,4 +1,4 @@
-package com.peekaboo.entity;
+package com.peekaboo.model.entity;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -43,7 +43,6 @@ public class User implements UserDetails {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_role_id")
-    @Column(nullable = false)
     private UserRole role;
 
     //TODO: male = 0 , female = 1

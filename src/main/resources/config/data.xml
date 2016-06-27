@@ -1,31 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+       xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-    <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+    <context:component-scan base-package="com.peekaboo.model"/>
+
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="persistenceXmlLocation" value="classpath:/META-INF/persistence.xml"/>
+        <property name="persistenceUnitName" value="persistenceUnit"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+        <property name="jpaDialect" ref="jpaDialect"/>
+    </bean>
+
+    <bean id="jpaVendorAdapter"
+          class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+        <property name="database" value="MYSQL"/>
+        <property name="databasePlatform" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
+    </bean>
+
+    <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
+
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <property name="dataSource" ref="dataSource"/>
+        <property name="jpaDialect" ref="jpaDialect"/>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${jdbc.driverClassName}"/>
-        <property name="url"             value="${jdbc.url}"/>
-        <property name="username"        value="${jdbc.username}"/>
-        <property name="password"        value="${jdbc.password}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
     </bean>
 
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="dataSource" ref="dataSource" />
-        <property name="packagesToScan" value="com.peekaboo.entity" />
-        <property name="jpaVendorAdapter">
-            <bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
-        </property>
-        <property name="jpaProperties">
-            <props>
-                <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</prop>
-            </props>
-        </property>
+    <bean id="userDao" class="com.peekaboo.model.dao.impl.GenericDaoImpl">
+        <constructor-arg value="com.peekaboo.model.entity.User"/>
     </bean>
 
-    <bean id="userRepository" class="com.peekaboo.repository.UserRepositoryImpl">
-        <property name="emf" ref="entityManagerFactory"/>
+    <bean id="userRoleDao" class="com.peekaboo.model.dao.impl.GenericDaoImpl">
+        <constructor-arg value="com.peekaboo.model.entity.UserRole"/>
     </bean>
-
 </beans>

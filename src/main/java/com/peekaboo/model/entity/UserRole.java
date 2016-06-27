@@ -1,6 +1,7 @@
-package com.peekaboo.entity;
+package com.peekaboo.model.entity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "user_roles")
@@ -14,11 +15,16 @@ public class UserRole {
     @Column(unique = true)
     private String name;
 
+    @Column
+    @OneToMany(mappedBy = "role")
+    private List<User> users;
+
     public UserRole() {
     }
 
-    public UserRole(String name) {
+    public UserRole(String name, List<User> users) {
         this.name = name;
+        this.users = users;
     }
 
     @Override

@@ -23,6 +23,12 @@ public class SignController {
     }
 
 
+    @RequestMapping(method = RequestMethod.GET)
+    public SignResponse hello() {
+        SignResponse sr = new SignResponse();
+        sr.setId("hello world");
+        return sr;
+    }
 
     private class SignResponse {
         private String id;

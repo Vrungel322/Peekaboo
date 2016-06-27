@@ -58,6 +58,14 @@
             <version>${mysql-version}</version>
         </dependency>
 
+        <!--=============Form validation=================-->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-validator</artifactId>
+            <version>5.2.4.Final</version>
+        </dependency>
+        <!--=============Form validation=================-->
+
         <!--=============REST mapping=================-->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>

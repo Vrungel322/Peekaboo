@@ -1,6 +1,7 @@
 package com.peekaboo;
 
 import com.peekaboo.entity.User;
+import com.peekaboo.entity.UserRole;
 import com.peekaboo.repository.UserRepository;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;

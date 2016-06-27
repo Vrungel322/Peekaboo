@@ -9,6 +9,7 @@
         <scala-version>2.11.8</scala-version>
         <hibernate-version>5.1.0.Final</hibernate-version>
         <mysql-version>6.0.2</mysql-version>
+        <springsecurity-version>4.1.0.RELEASE</springsecurity-version>
     </properties>
     <groupId>com.canyoncapital</groupId>
     <artifactId>peekaboo</artifactId>
@@ -41,6 +42,12 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>${springsecurity-version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-entitymanager</artifactId>
             <version>${hibernate-version}</version>
@@ -58,6 +65,7 @@
             <version>${mysql-version}</version>
         </dependency>
 
+
         <!--=============Form validation=================-->
         <dependency>
             <groupId>org.hibernate</groupId>
@@ -65,6 +73,25 @@
             <version>5.2.4.Final</version>
         </dependency>
         <!--=============Form validation=================-->
+
+
+
+        <!--=============Logging=================-->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.5</version>
+        </dependency>
+
+
+            <!-- ============Bridge between my logging and spring ===========-->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-jcl</artifactId>
+            <version>2.1</version>
+        </dependency>
+        <!--=============Logging=================-->
+
 
         <!--=============REST mapping=================-->
         <dependency>

@@ -3,8 +3,10 @@ package com.peekaboo.controller;
 import com.peekaboo.controller.helper.SignResponse;
 import com.peekaboo.controller.helper.SigninRequestEntity;
 import com.peekaboo.controller.helper.SignupRequestEntity;
+import com.peekaboo.model.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
@@ -19,6 +21,10 @@ public class SignController {
 
     final Logger logger = LogManager.getLogger(SignController.class);
 
+    @Autowired
+    private UserService userService;
+
+
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) {
         logger.debug("Got SIGN IN request");
@@ -26,6 +32,8 @@ public class SignController {
             logErrors(errors);
             return new ResponseEntity(errors.getAllErrors().toArray(), HttpStatus.BAD_REQUEST);
         }
+
+
 
         if (requestEntity.getUsername().equals(requestEntity.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");

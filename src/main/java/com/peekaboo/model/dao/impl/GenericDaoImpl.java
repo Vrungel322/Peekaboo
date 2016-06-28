@@ -39,6 +39,11 @@ public class GenericDaoImpl<T, PK extends Serializable> implements GenericDao<T,
     }
 
     @Override
+    public CriteriaBuilder getBuilder() {
+        return entityManager.getCriteriaBuilder();
+    }
+
+    @Override
     public List<T> findAll() {
         return entityManager.createQuery("SELECT a FROM " + type.getSimpleName() + " a").getResultList();
     }

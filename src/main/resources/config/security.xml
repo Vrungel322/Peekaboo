@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<b:beans xmlns="http://www.springframework.org/schema/security"
+         xmlns:b="http://www.springframework.org/schema/beans"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+
+    <b:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
+
+    <http>
+        <intercept-url pattern="/signin" access="permitAll"/>
+        <intercept-url pattern="/signup" access="permitAll"/>
+        <intercept-url pattern="/**" access="hasRole('User')"/>
+        <form-login login-page="/login" default-target-url="/home"/>
+        <logout logout-success-url="/home"/>
+    </http>
+
+
+    <authentication-manager id="loginManager">
+        <authentication-provider user-service-ref="userService">
+            <password-encoder ref="passwordEncoder"/>
+        </authentication-provider>
+    </authentication-manager>
+</b:beans>

@@ -33,13 +33,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
-        CriteriaBuilder builder = genericDao.getBuilder();
-        CriteriaQuery<User> criteriaQuery = builder.createQuery(User.class);
-        Root<User> userRoot = criteriaQuery.from(User.class);
-        ParameterExpression<String> username = builder.parameter(String.class, "username");
-        criteriaQuery.select(userRoot);
-
-        criteriaQuery.where(Builder)
+       return null;
     }
 
     @Override

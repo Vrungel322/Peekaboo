@@ -16,7 +16,5 @@ public interface GenericDao<T, PK extends Serializable> {
 
     void delete(T obj);
 
-    CriteriaBuilder getBuilder();
-
     List<T> findAll();
 }

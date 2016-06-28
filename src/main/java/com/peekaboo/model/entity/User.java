@@ -39,7 +39,7 @@ public class User implements UserDetails {
 
     //TODO: change type of birthdate to java.time.LocalDate
     @Column
-    @Temporal(TemporalType.TIMESTAMP)
+
     private LocalDate birthdate;
 
     @ManyToOne(fetch = FetchType.EAGER)

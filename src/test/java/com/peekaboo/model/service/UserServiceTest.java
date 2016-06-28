@@ -16,7 +16,6 @@ import java.time.LocalDate;
 public class UserServiceTest {
 
     @Autowired
-    @Qualifier("userServiceImpl")
     private UserService userService;
 
 

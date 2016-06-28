@@ -5,6 +5,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -38,8 +39,8 @@ public class User implements UserDetails {
 
     //TODO: change type of birthdate to java.time.LocalDate
     @Column
-    @Temporal(TemporalType.DATE)
-    private Date birthdate;
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDate birthdate;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_role_id")
@@ -53,7 +54,7 @@ public class User implements UserDetails {
     }
 
     public User(String firstName, String lastName, String username, String password,
-                String email, String telephone, Date birthdate, UserRole role, int gender) {
+                String email, String telephone, LocalDate birthdate, UserRole role, int gender) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -150,11 +151,11 @@ public class User implements UserDetails {
         this.telephone = telephone;
     }
 
-    public Date getBirthdate() {
+    public LocalDate getBirthdate() {
         return birthdate;
     }
 
-    public void setBirthdate(Date birthdate) {
+    public void setBirthdate(LocalDate birthdate) {
         this.birthdate = birthdate;
     }
 

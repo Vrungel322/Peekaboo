@@ -1,72 +1,56 @@
 package com.peekaboo.model.service.impl;
 
-import com.peekaboo.model.dao.GenericDao;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.repository.UserRepository;
 import com.peekaboo.model.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.ParameterExpression;
-import javax.persistence.criteria.Root;
-
 @Service
 public class UserServiceImpl implements UserService {
 
     @Autowired
-    @Qualifier("userDao")
-    private GenericDao<User, Long> genericDao;
-
-//    CriteriaBuilder cb = em.getCriteriaBuilder();
-//
-//    CriteriaQuery<Country> q = cb.createQuery(Country.class);
-//    Root<Country> c = q.from(Country.class);
-//    ParameterExpression<Integer> p = cb.parameter(Integer.class);
-//    q.select(c).where(cb.gt(c.get("population"), p));
+    private UserRepository userRepository;
 
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
 
-       return null;
+        return null;
     }
 
     @Override
     @Transactional
     public void add(User user) {
-        genericDao.create(user);
+        userRepository.saveAndFlush(user);
     }
 
     @Override
     @Transactional
     public User get(Long id) {
-        return genericDao.read(id);
+        return userRepository.findOne(id);
     }
 
     @Override
     @Transactional
     public void update(User user) {
-        genericDao.update(user);
+        userRepository.saveAndFlush(user);
     }
 
     @Override
     @Transactional
     public void delete(User user) {
-        genericDao.delete(user);
+        userRepository.delete(user);
     }
 
-    public GenericDao<User, Long> getGenericDao() {
-        return genericDao;
+    public UserRepository getUserRepository() {
+        return userRepository;
     }
 
-    public void setGenericDao(GenericDao<User, Long> genericDao) {
-        this.genericDao = genericDao;
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
-
-
 }

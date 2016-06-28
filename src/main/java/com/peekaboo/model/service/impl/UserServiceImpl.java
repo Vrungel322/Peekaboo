@@ -15,19 +15,12 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.ParameterExpression;
 import javax.persistence.criteria.Root;
 
-@Service
+@Service(value = "userService")
 public class UserServiceImpl implements UserService {
 
     @Autowired
     @Qualifier("userDao")
     private GenericDao<User, Long> genericDao;
-
-//    CriteriaBuilder cb = em.getCriteriaBuilder();
-//
-//    CriteriaQuery<Country> q = cb.createQuery(Country.class);
-//    Root<Country> c = q.from(Country.class);
-//    ParameterExpression<Integer> p = cb.parameter(Integer.class);
-//    q.select(c).where(cb.gt(c.get("population"), p));
 
     @Override
     @Transactional

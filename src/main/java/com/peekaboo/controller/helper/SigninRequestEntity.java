@@ -15,6 +15,7 @@ public class SigninRequestEntity {
 
     @NotNull
     @Pattern(regexp = "[\\d|\\w|_]+")
+    @Length(min = 6)
     private String password;
 
     public String getUsername() {

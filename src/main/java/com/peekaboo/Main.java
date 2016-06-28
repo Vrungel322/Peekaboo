@@ -8,7 +8,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class Main {
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("config/root.xml");
-        UserService userService = (UserService) context.getBean("userServiceImpl");
+        UserService userService = (UserService) context.getBean("userService");
         User user = new User();
         user.setUsername("Vlad");
         user.setEmail("jack@gmail.com");
@@ -16,6 +16,6 @@ public class Main {
         userService.add(user);
         System.out.println("User were created");
         System.out.println("Fetching user with id 1");
-        System.out.println(userService.get(1l));
+        System.out.println(userService.findByUsername("Vlad"));
     }
 }

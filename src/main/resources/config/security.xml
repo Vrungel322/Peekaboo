@@ -12,6 +12,7 @@
         <intercept-url pattern="/signup" access="permitAll"/>
         <intercept-url pattern="/**" access="hasRole('User')"/>
         <form-login login-page="/login" default-target-url="/home"/>
+        <csrf disabled="true"/>
         <logout logout-success-url="/home"/>
     </http>
 

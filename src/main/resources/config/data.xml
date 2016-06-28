@@ -2,12 +2,15 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:jpa="http://www.springframework.org/schema/data/jpa"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
-        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
 
     <context:component-scan base-package="com.peekaboo.model"/>
+
+    <jpa:repositories base-package="com.peekaboo.model.repository"></jpa:repositories>
 
     <bean id="jpaDialect" class="org.springframework.orm.jpa.vendor.HibernateJpaDialect"/>
 
@@ -23,15 +26,10 @@
               class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
             <property name="persistenceXmlLocation" value="classpath:/META-INF/persistence.xml"/>
             <property name="persistenceUnitName" value="devPersistenceUnit"/>
-            <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+            <!--<property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>-->
             <property name="jpaDialect" ref="jpaDialect"/>
         </bean>
 
-        <bean id="jpaVendorAdapter"
-              class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-            <property name="database" value="MYSQL"/>
-            <property name="databasePlatform" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
-        </bean>
     </beans>
 
     <beans profile="test">
@@ -39,15 +37,10 @@
               class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
             <property name="persistenceXmlLocation" value="classpath:/META-INF/persistence.xml"/>
             <property name="persistenceUnitName" value="testPersistenceUnit"/>
-            <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+            <!--<property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>-->
             <property name="jpaDialect" ref="jpaDialect"/>
         </bean>
 
-        <bean id="jpaVendorAdapter"
-              class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
-            <property name="database" value="MYSQL"/>
-            <property name="databasePlatform" value="org.hibernate.dialect.MySQL5InnoDBDialect"/>
-        </bean>
     </beans>
 
 </beans>

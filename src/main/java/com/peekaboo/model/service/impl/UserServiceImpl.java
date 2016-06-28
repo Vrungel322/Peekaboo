@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
+@Service(value = "userService")
 public class UserServiceImpl implements UserService {
 
     @Autowired
@@ -44,6 +44,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(User user) {
         userRepository.delete(user);
+    }
+
+    @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     public UserRepository getUserRepository() {

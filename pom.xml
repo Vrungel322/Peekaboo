@@ -169,6 +169,14 @@
         </dependency>
         <!--=============Testing=================-->
 
+
+        <!--=============JWT deps=============-->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>0.6.0</version>
+        </dependency>
+        <!--=============JWT deps=============-->
     </dependencies>
 
     <build>

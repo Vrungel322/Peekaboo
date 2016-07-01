@@ -1,5 +1,6 @@
 package com.peekaboo.model.entity;
 
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,9 +16,10 @@ import java.util.Date;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(generator="system-uuid")
+    @GenericGenerator(name="system-uuid", strategy = "uuid")
     @Column(name = "user_id")
-    private long id;
+    private String id;
 
     @Column(name = "first_name")
     private String firstName;
@@ -41,7 +43,7 @@ public class User implements UserDetails {
     @Column
     private LocalDate birthdate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     @JoinColumn(name = "user_role_id")
     private UserRole role;
 
@@ -102,11 +104,11 @@ public class User implements UserDetails {
         return true;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -184,15 +186,15 @@ public class User implements UserDetails {
 
     @Override
     public int hashCode() {
-        int result = (int) (id ^ (id >>> 32));
+        int result = id.hashCode();
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
-        result = 31 * result + (username != null ? username.hashCode() : 0);
-        result = 31 * result + (password != null ? password.hashCode() : 0);
-        result = 31 * result + (email != null ? email.hashCode() : 0);
+        result = 31 * result + username.hashCode();
+        result = 31 * result + password.hashCode();
+        result = 31 * result + email.hashCode();
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
         result = 31 * result + (birthdate != null ? birthdate.hashCode() : 0);
-        result = 31 * result + (role != null ? role.hashCode() : 0);
+        result = 31 * result + role.hashCode();
         result = 31 * result + gender;
         return result;
     }
@@ -212,4 +214,10 @@ public class User implements UserDetails {
                 ", gender=" + gender +
                 '}';
     }
+
+    //todo: implement
+    public void setRole(String role) {
+
+    }
+
 }

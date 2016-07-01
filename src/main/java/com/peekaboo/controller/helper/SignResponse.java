@@ -1,15 +1,50 @@
 package com.peekaboo.controller.helper;
 
+import org.springframework.beans.factory.annotation.Value;
+
 public class SignResponse {
 
     private String id;
+    private String username;
+    private String role;
+
+    @Value("${jwt.secret}")
+    private String secret;
+
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public SignResponse setId(String id) {
         this.id = id;
+        return this;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public SignResponse setUsername(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public SignResponse setRole(String role) {
+        this.role = role;
+        return this;
+    }
+
+    public String getSecret() {
+        return secret;
+    }
+
+    public SignResponse setSecret(String secret) {
+        this.secret = secret;
+        return this;
+    }
 }

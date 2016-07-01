@@ -1,6 +1,8 @@
 package com.peekaboo.security.jwt;
 
 import com.peekaboo.security.exception.JwtTokenMissingException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -13,6 +15,8 @@ import java.io.IOException;
 
 public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
+    private final Logger logger = LogManager.getLogger(JwtAuthenticationFilter.class);
+
     public JwtAuthenticationFilter() {
         super("/**");
     }
@@ -24,9 +28,11 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
+        logger.debug("Attempting to authenticate");
         String header = request.getHeader("Authorization");
 
         if (header == null || !header.startsWith("Bearer ")) {
+            logger.debug("No relevant headers were found");
             throw new JwtTokenMissingException("No JWT token found in request header");
         }
 

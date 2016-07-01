@@ -6,10 +6,8 @@ public class SignResponse {
 
     private String id;
     private String username;
-    private String role;
+    private int role;
 
-    @Value("${jwt.secret}")
-    private String secret;
 
 
     public String getId() {
@@ -30,21 +28,13 @@ public class SignResponse {
         return this;
     }
 
-    public String getRole() {
+    public int getRole() {
         return role;
     }
 
-    public SignResponse setRole(String role) {
+    public SignResponse setRole(int role) {
         this.role = role;
         return this;
     }
 
-    public String getSecret() {
-        return secret;
-    }
-
-    public SignResponse setSecret(String secret) {
-        this.secret = secret;
-        return this;
-    }
 }

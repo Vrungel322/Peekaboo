@@ -34,7 +34,7 @@ public class JwtUtil {
             User u = new User();
             u.setUsername(body.getSubject());
             u.setId((String)body.get("userId"));
-            u.setRole((String)body.get("role"));
+            u.setRoles((int)body.get("role"));
 
             return u;
         } catch (JwtException | ClassCastException e) {

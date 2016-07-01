@@ -2,6 +2,8 @@ package com.peekaboo.security.jwt;
 
 import com.peekaboo.model.entity.User;
 import com.peekaboo.security.exception.JwtTokenMalformedException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
@@ -15,6 +17,8 @@ import java.util.List;
 
 @Component
 public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
+
+    private final Logger logger = LogManager.getLogger(JwtAuthenticationProvider.class);
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -34,17 +38,19 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         String token = jwtAuthenticationToken.getToken();
 
+        logger.debug("Retrieving user from token");
         User parsedUser = jwtUtil.parse(token);
 
         if (parsedUser == null) {
+            logger.debug("Error with retrieving user");
             throw new JwtTokenMalformedException("JWT token is not valid");
         }
 
 
 
-        List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(parsedUser.getRole().toString());
+//        List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(parsedUser.getRole().toString());
 
 //        return new AuthenticatedUser(parsedUser.getId(), parsedUser.getUsername(), token, authorities);
-        return new AuthenticatedUser(1, parsedUser.getUsername(), token, authorities);
+        return parsedUser;
     }
 }

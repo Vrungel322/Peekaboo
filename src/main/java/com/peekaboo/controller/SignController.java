@@ -70,7 +70,7 @@ public class SignController {
         newUser.setUsername(requestEntity.getUsername());
         newUser.setEmail(requestEntity.getEmail());
         newUser.setPassword(requestEntity.getPassword());
-        newUser.setRole(new UserRole(""));
+        //newUser.setRole(new UserRole(""));
         newUser = userService.add(newUser);
 
         SignResponse response = new SignResponse();

@@ -15,8 +15,8 @@ import java.util.Collection;
 public class User implements UserDetails {
 
     @Id
-    @GeneratedValue(generator="system-uuid")
-    @GenericGenerator(name="system-uuid", strategy = "uuid")
+    @GeneratedValue(generator = "system-uuid")
+    @GenericGenerator(name = "system-uuid", strategy = "uuid")
     @Column(name = "user_id")
     private String id;
 
@@ -42,9 +42,8 @@ public class User implements UserDetails {
     @Column
     private LocalDate birthdate;
 
-    @ManyToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_role_id")
-    private UserRole role;
+    @Column
+    private int roles;
 
     //TODO: male = 0 , female = 1
     @Column
@@ -54,7 +53,7 @@ public class User implements UserDetails {
     }
 
     public User(String firstName, String lastName, String username, String password,
-                String email, String telephone, LocalDate birthdate, UserRole role, int gender) {
+                String email, String telephone, LocalDate birthdate, int roles, int gender) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
@@ -62,15 +61,13 @@ public class User implements UserDetails {
         this.email = email;
         this.telephone = telephone;
         this.birthdate = birthdate;
-        this.role = role;
+        this.roles = roles;
         this.gender = gender;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority(role.toString()));
-        return authorities;
+        return null;
     }
 
     @Override
@@ -101,6 +98,14 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public boolean hasRole(UserRole userRole) {
+        return (this.roles & userRole.getId()) != 0;
+    }
+
+    public void addRole(UserRole userRole) {
+        this.roles |= userRole.getId();
     }
 
     public String getId() {
@@ -159,12 +164,12 @@ public class User implements UserDetails {
         this.birthdate = birthdate;
     }
 
-    public UserRole getRole() {
-        return role;
+    public int getRoles() {
+        return roles;
     }
 
-    public void setRole(UserRole role) {
-        this.role = role;
+    public void setRoles(int roles) {
+        this.roles = roles;
     }
 
     public int getGender() {
@@ -193,7 +198,7 @@ public class User implements UserDetails {
         result = 31 * result + email.hashCode();
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
         result = 31 * result + (birthdate != null ? birthdate.hashCode() : 0);
-        result = 31 * result + role.hashCode();
+        result = 31 * result + roles;
         result = 31 * result + gender;
         return result;
     }
@@ -209,7 +214,7 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 ", telephone='" + telephone + '\'' +
                 ", birthdate=" + birthdate +
-                ", role=" + role +
+                ", roles=" + roles +
                 ", gender=" + gender +
                 '}';
     }
@@ -218,5 +223,4 @@ public class User implements UserDetails {
     public void setRole(String role) {
 
     }
-
 }

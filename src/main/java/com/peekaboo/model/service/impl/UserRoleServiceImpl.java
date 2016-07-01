@@ -15,8 +15,8 @@ public class UserRoleServiceImpl implements UserRoleService {
 
     @Override
     @Transactional
-    public void add(UserRole userRole) {
-        userRoleRepository.saveAndFlush(userRole);
+    public UserRole add(UserRole userRole) {
+        return userRoleRepository.saveAndFlush(userRole);
     }
 
     @Override

@@ -15,16 +15,12 @@ public class UserRole {
     @Column(unique = true)
     private String name;
 
-    @Column
-    @OneToMany(mappedBy = "role")
-    private List<User> users;
 
     public UserRole() {
     }
 
-    public UserRole(String name, List<User> users) {
+    public UserRole(String name) {
         this.name = name;
-        this.users = users;
     }
 
     @Override

@@ -2,24 +2,31 @@
 <b:beans xmlns="http://www.springframework.org/schema/security"
          xmlns:b="http://www.springframework.org/schema/beans"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:context="http://www.springframework.org/schema/context"
          xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
+       http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.peekaboo.security"/>
 
     <b:bean id="passwordEncoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder"/>
 
-    <http>
-        <intercept-url pattern="/signin" access="permitAll"/>
-        <intercept-url pattern="/signup" access="permitAll"/>
-        <intercept-url pattern="/**" access="hasRole('User')"/>
-        <form-login login-page="/login" default-target-url="/home"/>
+    <global-method-security pre-post-annotations="enabled"/>
+
+    <http pattern="/signin" security="none"/>
+    <http pattern="/signup" security="none"/>
+
+    <http pattern="/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless">
         <csrf disabled="true"/>
-        <logout logout-success-url="/home"/>
+        <custom-filter before="FORM_LOGIN_FILTER" ref="jwtAuthenticationFilter"/>
     </http>
 
+    <b:bean id="jwtAuthenticationFilter" class="com.peekaboo.security.jwt.JwtAuthenticationFilter">
+        <b:property name="authenticationManager" ref="authenticationManager"/>
+        <b:property name="authenticationSuccessHandler" ref="jwtAuthenticationSuccessHandler"/>
+    </b:bean>
 
-    <authentication-manager id="loginManager">
-        <authentication-provider user-service-ref="userService">
-            <password-encoder ref="passwordEncoder"/>
-        </authentication-provider>
+
+    <authentication-manager alias="authenticationManager">
+        <authentication-provider ref="jwtAuthenticationProvider"/>
     </authentication-manager>
 </b:beans>

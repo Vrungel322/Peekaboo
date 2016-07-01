@@ -50,7 +50,7 @@ public class SignController {
         SignResponse response = new SignResponse();
         response.setId(user.getId())
                 .setUsername(user.getUsername())
-                .setRole(user.getRole().toString());
+                .setRole(user.getRoles());
 
         String token = jwtUtil.generateToken(response);
 

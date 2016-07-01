@@ -50,7 +50,7 @@ public class SignController {
         SignResponse response = new SignResponse();
         response.setId(user.getId())
                 .setUsername(user.getUsername())
-                .setRole(user.getRole().toString());
+                .setRole(user.getRoles());
 
         String token = jwtUtil.generateToken(response);
 
@@ -70,13 +70,13 @@ public class SignController {
         newUser.setUsername(requestEntity.getUsername());
         newUser.setEmail(requestEntity.getEmail());
         newUser.setPassword(requestEntity.getPassword());
-        //newUser.setRole(new UserRole(""));
+        newUser.addRole(UserRole.USER);
         newUser = userService.add(newUser);
 
         SignResponse response = new SignResponse();
         response.setId(newUser.getId())
                 .setUsername(newUser.getUsername())
-                .setRole(newUser.getRole().toString());
+                .setRole(newUser.getRoles());
 
         String token = jwtUtil.generateToken(response);
 

@@ -8,8 +8,6 @@ public class SignResponse {
     private String username;
     private String role;
 
-    @Value("${jwt.secret}")
-    private String secret;
 
 
     public String getId() {
@@ -39,12 +37,4 @@ public class SignResponse {
         return this;
     }
 
-    public String getSecret() {
-        return secret;
-    }
-
-    public SignResponse setSecret(String secret) {
-        this.secret = secret;
-        return this;
-    }
 }

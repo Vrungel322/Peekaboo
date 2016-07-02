@@ -10,6 +10,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+/**
+ * Class is used for encapsulating token generation and parsing.
+ */
 @Component
 public class JwtUtil {
 
@@ -37,7 +40,7 @@ public class JwtUtil {
             u.setRoles((int)body.get("role"));
 
             return u;
-        } catch (JwtException | ClassCastException e) {
+        } catch (JwtException | ClassCastException | IllegalArgumentException e) {
             return null;
         }
     }

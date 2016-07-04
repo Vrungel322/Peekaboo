@@ -96,11 +96,4 @@ public class SignController {
             logger.debug(objectError.getObjectName() + " : " + objectError.getDefaultMessage());
         });
     }
-
-    @RequestMapping("/")
-    public String hello() {
-        return "Hello";
-    }
-
-
 }

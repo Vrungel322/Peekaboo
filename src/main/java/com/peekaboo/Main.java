@@ -1,5 +1,6 @@
 package com.peekaboo;
 
+import com.peekaboo.mail.MailService;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.UserService;
 import org.springframework.context.ApplicationContext;
@@ -17,5 +18,7 @@ public class Main {
         System.out.println("User were created");
         System.out.println("Fetching user with id 1");
         System.out.println(userService.findByUsername("Vlad"));
+        MailService sender = (MailService)  context.getBean("mailService");
+        sender.send("zakolenkoroman@gmail.com", "test", "Hello world");
     }
 }

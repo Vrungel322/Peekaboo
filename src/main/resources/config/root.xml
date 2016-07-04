@@ -5,7 +5,9 @@
 
     <import resource="data.xml"/>
 
-    <import resource="security.xml"/>
+    <!--<import resource="security.xml"/>-->
+
+    <import resource="mail.xml"/>
 
     <bean id="propertiesConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">

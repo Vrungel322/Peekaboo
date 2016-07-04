@@ -18,14 +18,13 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
-
     @Test
     public void testAdd() {
         final User user = new User();
         user.setFirstName("John");
         user.setLastName("Doe");
         user.setUsername("john");
-        user.setPassword("qwert");
+        user.setPassword("qwerty");
         user.setEmail("john@gmail.com");
         user.setTelephone("0954624456");
         user.setBirthdate(LocalDate.now());

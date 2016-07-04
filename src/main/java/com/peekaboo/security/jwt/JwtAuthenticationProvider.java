@@ -5,6 +5,7 @@ import com.peekaboo.security.exception.JwtTokenMalformedException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.dao.AbstractUserDetailsAuthenticationProvider;
 import org.springframework.security.core.AuthenticationException;
@@ -13,6 +14,8 @@ import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -29,9 +32,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
     }
 
     @Override
-    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {
-
-    }
+    protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken) throws AuthenticationException {}
 
     @Override
     protected UserDetails retrieveUser(String s, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
@@ -42,15 +43,10 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
         User parsedUser = jwtUtil.parse(token);
 
         if (parsedUser == null) {
-            logger.debug("Error with retrieving user");
-            throw new JwtTokenMalformedException("JWT token is not valid");
+            logger.debug("Error with retrieving user. Warn: authorization as anonymous user without any role");
+            return new org.springframework.security.core.userdetails.User("anonymous", "anonymous", new ArrayList<>());
         }
 
-
-
-//        List<GrantedAuthority> authorities = AuthorityUtils.commaSeparatedStringToAuthorityList(parsedUser.getRole().toString());
-
-//        return new AuthenticatedUser(parsedUser.getId(), parsedUser.getUsername(), token, authorities);
         return parsedUser;
     }
 }

@@ -12,10 +12,10 @@
 
     <global-method-security pre-post-annotations="enabled"/>
 
-    <http pattern="/signin" security="none"/>
-    <http pattern="/signup" security="none"/>
-
-    <http pattern="/**" entry-point-ref="restAuthenticationEntryPoint" create-session="stateless">
+    <http entry-point-ref="restAuthenticationEntryPoint" create-session="stateless">
+        <intercept-url pattern="/signin"  requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/signup"  requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/**"      requires-channel="http" access="hasAuthority('USER')"/>
         <csrf disabled="true"/>
         <custom-filter before="FORM_LOGIN_FILTER" ref="jwtAuthenticationFilter"/>
     </http>
@@ -24,7 +24,6 @@
         <b:property name="authenticationManager" ref="authenticationManager"/>
         <b:property name="authenticationSuccessHandler" ref="jwtAuthenticationSuccessHandler"/>
     </b:bean>
-
 
     <authentication-manager alias="authenticationManager">
         <authentication-provider ref="jwtAuthenticationProvider"/>

@@ -97,10 +97,5 @@ public class SignController {
         });
     }
 
-    @RequestMapping("/")
-    public String hello() {
-        return "Hello";
-    }
-
 
 }

@@ -13,9 +13,13 @@
     <global-method-security pre-post-annotations="enabled"/>
 
     <http entry-point-ref="restAuthenticationEntryPoint" create-session="stateless">
-        <intercept-url pattern="/signin"  requires-channel="http" access="permitAll"/>
-        <intercept-url pattern="/signup"  requires-channel="http" access="permitAll"/>
-        <intercept-url pattern="/**"      requires-channel="http" access="hasAuthority('USER')"/>
+        <intercept-url pattern="/signin"          requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/signup"          requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/"                requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/app/**"          requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/node_modules/**" requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/typins/**"       requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/**"              requires-channel="http" access="hasAuthority('USER')"/>
         <csrf disabled="true"/>
         <custom-filter before="FORM_LOGIN_FILTER" ref="jwtAuthenticationFilter"/>
     </http>

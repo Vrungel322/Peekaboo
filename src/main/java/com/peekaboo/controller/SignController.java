@@ -1,8 +1,6 @@
 package com.peekaboo.controller;
 
-import com.peekaboo.controller.helper.SignResponse;
-import com.peekaboo.controller.helper.SigninRequestEntity;
-import com.peekaboo.controller.helper.SignupRequestEntity;
+import com.peekaboo.controller.helper.*;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.UserRole;
 import com.peekaboo.model.service.UserService;
@@ -13,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,14 +21,13 @@ import javax.validation.Valid;
 @RestController
 public class SignController {
 
-    final Logger logger = LogManager.getLogger(SignController.class);
+    private final Logger logger = LogManager.getLogger(SignController.class);
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private JwtUtil jwtUtil;
-
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) throws Exception{
@@ -46,7 +44,7 @@ public class SignController {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             throw new SignException();
         }
-
+        logger.debug("User were successfully authorized");
         SignResponse response = new SignResponse();
         response.setId(user.getId())
                 .setUsername(user.getUsername())
@@ -78,22 +76,18 @@ public class SignController {
                 .setUsername(newUser.getUsername())
                 .setRole(newUser.getRoles());
 
+        logger.debug("User were successfully created");
         String token = jwtUtil.generateToken(response);
 
         return new ResponseEntity(token, HttpStatus.OK);
+    }
 
-//        //temporal solution
-//        if (requestEntity.getUsername().equals(requestEntity.getPassword())) {
-//            logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
-//            return new ResponseEntity(HttpStatus.NOT_FOUND);
-//        }
-//
-//        SignResponse response = new SignResponse();
-//        response.setId("1");
-//
-//        return new ResponseEntity(response, HttpStatus.OK);
-
-
+    @ExceptionHandler({SignException.class})
+    public ResponseEntity<ErrorResponse> exceptionHandler() {
+        logger.debug("Got exception. Sending error to client");
+        return new ResponseEntity<>(
+                new ErrorResponse("SignError", "Error were caused while loggining into the server"),
+                HttpStatus.BAD_REQUEST);
     }
 
     private void logErrors(Errors errors) {

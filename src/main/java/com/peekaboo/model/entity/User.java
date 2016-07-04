@@ -70,10 +70,11 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(UserRole.values())
+        List<GrantedAuthority> authorities =  Arrays.stream(UserRole.values())
                 .filter(this::hasRole)
                 .map(userRole -> new SimpleGrantedAuthority(userRole.toString()))
                 .collect(Collectors.toList());
+        return authorities;
     }
 
     @Override

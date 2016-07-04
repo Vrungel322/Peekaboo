@@ -1,8 +1,8 @@
-package com.peekaboo.controller;
+package com.peekaboo.controller.helper;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.NOT_FOUND, reason = "Wrong username of password")
+
 public class SignException extends Exception{
 }

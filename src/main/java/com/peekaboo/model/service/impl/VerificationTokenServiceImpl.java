@@ -16,13 +16,13 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     @Override
     @Transactional
-    public VerificationToken add(VerificationToken entity) {
+    public VerificationToken create(VerificationToken entity) {
         return verificationTokenRepository.saveAndFlush(entity);
     }
 
     @Override
     @Transactional
-    public VerificationToken get(Long id) {
+    public VerificationToken get(String id) {
         return verificationTokenRepository.findOne(id);
     }
 
@@ -40,7 +40,19 @@ public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     @Override
     @Transactional
-    public VerificationToken findByToken(String token) {
-        return verificationTokenRepository.findByToken(token);
+    public VerificationToken findByValue(String value) {
+        return verificationTokenRepository.findByValue(value);
+    }
+
+    @Override
+    @Transactional
+    public String deleteByValue(String value) {
+        return verificationTokenRepository.deleteByValue(value);
+    }
+
+    @Override
+    @Transactional
+    public VerificationToken findByUser(User user){
+        return verificationTokenRepository.findByUser(user);
     }
 }

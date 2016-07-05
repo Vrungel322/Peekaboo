@@ -35,7 +35,7 @@ public class JwtUtil {
                     .getBody();
 
             User u = new User();
-            u.setUsername(body.getSubject());
+            u.setLogin(body.getSubject());
             u.setId((String) body.get("userId"));
             u.setRoles((int) body.get("role"));
 

@@ -19,13 +19,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User add(User user) {
+    public User create(User user) {
         return userRepository.saveAndFlush(user);
     }
 
     @Override
     @Transactional
-    public User get(Long id) {
+    public User get(String id) {
         return userRepository.findOne(id);
     }
 
@@ -43,18 +43,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByLogin(String login) {
+        return userRepository.findByLogin(login);
     }
 
+    @Override
     @Transactional
-    public boolean emailExist(String email) {
-        return userRepository.findByUsername(email) != null;
+    public boolean loginExist(String login) {
+        return userRepository.findByLogin(login) != null;
     }
 
+    @Override
     @Transactional
-    public User findByToken(String token) {
-        return verificationTokenRepository.findByToken(token).getUser();
+    public User findByConfirmToken(String token) {
+        return verificationTokenRepository.findByValue(token).getUser();
     }
 
     public UserRepository getUserRepository() {

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public interface EntityService<T, PK extends Serializable> {
 
-    T add(T entity);
+    T create(T entity);
 
     T get(PK id);
 

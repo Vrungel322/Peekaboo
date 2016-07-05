@@ -1,8 +1,9 @@
 package com.peekaboo;
 
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
-import com.peekaboo.registrconfirm.RegistrationConfirmEvent;
+import com.peekaboo.registrconfirm.ConfirmEvent;
 import com.peekaboo.registrconfirm.RegistrationConfirmPublisher;
 import com.peekaboo.registrconfirm.mail.MailService;
 import org.springframework.context.ApplicationContext;
@@ -15,9 +16,10 @@ public class Main {
         RegistrationConfirmPublisher publisher = (RegistrationConfirmPublisher) context.getBean("registrationConfirmPublisher");
         MailService mailService = context.getBean(MailService.class);
         User user = new User();
-        user.setUsername("zakolenkoroman@gmail.com");
+        user.setLogin("zakolenkoroman@gmail.com");
         user.setPassword("qwerty");
-        userService.add(user);
-        publisher.publishEvent(new RegistrationConfirmEvent(new Object(), user, mailService));
+        userService.create(user);
+        VerificationToken token = new VerificationToken("test", user);
+        publisher.publishEvent(new ConfirmEvent(new Object(), user, token, mailService));
     }
 }

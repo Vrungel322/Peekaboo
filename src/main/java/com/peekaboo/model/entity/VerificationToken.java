@@ -3,7 +3,7 @@ package com.peekaboo.model.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "verification_tokens")
@@ -16,20 +16,20 @@ public class VerificationToken {
     private String id;
 
     @Column(unique = true)
-    private String token;
+    private String value;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
     @Column
-    private Date expiryDate;
+    private LocalDate expiryDate;
 
     public VerificationToken() {
     }
 
     public VerificationToken(String token, User user) {
-        this.token = token;
+        this.value = token;
         this.user = user;
     }
 
@@ -41,12 +41,12 @@ public class VerificationToken {
         this.id = id;
     }
 
-    public String getToken() {
-        return token;
+    public String getValue() {
+        return value;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setValue(String token) {
+        this.value = token;
     }
 
     public User getUser() {
@@ -57,11 +57,11 @@ public class VerificationToken {
         this.user = user;
     }
 
-    public Date getExpiryDate() {
+    public LocalDate getExpiryDate() {
         return expiryDate;
     }
 
-    public void setExpiryDate(Date expiryDate) {
+    public void setExpiryDate(LocalDate expiryDate) {
         this.expiryDate = expiryDate;
     }
 
@@ -82,7 +82,7 @@ public class VerificationToken {
     public String toString() {
         final StringBuilder sb = new StringBuilder("VerificationToken{");
         sb.append("id='").append(id).append('\'');
-        sb.append(", token='").append(token).append('\'');
+        sb.append(", token='").append(value).append('\'');
         sb.append(", user=").append(user);
         sb.append(", expiryDate=").append(expiryDate);
         sb.append('}');

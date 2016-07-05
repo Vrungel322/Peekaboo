@@ -28,7 +28,7 @@ public class User implements UserDetails {
     private String lastName;
 
     @Column(unique = true, nullable = false)
-    private String username;
+    private String login;
 
     @Column(nullable = false)
     private String password;
@@ -36,7 +36,6 @@ public class User implements UserDetails {
     @Column
     private String telephone;
 
-    //TODO: change type of birthdate to java.time.LocalDate
     @Column
     private LocalDate birthdate;
 
@@ -53,11 +52,11 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String firstName, String lastName, String username, String password,
+    public User(String firstName, String lastName, String login, String password,
                 String telephone, LocalDate birthdate, int roles, int gender) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.username = username;
+        this.login = login;
         this.password = password;
         this.telephone = telephone;
         this.birthdate = birthdate;
@@ -80,7 +79,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return username;
+        return login;
     }
 
     @Override
@@ -135,8 +134,8 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public void setPassword(String password) {
@@ -175,12 +174,16 @@ public class User implements UserDetails {
         this.gender = gender;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         User user = (User) obj;
-        return this.username.equals(user.username);
+        return this.login.equals(user.login);
     }
 
     @Override
@@ -188,7 +191,7 @@ public class User implements UserDetails {
         int result = id.hashCode();
         result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
-        result = 31 * result + username.hashCode();
+        result = 31 * result + login.hashCode();
         result = 31 * result + password.hashCode();
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
         result = 31 * result + (birthdate != null ? birthdate.hashCode() : 0);
@@ -203,7 +206,7 @@ public class User implements UserDetails {
         sb.append("id='").append(id).append('\'');
         sb.append(", firstName='").append(firstName).append('\'');
         sb.append(", lastName='").append(lastName).append('\'');
-        sb.append(", username='").append(username).append('\'');
+        sb.append(", username='").append(login).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append(", telephone='").append(telephone).append('\'');
         sb.append(", birthdate=").append(birthdate);

@@ -23,13 +23,12 @@ public class UserServiceTest {
         final User user = new User();
         user.setFirstName("John");
         user.setLastName("Doe");
-        user.setUsername("john");
+        user.setLogin("john@gmail.com");
         user.setPassword("qwerty");
-        user.setEmail("john@gmail.com");
         user.setTelephone("0954624456");
         user.setBirthdate(LocalDate.now());
         user.setGender(1);
-        userService.add(user);
+        userService.create(user);
         Assert.assertEquals(user, userService.get(1l));
     }
 }

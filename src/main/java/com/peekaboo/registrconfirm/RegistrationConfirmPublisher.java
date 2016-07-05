@@ -16,7 +16,7 @@ public class RegistrationConfirmPublisher implements ApplicationEventPublisherAw
         this.eventPublisher = applicationEventPublisher;
     }
 
-    public void publishEvent(RegistrationConfirmEvent event) {
+    public void publishEvent(ConfirmEvent event) {
         eventPublisher.publishEvent(event);
     }
 }

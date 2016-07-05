@@ -2,10 +2,9 @@ package com.peekaboo.model.service.impl;
 
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.repository.UserRepository;
+import com.peekaboo.model.repository.VerificationTokenRepository;
 import com.peekaboo.model.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,12 +14,8 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-
-    @Transactional
-    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
-
-        return null;
-    }
+    @Autowired
+    private VerificationTokenRepository verificationTokenRepository;
 
     @Override
     @Transactional
@@ -47,8 +42,19 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User findByUsername(String username) {
         return userRepository.findByUsername(username);
+    }
+
+    @Transactional
+    public boolean emailExist(String email) {
+        return userRepository.findByUsername(email) != null;
+    }
+
+    @Transactional
+    public User findByToken(String token) {
+        return verificationTokenRepository.findByToken(token).getUser();
     }
 
     public UserRepository getUserRepository() {

@@ -9,8 +9,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Entity
@@ -35,9 +33,6 @@ public class User implements UserDetails {
     @Column(nullable = false)
     private String password;
 
-    @Column(unique = true, nullable = false)
-    private String email;
-
     @Column
     private String telephone;
 
@@ -52,16 +47,18 @@ public class User implements UserDetails {
     @Column
     private int gender;
 
+    @Column
+    private boolean enabled;
+
     public User() {
     }
 
     public User(String firstName, String lastName, String username, String password,
-                String email, String telephone, LocalDate birthdate, int roles, int gender) {
+                String telephone, LocalDate birthdate, int roles, int gender) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.username = username;
         this.password = password;
-        this.email = email;
         this.telephone = telephone;
         this.birthdate = birthdate;
         this.roles = roles;
@@ -70,11 +67,10 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> authorities =  Arrays.stream(UserRole.values())
+        return Arrays.stream(UserRole.values())
                 .filter(this::hasRole)
                 .map(userRole -> new SimpleGrantedAuthority(userRole.toString()))
                 .collect(Collectors.toList());
-        return authorities;
     }
 
     @Override
@@ -147,14 +143,6 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
     public String getTelephone() {
         return telephone;
     }
@@ -202,7 +190,6 @@ public class User implements UserDetails {
         result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
         result = 31 * result + username.hashCode();
         result = 31 * result + password.hashCode();
-        result = 31 * result + email.hashCode();
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
         result = 31 * result + (birthdate != null ? birthdate.hashCode() : 0);
         result = 31 * result + roles;
@@ -212,18 +199,17 @@ public class User implements UserDetails {
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + id +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                ", email='" + email + '\'' +
-                ", telephone='" + telephone + '\'' +
-                ", birthdate=" + birthdate +
-                ", roles=" + roles +
-                ", gender=" + gender +
-                '}';
+        final StringBuilder sb = new StringBuilder("User{");
+        sb.append("id='").append(id).append('\'');
+        sb.append(", firstName='").append(firstName).append('\'');
+        sb.append(", lastName='").append(lastName).append('\'');
+        sb.append(", username='").append(username).append('\'');
+        sb.append(", password='").append(password).append('\'');
+        sb.append(", telephone='").append(telephone).append('\'');
+        sb.append(", birthdate=").append(birthdate);
+        sb.append(", roles=").append(roles);
+        sb.append(", gender=").append(gender);
+        sb.append('}');
+        return sb.toString();
     }
-
 }

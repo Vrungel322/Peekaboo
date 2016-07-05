@@ -1,5 +1,6 @@
 package com.peekaboo.controller.helper;
 
+import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 
@@ -10,20 +11,20 @@ public class SigninRequestEntity {
 
     @NotNull
     @NotEmpty
-    @Length(min = 6, max = 25)
-    private String username;
+    @Email
+    private String email;
 
     @NotNull
-    @Pattern(regexp = "[\\d|\\w|_]+")
+    @Pattern(regexp = "[\\d\\w_]+")
     @Length(min = 6)
     private String password;
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {

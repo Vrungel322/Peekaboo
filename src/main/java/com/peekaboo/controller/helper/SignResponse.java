@@ -8,8 +8,6 @@ public class SignResponse {
     private String username;
     private int role;
 
-
-
     public String getId() {
         return id;
     }
@@ -36,5 +34,4 @@ public class SignResponse {
         this.role = role;
         return this;
     }
-
 }

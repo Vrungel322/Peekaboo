@@ -15,13 +15,8 @@ public class SignupRequestEntity {
     private String email;
 
     @NotNull
-    @NotEmpty
-    @Length(min = 6, max = 25)
-    private String username;
-
-    @NotNull
     @Length(min = 6)
-    @Pattern(regexp = "[\\d|\\w|_]+")
+    @Pattern(regexp = "[\\d\\w_]+")
     private String password;
 
     public String getEmail() {
@@ -30,14 +25,6 @@ public class SignupRequestEntity {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public String getPassword() {

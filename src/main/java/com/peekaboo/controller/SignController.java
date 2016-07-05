@@ -30,7 +30,7 @@ public class SignController {
     private JwtUtil jwtUtil;
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
-    public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) throws Exception{
+    public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) throws Exception {
 
         logger.debug("Got SIGN IN request");
         if (errors.hasErrors()) {
@@ -39,7 +39,7 @@ public class SignController {
             return new ResponseEntity(errors.getAllErrors().toArray(), HttpStatus.BAD_REQUEST);
         }
 
-        User user = userService.findByUsername(requestEntity.getUsername());
+        User user = userService.findByUsername(requestEntity.getEmail());
         if (user == null || !user.getPassword().equals(requestEntity.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             throw new SignException();
@@ -65,8 +65,7 @@ public class SignController {
 
         //todo: check uniqueness
         User newUser = new User();
-        newUser.setUsername(requestEntity.getUsername());
-        newUser.setEmail(requestEntity.getEmail());
+        newUser.setUsername(requestEntity.getEmail());
         newUser.setPassword(requestEntity.getPassword());
         newUser.addRole(UserRole.USER);
         newUser = userService.add(newUser);

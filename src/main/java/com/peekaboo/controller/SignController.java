@@ -11,13 +11,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@SuppressWarnings("unchecked")
 @RestController
 public class SignController {
 
@@ -29,21 +33,29 @@ public class SignController {
     @Autowired
     private JwtUtil jwtUtil;
 
+
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) throws Exception{
 
         logger.debug("Got SIGN IN request");
         if (errors.hasErrors()) {
             logErrors(errors);
-            //todo: return errors in different way
-            return new ResponseEntity(errors.getAllErrors().toArray(), HttpStatus.BAD_REQUEST);
+
+            return new ResponseEntity(
+                    transformErrors(errors.getAllErrors()),
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
         User user = userService.findByUsername(requestEntity.getUsername());
         if (user == null || !user.getPassword().equals(requestEntity.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
-            throw new SignException();
+            return new ResponseEntity(
+                    new ErrorResponse(ErrorType.WRONG_LOGIN_OR_PASSWORD, "User entered wrong login or password"),
+                    HttpStatus.NOT_FOUND
+            );
         }
+
         logger.debug("User were successfully authorized");
         SignResponse response = new SignResponse();
         response.setId(user.getId())
@@ -55,12 +67,16 @@ public class SignController {
         return new ResponseEntity(token, HttpStatus.OK);
     }
 
+    //todo: after Roma's commit handle errors
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public ResponseEntity signup(@Valid SignupRequestEntity requestEntity, Errors errors) {
         logger.debug("Got SIGN UP request");
         if (errors.hasErrors()) {
             logErrors(errors);
-            return new ResponseEntity(errors.getAllErrors().toArray(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity(
+                    transformErrors(errors.getAllErrors()),
+                    HttpStatus.BAD_REQUEST
+            );
         }
 
         //todo: check uniqueness
@@ -82,19 +98,22 @@ public class SignController {
         return new ResponseEntity(token, HttpStatus.OK);
     }
 
-    @ExceptionHandler({SignException.class})
-    public ResponseEntity<ErrorResponse> exceptionHandler() {
-        logger.debug("Got exception. Sending error to client");
-        return new ResponseEntity<>(
-                new ErrorResponse("SignError", "Error were caused while loggining into the server"),
-                HttpStatus.BAD_REQUEST);
-    }
-
     private void logErrors(Errors errors) {
         logger.info("User has entered invalid data.");
         errors.getAllErrors().forEach(objectError -> {
             logger.debug(objectError.getObjectName() + " : " + objectError.getDefaultMessage());
         });
+    }
+
+    private List<ErrorResponse> transformErrors (List<ObjectError> errors) {
+        return errors.stream()
+                .map(objectError ->
+                        new ErrorResponse(
+                                ErrorType.AUTHENTICATION_ERROR,
+                                objectError.getDefaultMessage()
+                        )
+                )
+                .collect(Collectors.toList());
     }
 
 }

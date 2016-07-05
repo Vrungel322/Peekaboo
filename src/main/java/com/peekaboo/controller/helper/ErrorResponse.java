@@ -2,19 +2,19 @@ package com.peekaboo.controller.helper;
 
 public class ErrorResponse {
 
-    private String type;
+    private ErrorType type;
     private String message;
 
-    public ErrorResponse(String type, String message) {
+    public ErrorResponse(ErrorType type, String message) {
         this.type = type;
         this.message = message;
     }
 
-    public String getType() {
+    public ErrorType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ErrorType type) {
         this.type = type;
     }
 

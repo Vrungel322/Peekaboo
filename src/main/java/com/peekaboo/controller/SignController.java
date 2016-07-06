@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +22,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @RestController
+@RequestMapping("/api")
 public class SignController {
 
     private final Logger logger = LogManager.getLogger(SignController.class);
@@ -64,7 +64,7 @@ public class SignController {
 
         String token = jwtUtil.generateToken(response);
 
-        return new ResponseEntity(token, HttpStatus.OK);
+        return new ResponseEntity(new Token(token), HttpStatus.OK);
     }
 
     //todo: after Roma's commit handle errors
@@ -94,8 +94,9 @@ public class SignController {
 
         logger.debug("User were successfully created");
         String token = jwtUtil.generateToken(response);
+        logger.debug("Token was generated");
 
-        return new ResponseEntity(token, HttpStatus.OK);
+        return new ResponseEntity(new Token(token), HttpStatus.OK);
     }
 
     private void logErrors(Errors errors) {
@@ -114,6 +115,18 @@ public class SignController {
                         )
                 )
                 .collect(Collectors.toList());
+    }
+
+    private class Token {
+        private String token;
+
+        public Token(String token) {
+            this.token = token;
+        }
+
+        public String getToken() {
+            return token;
+        }
     }
 
 }

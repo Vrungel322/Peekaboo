@@ -1,6 +1,6 @@
-package com.peekaboo.registrconfirm.phone;
+package com.peekaboo.confirmation.phone;
 
-import com.peekaboo.registrconfirm.ConfirmSender;
+import com.peekaboo.confirmation.ConfirmSender;
 import org.springframework.stereotype.Service;
 
 @Service

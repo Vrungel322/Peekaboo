@@ -1,4 +1,4 @@
-package com.peekaboo.registrconfirm;
+package com.peekaboo.confirmation;
 
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;

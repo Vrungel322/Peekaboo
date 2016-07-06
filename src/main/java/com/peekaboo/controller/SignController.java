@@ -1,12 +1,12 @@
 package com.peekaboo.controller;
 
-import com.peekaboo.controller.helper.*;
+import com.peekaboo.confirmation.RegistrationConfirmService;
+import com.peekaboo.controller.utils.*;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.UserRole;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
 import com.peekaboo.model.service.VerificationTokenService;
-import com.peekaboo.registrconfirm.RegistrationConfirmService;
 import com.peekaboo.security.jwt.JwtUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,7 +45,7 @@ public class SignController {
 
     //todo: use BCrypt for password encrypting
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
-    public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) throws Exception {
+    public ResponseEntity signin(@Valid @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
         logger.debug("Got SIGN IN request");
         if (errors.hasErrors()) {
             logErrors(errors);
@@ -71,7 +72,7 @@ public class SignController {
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public ResponseEntity signup(@Valid SignupRequestEntity requestEntity, Errors errors) {
+    public ResponseEntity signup(@Valid @RequestBody SignupRequestEntity requestEntity, Errors errors) {
         logger.debug("Got SIGN UP request");
         if (errors.hasErrors()) {
             logErrors(errors);
@@ -110,7 +111,7 @@ public class SignController {
     private void logErrors(Errors errors) {
         logger.info("User has entered invalid data.");
         errors.getAllErrors().forEach(objectError -> {
-            logger.debug(objectError.getObjectName() + " : " + objectError.getDefaultMessage());
+            logger.debug(objectError.toString());
         });
     }
 

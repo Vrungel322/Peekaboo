@@ -1,4 +1,4 @@
-package com.peekaboo.controller.helper;
+package com.peekaboo.controller.utils;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
@@ -6,16 +6,15 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
-public class SignupRequestEntity {
+public class SigninRequestEntity {
 
     @NotNull
     @NotEmpty
-    //TODO: pattern
     private String login;
 
     @NotNull
-    @Length(min = 6)
     @Pattern(regexp = "[\\d\\w_]+")
+    @Length(min = 6)
     private String password;
 
     public String getLogin() {

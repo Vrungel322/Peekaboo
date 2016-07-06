@@ -1,9 +1,9 @@
-package com.peekaboo.registrconfirm;
+package com.peekaboo.confirmation;
 
+import com.peekaboo.confirmation.mail.MailService;
+import com.peekaboo.confirmation.phone.PhoneService;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
-import com.peekaboo.registrconfirm.mail.MailService;
-import com.peekaboo.registrconfirm.phone.PhoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

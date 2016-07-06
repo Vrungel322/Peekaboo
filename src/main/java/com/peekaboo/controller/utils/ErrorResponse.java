@@ -1,4 +1,4 @@
-package com.peekaboo.controller.helper;
+package com.peekaboo.controller.utils;
 
 public class ErrorResponse {
 

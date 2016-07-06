@@ -1,4 +1,4 @@
-package com.peekaboo.registrconfirm;
+package com.peekaboo.confirmation;
 
 public interface ConfirmSender {
 

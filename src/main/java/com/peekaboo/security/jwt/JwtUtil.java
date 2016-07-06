@@ -1,7 +1,7 @@
 package com.peekaboo.security.jwt;
 
 
-import com.peekaboo.controller.helper.SignResponse;
+import com.peekaboo.controller.utils.SignResponse;
 import com.peekaboo.model.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

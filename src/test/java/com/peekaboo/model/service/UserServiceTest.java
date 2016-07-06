@@ -29,10 +29,8 @@ public class UserServiceTest {
         user.setBirthdate(LocalDate.now());
         user.setGender(1);
         userService.create(user);
-<<<<<<< HEAD
-        Assert.assertEquals(user, userService.get(""));
-=======
+
         Assert.assertEquals(user, userService.get("asdf"));
->>>>>>> 84fdfd0608c4b33370b66bcff906ddb4bbb8d689
+
     }
 }

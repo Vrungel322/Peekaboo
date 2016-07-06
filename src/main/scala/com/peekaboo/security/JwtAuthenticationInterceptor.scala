@@ -20,7 +20,16 @@ class JwtAuthenticationInterceptor extends AuthenticationInterceptor{
 		logger.debug("Headers:" + headersContent)
 		val header = if (headersContent.size > 0) headersContent.get(0) else ""
 		logger.debug(header)
-		val tokenHeader = new JwtAuthenticationToken(header)
+
+		var authToken: String = ""
+		if (!header.startsWith("Bearer ")) {
+			logger.debug("No relevant headers were found")
+		}
+		else {
+			authToken = header.substring(7)
+		}
+
+		val tokenHeader = new JwtAuthenticationToken(authToken)
 		authenticationProvider.authenticate(tokenHeader)
 	}
 }

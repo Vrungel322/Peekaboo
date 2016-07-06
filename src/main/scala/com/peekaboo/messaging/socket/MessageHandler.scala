@@ -3,7 +3,8 @@ package com.peekaboo.messaging.socket
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.peekaboo.controller.helper.ErrorType
+import com.peekaboo.controller.utils.ErrorType
+import com.peekaboo.model.entity.User
 import com.peekaboo.security.AuthenticationInterceptor
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,7 +36,8 @@ class MessageHandler extends WebSocketHandler{
 		logger.debug("Received new connection request.")
 		logger.debug("Attempting to authenticate it")
 		val authentication = authenticationInterceptor.authenticate(session.getHandshakeHeaders)
-		if (!authentication.getAuthorities.asScala.exists(_.getAuthority == "ROLE_USER")) {
+
+		if (!authentication.getAuthorities.asScala.exists(_.getAuthority == "USER")) {
 			logger.debug("User don't have permissions to connect to websocket")
 //			session.sendMessage(
 //				new TextMessage(
@@ -44,11 +46,12 @@ class MessageHandler extends WebSocketHandler{
 //					)
 //				)
 //			)
-			session.close(new CloseStatus(ErrorType.AUTHENTICATION_ERROR.getType, "Authentication error. You are not permitted to connect"))
+			session.close(new CloseStatus(CloseStatus.TLS_HANDSHAKE_FAILURE.getCode, "Authentication error. You are not permitted to connect"))
 		}
-		val id = getId(session.getHandshakeHeaders)
+		val user = authentication.getPrincipal.asInstanceOf[User]
+
 		val actor = new Actor(session)
-		actorPool.addActor(id, actor)
+		actorPool.addActor(user.getId, actor)
 
 	}
 
@@ -60,6 +63,8 @@ class MessageHandler extends WebSocketHandler{
 
 	override def handleMessage(session: WebSocketSession, message: WebSocketMessage[_]): Unit = {
 		logger.info(message.getPayload)
+
+
 		session.sendMessage(new TextMessage("Hello"))
 	}
 

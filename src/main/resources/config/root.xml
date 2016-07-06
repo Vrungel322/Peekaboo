@@ -11,6 +11,8 @@
 
     <import resource="mail.xml"/>
 
+    <import resource="messaging.xml"/>
+
     <bean id="propertiesConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
         <property name="locations">
             <list>

@@ -11,20 +11,19 @@ public class SigninRequestEntity {
 
     @NotNull
     @NotEmpty
-    @Email
-    private String email;
+    private String login;
 
     @NotNull
     @Pattern(regexp = "[\\d\\w_]+")
     @Length(min = 6)
     private String password;
 
-    public String getEmail() {
-        return email;
+    public String getLogin() {
+        return login;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setLogin(String login) {
+        this.login = login;
     }
 
     public String getPassword() {

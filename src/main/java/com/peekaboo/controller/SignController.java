@@ -8,6 +8,7 @@ import com.peekaboo.model.service.UserService;
 import com.peekaboo.model.service.VerificationTokenService;
 import com.peekaboo.registrconfirm.ConfirmEvent;
 import com.peekaboo.registrconfirm.RegistrationConfirmPublisher;
+import com.peekaboo.registrconfirm.RegistrationConfirmService;
 import com.peekaboo.registrconfirm.mail.MailService;
 import com.peekaboo.security.jwt.JwtUtil;
 import org.apache.logging.log4j.LogManager;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @RestController
+@RequestMapping("/")
 public class SignController {
 
     private final Logger logger = LogManager.getLogger(SignController.class);
@@ -38,15 +40,13 @@ public class SignController {
     private VerificationTokenService tokenService;
 
     @Autowired
-    private RegistrationConfirmPublisher registrationPublisher;
-
-    @Autowired
-    private MailService mailService;
+    private RegistrationConfirmService registrationConfirmService;
 
     @Autowired
     private JwtUtil jwtUtil;
 
 
+    //todo: use BCrypt for password encrypting
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) throws Exception {
         logger.debug("Got SIGN IN request");
@@ -58,7 +58,7 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
-        User user = userService.findByLogin(requestEntity.getEmail());
+        User user = userService.findByLogin(requestEntity.getLogin());
         if (user == null || !user.getPassword().equals(requestEntity.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             return new ResponseEntity(
@@ -73,10 +73,10 @@ public class SignController {
                 .setRole(user.getRoles());
         String token = jwtUtil.generateToken(response);
 
-        return new ResponseEntity(token, HttpStatus.OK);
+        return new ResponseEntity(new SigninResponse(user.getId(), token), HttpStatus.OK);
     }
 
-    //todo: after Roma's commit handle errors
+
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public ResponseEntity signup(@Valid SignupRequestEntity requestEntity, Errors errors) {
         logger.debug("Got SIGN UP request");
@@ -87,7 +87,7 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
-        //todo: check uniqueness
+
         User user = userService.findByLogin(requestEntity.getLogin());
         if (user != null && user.isEnabled()) {
             logger.debug("User already exists. Sending BAD_REQUEST status");
@@ -96,31 +96,27 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         } else {
-            if (!user.isEnabled()) {
-                tokenService.deleteByValue(tokenService.findByUser(user).getValue());
-            } else {
+            if (user == null) {
                 user = new User();
                 user.setLogin(requestEntity.getLogin());
                 user.setPassword(requestEntity.getPassword());
                 user.addRole(UserRole.USER);
                 user = userService.create(user);
+            } else {
+                tokenService.deleteByValue(tokenService.findByUser(user).getValue());
             }
             //TODO: generate token ('test')!
             VerificationToken verToken = tokenService.create(new VerificationToken("test", user));
-            //TODO: choose way of sending by login
-            registrationPublisher.publishEvent(new ConfirmEvent(this, user, verToken, mailService));
+            registrationConfirmService.confirm(user, verToken);
         }
 
-        SignResponse response = new SignResponse();
-        response.setId(user.getId())
-                .setUsername(user.getUsername())
-                .setRole(user.getRoles());
+        SignupResponse response = new SignupResponse(user.getId());
 
-        //TODO: delete token from sign up
+
         logger.debug("User were successfully created");
-        String token = jwtUtil.generateToken(response);
 
-        return new ResponseEntity(token, HttpStatus.OK);
+
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     private void logErrors(Errors errors) {
@@ -139,5 +135,35 @@ public class SignController {
                         )
                 )
                 .collect(Collectors.toList());
+    }
+
+    private class SigninResponse {
+        private String id;
+        private String token;
+
+        public SigninResponse(String id, String token) {
+            this.token = token;
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public String getToken() {
+            return token;
+        }
+    }
+
+    private class SignupResponse {
+        private String id;
+
+        public SignupResponse(String id) {
+            this.id = id;
+        }
+
+        public String getId() {
+            return id;
+        }
     }
 }

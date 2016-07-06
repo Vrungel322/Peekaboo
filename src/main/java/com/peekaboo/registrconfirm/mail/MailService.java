@@ -29,16 +29,22 @@ public class MailService implements ConfirmSender {
 
     public void send(SimpleMailMessage mailMessage) {
         logger.debug("Start send message");
-        try {
-            mailSender.send(mailMessage);
-        } catch (MailSendException e) {
-            logger.warn("Cannot send message, retry after 100 ms");
+        boolean toSend = false;
+        int numberOfSend = 5;
+        int i = 0;
+        while (i < numberOfSend && !toSend) {
             try {
-                Thread.sleep(100);
-            } catch (InterruptedException e1) {
-                e1.printStackTrace();
+                mailSender.send(mailMessage);
+                toSend = true;
+            } catch (MailSendException e) {
+                logger.warn("Cannot send message, retry after 100 ms");
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
             }
-            send(mailMessage);
+            i++;
         }
     }
 }

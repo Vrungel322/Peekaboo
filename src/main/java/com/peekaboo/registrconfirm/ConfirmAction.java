@@ -6,17 +6,20 @@ import org.springframework.context.ApplicationEvent;
 
 import java.util.Locale;
 
-public class ConfirmEvent extends ApplicationEvent {
+public class ConfirmAction extends Thread {
     private final User user;
     private final VerificationToken verificationToken;
     private final ConfirmSender confirmSender;
 
-    public ConfirmEvent(Object source, User user, VerificationToken verificationToken,
-                        ConfirmSender confirmSender) {
-        super(source);
+    public ConfirmAction(User user, VerificationToken token, ConfirmSender sender) {
         this.user = user;
-        this.verificationToken = verificationToken;
-        this.confirmSender = confirmSender;
+        this.verificationToken = token;
+        this.confirmSender = sender;
+    }
+
+    @Override
+    public void run() {
+        confirmSender.send(user.getUsername(), verificationToken.getValue());
     }
 
     public User getUser() {
@@ -25,9 +28,5 @@ public class ConfirmEvent extends ApplicationEvent {
 
     public VerificationToken getVerificationToken() {
         return verificationToken;
-    }
-
-    public ConfirmSender getConfirmSender() {
-        return confirmSender;
     }
 }

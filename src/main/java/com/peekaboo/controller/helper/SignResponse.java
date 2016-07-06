@@ -1,7 +1,5 @@
 package com.peekaboo.controller.helper;
 
-import org.springframework.beans.factory.annotation.Value;
-
 public class SignResponse {
 
     private String id;

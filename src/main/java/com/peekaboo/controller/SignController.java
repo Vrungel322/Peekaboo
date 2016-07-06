@@ -6,10 +6,7 @@ import com.peekaboo.model.entity.UserRole;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
 import com.peekaboo.model.service.VerificationTokenService;
-import com.peekaboo.registrconfirm.ConfirmEvent;
-import com.peekaboo.registrconfirm.RegistrationConfirmPublisher;
 import com.peekaboo.registrconfirm.RegistrationConfirmService;
-import com.peekaboo.registrconfirm.mail.MailService;
 import com.peekaboo.security.jwt.JwtUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,14 +42,12 @@ public class SignController {
     @Autowired
     private JwtUtil jwtUtil;
 
-
     //todo: use BCrypt for password encrypting
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin(@Valid SigninRequestEntity requestEntity, Errors errors) throws Exception {
         logger.debug("Got SIGN IN request");
         if (errors.hasErrors()) {
             logErrors(errors);
-
             return new ResponseEntity(
                     transformErrors(errors.getAllErrors()),
                     HttpStatus.BAD_REQUEST
@@ -72,10 +67,8 @@ public class SignController {
                 .setUsername(user.getUsername())
                 .setRole(user.getRoles());
         String token = jwtUtil.generateToken(response);
-
         return new ResponseEntity(new SigninResponse(user.getId(), token), HttpStatus.OK);
     }
-
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public ResponseEntity signup(@Valid SignupRequestEntity requestEntity, Errors errors) {
@@ -87,7 +80,6 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
-
         User user = userService.findByLogin(requestEntity.getLogin());
         if (user != null && user.isEnabled()) {
             logger.debug("User already exists. Sending BAD_REQUEST status");
@@ -105,17 +97,13 @@ public class SignController {
             } else {
                 tokenService.deleteByValue(tokenService.findByUser(user).getValue());
             }
-            //TODO: generate token ('test')!
-            VerificationToken verToken = tokenService.create(new VerificationToken("test", user));
+            VerificationToken verToken = registrationConfirmService.generateVerificationToken();
+            verToken.setUser(user);
+            verToken = tokenService.create(verToken);
             registrationConfirmService.confirm(user, verToken);
         }
-
         SignupResponse response = new SignupResponse(user.getId());
-
-
         logger.debug("User were successfully created");
-
-
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

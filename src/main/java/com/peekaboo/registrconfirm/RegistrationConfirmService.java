@@ -7,8 +7,11 @@ import com.peekaboo.registrconfirm.phone.PhoneService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.Random;
+
 @Component
 public class RegistrationConfirmService {
+    public final static int VERIFICATION_TOKEN_LENGTH = 4;
 
     @Autowired
     private MailService mailService;
@@ -24,5 +27,16 @@ public class RegistrationConfirmService {
             confirmAction = new ConfirmAction(user, token, phoneService);
         }
         confirmAction.start();
+    }
+
+    public VerificationToken generateVerificationToken() {
+        VerificationToken verificationToken = new VerificationToken();
+        Random random = new Random();
+        StringBuilder token = new StringBuilder();
+        for (int i = 0; i < VERIFICATION_TOKEN_LENGTH; i++) {
+            token.append(random.nextInt(10));
+        }
+        verificationToken.setValue(token.toString());
+        return verificationToken;
     }
 }

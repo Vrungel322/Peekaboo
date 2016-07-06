@@ -1,4 +1,4 @@
-package com.peekaboo.controller.helper;
+package com.peekaboo.controller.utils;
 
 public enum  ErrorType {
     AUTHENTICATION_ERROR(1), USER_EXIST(2), WRONG_LOGIN_OR_PASSWORD(3);

@@ -3,9 +3,9 @@ package com.peekaboo;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
-import com.peekaboo.registrconfirm.ConfirmEvent;
-import com.peekaboo.registrconfirm.RegistrationConfirmPublisher;
-import com.peekaboo.registrconfirm.mail.MailService;
+import com.peekaboo.confirmation.ConfirmEvent;
+import com.peekaboo.confirmation.RegistrationConfirmPublisher;
+import com.peekaboo.confirmation.mail.MailService;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 

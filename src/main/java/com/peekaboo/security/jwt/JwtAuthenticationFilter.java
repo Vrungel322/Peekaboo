@@ -22,11 +22,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
     }
 
     @Override
-    protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        return true;
-    }
-
-    @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException, ServletException {
         logger.debug("Attempting to authenticate");
         String header = request.getHeader("Authorization");
@@ -38,6 +33,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         } else {
             authToken = header.substring(7); //7 - is length of 'Bearer '
         }
+
 
         JwtAuthenticationToken authRequest = new JwtAuthenticationToken(authToken);
 

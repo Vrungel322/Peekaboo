@@ -1,6 +1,6 @@
-package com.peekaboo.registrconfirm.mail;
+package com.peekaboo.confirmation.mail;
 
-import com.peekaboo.registrconfirm.ConfirmSender;
+import com.peekaboo.confirmation.ConfirmSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

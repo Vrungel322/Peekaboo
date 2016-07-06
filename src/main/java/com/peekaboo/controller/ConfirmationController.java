@@ -41,7 +41,7 @@ public class ConfirmationController {
 
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     public ResponseEntity confirm(@RequestBody ConfirmationRequestEntity requestEntity, Errors errors) {
-        logger.debug("Got SIGN IN request");
+        logger.debug("Got CONFIRMATION request");
         if (errors.hasErrors()) {
             logErrors(errors);
             return new ResponseEntity(
@@ -52,7 +52,7 @@ public class ConfirmationController {
         VerificationToken key = tokenService.findByValue(requestEntity.getKey());
         if (key == null || !key.getUser().getId().equals(requestEntity.getId())) {
             return new ResponseEntity(
-                    new ErrorResponse(ErrorType.INVALID_CONFIRM_TOKEN, "User entered invalid token"),
+                    new ErrorResponse(ErrorType.INVALID_CONFIRM_TOKEN, "User entered invalid verification token"),
                     HttpStatus.BAD_REQUEST);
         } else {
             User user = userService.get(requestEntity.getId());

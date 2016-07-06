@@ -15,7 +15,7 @@
     <http pattern="/socket/send" security="none"/>
 
     <http entry-point-ref="restAuthenticationEntryPoint" create-session="stateless">
-        <intercept-url pattern="/**" requires-channel="http" access="permitAll"/>
+        <intercept-url pattern="/**" requires-channel="https" access="permitAll"/>
         <csrf disabled="true"/>
         <custom-filter before="FORM_LOGIN_FILTER" ref="jwtAuthenticationFilter"/>
     </http>

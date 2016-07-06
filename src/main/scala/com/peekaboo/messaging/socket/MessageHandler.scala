@@ -62,7 +62,7 @@ class MessageHandler extends WebSocketHandler{
 	}
 
 	override def handleMessage(session: WebSocketSession, message: WebSocketMessage[_]): Unit = {
-		logger.info(message.getPayload)
+		val headers = session.getHandshakeHeaders
 
 
 		session.sendMessage(new TextMessage("Hello"))

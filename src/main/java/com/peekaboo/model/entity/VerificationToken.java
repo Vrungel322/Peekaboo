@@ -15,7 +15,7 @@ public class VerificationToken {
     @Column(name = "verification_token_id")
     private String id;
 
-    @Column(unique = true)
+    @Column()
     private String value;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)

@@ -1,5 +1,5 @@
 
-package com.peekaboo.controller.utils;
+package com.peekaboo.controller.sign;
 
 
 public class SignResponse {

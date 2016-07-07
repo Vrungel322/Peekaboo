@@ -3,7 +3,7 @@ package com.peekaboo.messaging.socket
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.peekaboo.controller.utils.ErrorType
+import com.peekaboo.controller.sign.ErrorType
 import com.peekaboo.model.entity.User
 import com.peekaboo.security.AuthenticationInterceptor
 import org.apache.logging.log4j.LogManager

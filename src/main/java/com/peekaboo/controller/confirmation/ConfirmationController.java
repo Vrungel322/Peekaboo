@@ -1,8 +1,8 @@
-package com.peekaboo.controller;
+package com.peekaboo.controller.confirmation;
 
-import com.peekaboo.controller.utils.ErrorResponse;
-import com.peekaboo.controller.utils.ErrorType;
-import com.peekaboo.controller.utils.SignResponse;
+import com.peekaboo.controller.sign.ErrorResponse;
+import com.peekaboo.controller.sign.ErrorType;
+import com.peekaboo.controller.sign.SignResponse;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
@@ -13,19 +13,20 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Controller
-@RequestMapping("/registration")
+@RestController
+@SuppressWarnings("unchecked")
 public class ConfirmationController {
 
     private final Logger logger = LogManager.getLogger(ConfirmationController.class);
@@ -40,7 +41,7 @@ public class ConfirmationController {
     private VerificationTokenService tokenService;
 
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
-    public ResponseEntity confirm(@RequestBody ConfirmationRequestEntity requestEntity, Errors errors) {
+    public ResponseEntity confirm(@Valid @RequestBody ConfirmationRequestEntity requestEntity, Errors errors) {
         logger.debug("Got CONFIRMATION request");
         if (errors.hasErrors()) {
             logErrors(errors);
@@ -65,7 +66,8 @@ public class ConfirmationController {
                     .setRole(user.getRoles());
             return new ResponseEntity(
                     new ConfirmationResponse(jwtUtil.generateToken(response)),
-                    HttpStatus.OK);
+                    HttpStatus.OK
+            );
         }
     }
 
@@ -87,45 +89,5 @@ public class ConfirmationController {
                 .collect(Collectors.toList());
     }
 
-    private class ConfirmationRequestEntity {
-        @NotNull
-        private String id;
-
-        @NotNull
-        private String key;
-
-        public String getId() {
-            return id;
-        }
-
-        public void setId(String id) {
-            this.id = id;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public void setKey(String key) {
-            this.key = key;
-        }
-    }
-
-    private static class ConfirmationResponse {
-        @NotNull
-        private String token;
-
-        public ConfirmationResponse(String token) {
-            this.token = token;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public void setToken(String token) {
-            this.token = token;
-        }
-    }
 
 }

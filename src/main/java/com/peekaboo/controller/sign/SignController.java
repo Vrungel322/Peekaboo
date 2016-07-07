@@ -1,7 +1,6 @@
-package com.peekaboo.controller;
+package com.peekaboo.controller.sign;
 
 import com.peekaboo.confirmation.RegistrationConfirmService;
-import com.peekaboo.controller.utils.*;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.UserRole;
 import com.peekaboo.model.entity.VerificationToken;
@@ -97,6 +96,8 @@ public class SignController {
                 user = userService.create(user);
             } else {
                 tokenService.deleteByValue(tokenService.findByUser(user).getValue());
+                user.setPassword(requestEntity.getPassword());
+                userService.update(user);
             }
             VerificationToken verToken = registrationConfirmService.generateVerificationToken();
             verToken.setUser(user);

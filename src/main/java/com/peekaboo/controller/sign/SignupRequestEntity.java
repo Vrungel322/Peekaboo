@@ -1,4 +1,4 @@
-package com.peekaboo.controller.utils;
+package com.peekaboo.controller.sign;
 
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;

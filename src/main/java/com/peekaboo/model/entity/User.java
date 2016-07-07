@@ -177,6 +177,14 @@ public class User implements UserDetails {
         this.telephone = null;
     }
 
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
+    }
+
     public boolean hasLogin(String login) {
         if (login.contains("@")) {
             return login.equals(this.email);

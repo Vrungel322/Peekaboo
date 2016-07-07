@@ -140,6 +140,7 @@ public class SignController {
             } else {
                 user = new User();
                 user.setUsername(requestEntity.getUsername());
+                user.setDisplayName(user.getUsername());
                 user.setLogin(requestEntity.getLogin());
                 user.setPassword(password);
                 user.addRole(UserRole.USER);

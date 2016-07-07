@@ -67,9 +67,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(UserRole.values())
-                .filter(this::hasRole)
-                .map(userRole -> new SimpleGrantedAuthority(userRole.toString()))
+        return Arrays.stream(UserRole.values()) //iterate through all possible UserRoles
+                .filter(this::hasRole) //leave only those one, which belongs to user
+                .map(userRole -> new SimpleGrantedAuthority(userRole.toString())) //map them to authorities
                 .collect(Collectors.toList());
     }
 
@@ -103,8 +103,9 @@ public class User implements UserDetails {
         return enabled;
     }
 
+    //todo: make private?
     public boolean hasRole(UserRole userRole) {
-        return (this.roles & userRole.getId()) != 0;
+        return (this.roles & userRole.getId()) != 0; //apply bit map to check existence of role
     }
 
     public void addRole(UserRole userRole) {
@@ -162,6 +163,32 @@ public class User implements UserDetails {
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+    public void setLogin(String login) {
+        if (login.contains("@")) {
+            this.email = login;
+        } else {
+            this.telephone = login;
+        }
+    }
+
+    public void emptyLogin() {
+        this.email = null;
+        this.telephone = null;
+    }
+
+    public boolean hasLogin(String login) {
+        if (login.contains("@")) {
+            return login.equals(this.email);
+        } else {
+            return login.equals(this.telephone);
+        }
+    }
+
+    public String getLogin() {
+        return email == null ? telephone : email;
+    }
+
 
     @Override
     public boolean equals(Object obj) {

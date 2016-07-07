@@ -19,7 +19,7 @@ public class ConfirmAction extends Thread {
 
     @Override
     public void run() {
-        confirmSender.send(user.getUsername(), verificationToken.getValue());
+        confirmSender.send(user.getLogin(), verificationToken.getValue());
     }
 
     public User getUser() {

@@ -7,13 +7,15 @@ public interface UserService extends EntityService<User, String> {
 
     User findByUsername(String username);
 
-    boolean usernameExist(String username);
+    boolean loginExists(String login);
 
-    User findByConfirmToken(String token);
+//    User findByConfirmToken(String token);
 
-    User findByEmail(String email);
+//    User findByEmail(String email);
+//
+//    User findByTelephone(String telephone);
 
-    User findByTelephone(String telephone);
+    User findByLogin(String login);
 
-    boolean userExist(String login);
+//    boolean userExist(String login);
 }

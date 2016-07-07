@@ -21,8 +21,8 @@ public class UserServiceTest {
     @Test
     public void testAdd() {
         final User user = new User();
-        user.setFirstName("John");
-        user.setLastName("Doe");
+//        user.setFirstName("John");
+//        user.setLastName("Doe");
         user.setLogin("john@gmail.com");
         user.setPassword("qwerty");
         user.setTelephone("0954624456");

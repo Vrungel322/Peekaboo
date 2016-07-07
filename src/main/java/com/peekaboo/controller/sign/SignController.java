@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,7 +43,10 @@ public class SignController {
     @Autowired
     private JwtUtil jwtUtil;
 
-    //todo: use BCrypt for password encrypting
+    @Autowired
+    private BCryptPasswordEncoder encoder;
+
+
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin(@Valid @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
         logger.debug("Got SIGN IN request");
@@ -54,16 +58,18 @@ public class SignController {
             );
         }
         User user;
-        if (requestEntity.isEmail()) {
-            user = userService.findByEmail(requestEntity.getLogin());
+        if (!requestEntity.isEmail() && !requestEntity.isPhone()) {
+            user = userService.findByUsername(requestEntity.getLogin());
         } else {
-            if (requestEntity.isPhone()) {
-                user = userService.findByTelephone(requestEntity.getLogin());
-            } else {
-                user = userService.findByUsername(requestEntity.getLogin());
-            }
+            user = userService.findByLogin(requestEntity.getLogin());
         }
-        if (user == null || !user.getPassword().equals(requestEntity.getPassword())) {
+        String password = requestEntity.getPassword();
+
+
+        //todo: BIG QUESTION! should we allow to sign in unverified user???
+
+
+        if (user == null || !encoder.matches(password, user.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             return new ResponseEntity(
                     new ErrorResponse(ErrorType.WRONG_LOGIN_OR_PASSWORD, "User entered wrong login or password"),
@@ -82,6 +88,7 @@ public class SignController {
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
     public ResponseEntity signup(@Valid @RequestBody SignupRequestEntity requestEntity, Errors errors) {
         logger.debug("Got SIGN UP request");
+        logger.debug("Attempting to register new user");
         if (errors.hasErrors()) {
             logErrors(errors);
             return new ResponseEntity(
@@ -90,39 +97,60 @@ public class SignController {
             );
         }
         User user = userService.findByUsername(requestEntity.getUsername());
-        if(user == null) {
-            if(!userService.userExist(requestEntity.getLogin())){
-                user = new User();
-                user.setLogin(requestEntity.getLogin());
-                user.setPassword(requestEntity.getPassword());
-                user.addRole(UserRole.USER);
-                user = userService.create(user);
+        String password = encoder.encode(requestEntity.getPassword());
+        if (user != null) {
+            logger.debug("User has registered before");
+            logger.debug("Checking maybe he hasn't been verified yet");
+
+            if (user.isEnabled()) {
+                logger.debug("User has already been registered. Send him error");
+                return new ResponseEntity(
+                        new ErrorResponse(ErrorType.USER_EXIST, "Username is taken"),
+                        HttpStatus.CONFLICT
+                );
             }
-        }
-        user = userService.findByLogin(requestEntity.getLogin());
-        if (user != null && user.isEnabled()) {
-            logger.debug("User already exists. Sending BAD_REQUEST status");
-            return new ResponseEntity(
-                    new ErrorResponse(ErrorType.USER_EXIST, "User already exists"),
-                    HttpStatus.BAD_REQUEST
-            );
-        } else {
-            if (user == null) {
-                user = new User();
+
+            if (user.hasLogin(requestEntity.getLogin()) ||
+                    !userService.loginExists(requestEntity.getLogin())) {
+
+                logger.debug("User has entered unique login or login belongs to him. Updating user info");
+                user.emptyLogin();
                 user.setLogin(requestEntity.getLogin());
-                user.setPassword(requestEntity.getPassword());
-                user.addRole(UserRole.USER);
-                user = userService.create(user);
-            } else {
-                tokenService.deleteByValue(tokenService.findByUser(user).getValue());
-                user.setPassword(requestEntity.getPassword());
+                user.setPassword(password);
                 userService.update(user);
+
+                logger.debug("Removing old verification key");
+                tokenService.deleteByValue(tokenService.findByUser(user).getValue());
+
+            } else {
+                logger.debug("Login is taken");
+                return new ResponseEntity(
+                        new ErrorResponse(ErrorType.USER_EXIST, "Login is taken"),
+                        HttpStatus.CONFLICT
+                );
             }
-            VerificationToken verToken = registrationConfirmService.generateVerificationToken();
-            verToken.setUser(user);
-            verToken = tokenService.create(verToken);
-            registrationConfirmService.confirm(user, verToken);
+
+        } else {
+            if (userService.loginExists(requestEntity.getLogin())) {
+                logger.debug("Login is taken");
+                return new ResponseEntity(
+                        new ErrorResponse(ErrorType.USER_EXIST, "Login is taken"),
+                        HttpStatus.CONFLICT
+                );
+            } else {
+                user = new User();
+                user.setUsername(requestEntity.getUsername());
+                user.setLogin(requestEntity.getLogin());
+                user.setPassword(password);
+                user.addRole(UserRole.USER);
+                user = userService.create(user);
+            }
         }
+
+        VerificationToken verToken = registrationConfirmService.generateVerificationToken();
+        verToken.setUser(user);
+        verToken = tokenService.create(verToken);
+        registrationConfirmService.confirm(user, verToken);
         SignupResponse response = new SignupResponse(user.getId());
         logger.debug("User were successfully created");
         return new ResponseEntity(response, HttpStatus.OK);

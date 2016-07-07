@@ -21,7 +21,7 @@ public class RegistrationConfirmService {
 
     public void confirm(User user, VerificationToken token) {
         ConfirmAction confirmAction;
-        if (user.getUsername().contains("@")) {
+        if (user.getLogin().contains("@")) {
             confirmAction = new ConfirmAction(user, token, mailService);
         } else {
             confirmAction = new ConfirmAction(user, token, phoneService);

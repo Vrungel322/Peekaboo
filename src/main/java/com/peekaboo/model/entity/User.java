@@ -21,20 +21,20 @@ public class User implements UserDetails {
     @Column(name = "user_id")
     private String id;
 
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
-
     @Column(unique = true, nullable = false)
-    private String login;
+    private String username;
+
+    @Column
+    private String displayName;
 
     @Column(nullable = false)
     private String password;
 
-    @Column
+    @Column(unique = true)
     private String telephone;
+
+    @Column(unique = true)
+    private String email;
 
     @Column
     private LocalDate birthdate;
@@ -52,16 +52,17 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String firstName, String lastName, String login, String password,
-                String telephone, LocalDate birthdate, int roles, int gender) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.login = login;
+    public User(String username, String displayName, String password, String telephone,
+                String email, LocalDate birthdate, int roles, int gender, boolean enabled) {
+        this.username = username;
+        this.displayName = displayName;
         this.password = password;
         this.telephone = telephone;
+        this.email = email;
         this.birthdate = birthdate;
         this.roles = roles;
         this.gender = gender;
+        this.enabled = enabled;
     }
 
     @Override
@@ -79,7 +80,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return login;
+        return username;
     }
 
     @Override
@@ -118,24 +119,8 @@ public class User implements UserDetails {
         this.id = id;
     }
 
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public void setPassword(String password) {
@@ -183,20 +168,16 @@ public class User implements UserDetails {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         User user = (User) obj;
-        return this.login.equals(user.login);
+        if (username != null ? !username.equals(user.username) : user.username != null) return false;
+        if (telephone != null ? !telephone.equals(user.telephone) : user.telephone != null) return false;
+        return email != null ? email.equals(user.email) : user.email == null;
     }
 
     @Override
     public int hashCode() {
-        int result = id.hashCode();
-        result = 31 * result + (firstName != null ? firstName.hashCode() : 0);
-        result = 31 * result + (lastName != null ? lastName.hashCode() : 0);
-        result = 31 * result + login.hashCode();
-        result = 31 * result + password.hashCode();
+        int result = username != null ? username.hashCode() : 0;
         result = 31 * result + (telephone != null ? telephone.hashCode() : 0);
-        result = 31 * result + (birthdate != null ? birthdate.hashCode() : 0);
-        result = 31 * result + roles;
-        result = 31 * result + gender;
+        result = 31 * result + (email != null ? email.hashCode() : 0);
         return result;
     }
 
@@ -204,14 +185,15 @@ public class User implements UserDetails {
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
         sb.append("id='").append(id).append('\'');
-        sb.append(", firstName='").append(firstName).append('\'');
-        sb.append(", lastName='").append(lastName).append('\'');
-        sb.append(", username='").append(login).append('\'');
+        sb.append(", username='").append(username).append('\'');
+        sb.append(", displayName='").append(displayName).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append(", telephone='").append(telephone).append('\'');
+        sb.append(", email='").append(email).append('\'');
         sb.append(", birthdate=").append(birthdate);
         sb.append(", roles=").append(roles);
         sb.append(", gender=").append(gender);
+        sb.append(", enabled=").append(enabled);
         sb.append('}');
         return sb.toString();
     }

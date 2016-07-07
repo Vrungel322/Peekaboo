@@ -43,20 +43,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public User findByLogin(String login) {
-        return userRepository.findByLogin(login);
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     @Override
     @Transactional
-    public boolean loginExist(String login) {
-        return userRepository.findByLogin(login) != null;
+    public boolean usernameExist(String username) {
+        return userRepository.findByUsername(username) != null;
     }
 
     @Override
     @Transactional
     public User findByConfirmToken(String token) {
         return verificationTokenRepository.findByValue(token).getUser();
+    }
+
+    @Override
+    @Transactional
+    public User findByTelephone(String telephone) {
+        return userRepository.findByTelephone(telephone);
+    }
+
+    @Override
+    @Transactional
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public boolean userExist(String login) {
+        return userRepository.findByEmailOrTelephone(login, login) != null;
     }
 
     public UserRepository getUserRepository() {

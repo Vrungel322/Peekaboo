@@ -53,7 +53,16 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
-        User user = userService.findByLogin(requestEntity.getLogin());
+        User user;
+        if (requestEntity.isEmail()) {
+            user = userService.findByEmail(requestEntity.getLogin());
+        } else {
+            if (requestEntity.isPhone()) {
+                user = userService.findByTelephone(requestEntity.getLogin());
+            } else {
+                user = userService.findByUsername(requestEntity.getLogin());
+            }
+        }
         if (user == null || !user.getPassword().equals(requestEntity.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             return new ResponseEntity(
@@ -80,7 +89,17 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
-        User user = userService.findByLogin(requestEntity.getLogin());
+        User user = userService.findByUsername(requestEntity.getUsername());
+        if(user == null) {
+            if(!userService.userExist(requestEntity.getLogin())){
+                user = new User();
+                user.setLogin(requestEntity.getLogin());
+                user.setPassword(requestEntity.getPassword());
+                user.addRole(UserRole.USER);
+                user = userService.create(user);
+            }
+        }
+        user = userService.findByLogin(requestEntity.getLogin());
         if (user != null && user.isEnabled()) {
             logger.debug("User already exists. Sending BAD_REQUEST status");
             return new ResponseEntity(

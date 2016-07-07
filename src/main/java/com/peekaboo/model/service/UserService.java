@@ -5,9 +5,15 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 
 public interface UserService extends EntityService<User, String> {
 
-    User findByLogin(String username);
+    User findByUsername(String username);
 
-    boolean loginExist(String login);
+    boolean usernameExist(String username);
 
     User findByConfirmToken(String token);
+
+    User findByEmail(String email);
+
+    User findByTelephone(String telephone);
+
+    boolean userExist(String login);
 }

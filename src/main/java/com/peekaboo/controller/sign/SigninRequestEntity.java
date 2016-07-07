@@ -32,4 +32,12 @@ public class SigninRequestEntity {
     public void setPassword(String password) {
         this.password = password;
     }
+
+    public boolean isEmail() {
+        return login.contains("@");
+    }
+
+    public boolean isPhone() {
+        return !login.chars().anyMatch(Character::isAlphabetic);
+    }
 }

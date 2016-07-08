@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -73,20 +74,22 @@ public class ConfirmationController {
 
     private void logErrors(Errors errors) {
         logger.info("User has entered invalid data.");
-        errors.getAllErrors().forEach(objectError -> {
-            logger.debug(objectError.toString());
-        });
+        for(ObjectError error : errors.getAllErrors()) {
+            logger.debug(error.toString());
+        }
     }
 
     private List<ErrorResponse> transformErrors(List<ObjectError> errors) {
-        return errors.stream()
-                .map(objectError ->
-                        new ErrorResponse(
+        List<ErrorResponse> errorResponses = new ArrayList<>();
+        for(ObjectError error : errors) {
+            errorResponses.add(
+                    new ErrorResponse(
                                 ErrorType.AUTHENTICATION_ERROR,
-                                objectError.getDefaultMessage()
+                                error.getDefaultMessage()
                         )
-                )
-                .collect(Collectors.toList());
+            );
+        }
+        return errorResponses;
     }
 
 

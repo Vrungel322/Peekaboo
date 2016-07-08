@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class SignController {
     private UserService userService;
 
     @Autowired
-    private VerificationTokenService tokenService;
+    private VerificationTokenService verificationService;
 
     @Autowired
     private RegistrationConfirmService registrationConfirmService;
@@ -120,7 +121,7 @@ public class SignController {
                 userService.update(user);
 
                 logger.debug("Removing old verification key");
-                tokenService.deleteByValue(tokenService.findByUser(user).getValue());
+                verificationService.deleteByValue(verificationService.findByUser(user).getValue());
 
             } else {
                 logger.debug("Login is taken");
@@ -150,7 +151,7 @@ public class SignController {
 
         VerificationToken verToken = registrationConfirmService.generateVerificationToken();
         verToken.setUser(user);
-        verToken = tokenService.create(verToken);
+        verToken = verificationService.create(verToken);
         registrationConfirmService.confirm(user, verToken);
         SignupResponse response = new SignupResponse(user.getId());
         logger.debug("User were successfully created");
@@ -159,20 +160,33 @@ public class SignController {
 
     private void logErrors(Errors errors) {
         logger.info("User has entered invalid data.");
-        errors.getAllErrors().forEach(objectError -> {
-            logger.debug(objectError.toString());
-        });
+        for (ObjectError error : errors.getAllErrors()) {
+            logger.debug(error.toString());
+        }
+//        errors.getAllErrors().forEach(objectError -> {
+//            logger.debug(objectError.toString());
+//        });
     }
 
     private List<ErrorResponse> transformErrors(List<ObjectError> errors) {
-        return errors.stream()
-                .map(objectError ->
-                        new ErrorResponse(
-                                ErrorType.AUTHENTICATION_ERROR,
-                                objectError.getDefaultMessage()
-                        )
-                )
-                .collect(Collectors.toList());
+        List<ErrorResponse> errorResponses = new ArrayList<>();
+        for(ObjectError error : errors) {
+            errorResponses.add(
+                    new ErrorResponse(
+                            ErrorType.AUTHENTICATION_ERROR,
+                            error.getDefaultMessage()
+                    )
+            );
+        }
+        return errorResponses;
+//        return errors.stream()
+//                .map(objectError ->
+//                        new ErrorResponse(
+//                                ErrorType.AUTHENTICATION_ERROR,
+//                                objectError.getDefaultMessage()
+//                        )
+//                )
+//                .collect(Collectors.toList());
     }
 
     private class SigninResponse {

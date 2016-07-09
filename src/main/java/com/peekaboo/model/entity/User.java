@@ -6,12 +6,12 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+//import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
+//import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -38,8 +38,8 @@ public class User implements UserDetails {
     @Column(unique = true)
     private String email;
 
-    @Column
-    private LocalDate birthdate;
+//    @Column
+//    private LocalDate birthdate;
 
     @Column
     private int roles;
@@ -55,13 +55,13 @@ public class User implements UserDetails {
     }
 
     public User(String username, String displayName, String password, String telephone,
-                String email, LocalDate birthdate, int roles, int gender, boolean enabled) {
+                String email, /*LocalDate birthdate,*/ int roles, int gender, boolean enabled) {
         this.username = username;
         this.displayName = displayName;
         this.password = password;
         this.telephone = telephone;
         this.email = email;
-        this.birthdate = birthdate;
+//        this.birthdate = birthdate;
         this.roles = roles;
         this.gender = gender;
         this.enabled = enabled;
@@ -141,13 +141,13 @@ public class User implements UserDetails {
         this.telephone = telephone;
     }
 
-    public LocalDate getBirthdate() {
-        return birthdate;
-    }
-
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
-    }
+//    public LocalDate getBirthdate() {
+//        return birthdate;
+//    }
+//
+//    public void setBirthdate(LocalDate birthdate) {
+//        this.birthdate = birthdate;
+//    }
 
     public int getRoles() {
         return roles;
@@ -230,7 +230,7 @@ public class User implements UserDetails {
         sb.append(", password='").append(password).append('\'');
         sb.append(", telephone='").append(telephone).append('\'');
         sb.append(", email='").append(email).append('\'');
-        sb.append(", birthdate=").append(birthdate);
+//        sb.append(", birthdate=").append(birthdate);
         sb.append(", roles=").append(roles);
         sb.append(", gender=").append(gender);
         sb.append(", enabled=").append(enabled);

@@ -38,6 +38,13 @@ public class SigninRequestEntity {
     }
 
     public boolean isPhone() {
-        return !login.chars().anyMatch(Character::isAlphabetic);
+
+        for(char ch : login.toCharArray())
+            if (Character.isAlphabetic(ch))
+                return false;
+
+        return true;
+
+//        return !login.chars().anyMatch(Character::isAlphabetic);
     }
 }

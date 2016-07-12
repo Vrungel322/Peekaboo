@@ -47,7 +47,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
         if (parsedUser == null) {
             logger.debug("Error with retrieving user. Warn: authorization as anonymous user without any role");
             //todo: find better way
-            return new org.springframework.security.core.userdetails.User("anonymous", "anonymous", new ArrayList<>());
+            return new org.springframework.security.core.userdetails.User("anonymous", "anonymous", new ArrayList<GrantedAuthority>());
         }
 
         return parsedUser;

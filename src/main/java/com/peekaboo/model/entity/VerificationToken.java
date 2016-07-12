@@ -3,7 +3,7 @@ package com.peekaboo.model.entity;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+//import java.time.LocalDate;
 
 @Entity
 @Table(name = "verification_tokens")
@@ -22,8 +22,8 @@ public class VerificationToken {
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
-    @Column
-    private LocalDate expiryDate;
+//    @Column
+//    private LocalDate expiryDate;
 
     public VerificationToken() {
     }
@@ -57,13 +57,13 @@ public class VerificationToken {
         this.user = user;
     }
 
-    public LocalDate getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(LocalDate expiryDate) {
-        this.expiryDate = expiryDate;
-    }
+//    public LocalDate getExpiryDate() {
+//        return expiryDate;
+//    }
+//
+//    public void setExpiryDate(LocalDate expiryDate) {
+//        this.expiryDate = expiryDate;
+//    }
 
     @Override
     public boolean equals(Object obj) {
@@ -84,7 +84,7 @@ public class VerificationToken {
         sb.append("id='").append(id).append('\'');
         sb.append(", token='").append(value).append('\'');
         sb.append(", user=").append(user);
-        sb.append(", expiryDate=").append(expiryDate);
+//        sb.append(", expiryDate=").append(expiryDate);
         sb.append('}');
         return sb.toString();
     }

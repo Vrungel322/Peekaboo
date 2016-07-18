@@ -2,13 +2,11 @@ package com.peekaboo.messaging.socket
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.peekaboo.controller.sign.ErrorType
 import com.peekaboo.model.entity.User
 import com.peekaboo.security.AuthenticationInterceptor
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.socket._
 
 import scala.collection.JavaConverters._
@@ -52,7 +50,6 @@ class MessageHandler extends WebSocketHandler {
 
     val actor = new MessageActor(session)
     actorPool.addActor(user.getId, actor)
-
   }
 
 
@@ -65,7 +62,7 @@ class MessageHandler extends WebSocketHandler {
     val receiver = headers.getFirst("RECEIVER")
     val sender = headers.getFirst("SENDER")
     val msg = message match {
-      case TextMessage => TextMessage(message.getPayload.toString, receiver, sender)
+      case TextMessage => Text(message.getPayload.toString, receiver, sender)
 
     }
 

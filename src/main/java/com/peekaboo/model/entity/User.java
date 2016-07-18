@@ -235,36 +235,4 @@ public class User implements UserDetails {
         sb.append('}');
         return sb.toString();
     }
-
-    public static void main(String[] args) {
-        LinkedList<J> list = new LinkedList<J>() {{
-            add(new J());
-            add(new J());
-            add(new J());
-            add(new J());
-            add(new J());
-            add(new J());
-        }};
-        System.out.println(list);
-        for (J j : list) {
-            j.setA(j.hashCode());
-        }
-        System.out.println(list);
-    }
-
-    private static class J {
-        private Integer a = 4;
-
-        public J() {
-        }
-
-        public void setA(Integer a) {
-            this.a = a;
-        }
-
-        @Override
-        public String toString() {
-            return "" + a;
-        }
-    }
 }

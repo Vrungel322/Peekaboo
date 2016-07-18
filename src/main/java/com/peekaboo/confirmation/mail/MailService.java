@@ -30,7 +30,7 @@ public class MailService implements ConfirmSender {
     public void send(SimpleMailMessage mailMessage) {
         logger.debug("Start send message");
         boolean toSend = false;
-        int numberOfSend = 5;
+        final int numberOfSend = 5;
         int i = 0;
         while (i < numberOfSend && !toSend) {
             try {

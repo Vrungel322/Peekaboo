@@ -1,5 +1,6 @@
 package com.peekaboo.messaging.socket
 
+
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.peekaboo.controller.sign.ErrorType
 import com.peekaboo.model.entity.User
@@ -7,6 +8,7 @@ import com.peekaboo.security.AuthenticationInterceptor
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
+import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.socket._
 
 import scala.collection.JavaConverters._
@@ -15,9 +17,9 @@ class MessageHandler extends WebSocketHandler {
 
   private val logger = LogManager.getLogger(MessageHandler.getClass)
 
-  private var authenticationInterceptor: AuthenticationInterceptor = null
+  private var authenticationInterceptor: AuthenticationInterceptor = _
 
-  private var actorPool: ActorPool = null
+  private var actorPool: ActorPool = _
 
   @Autowired
   def setAuthenticationInterceptor(interceptor: AuthenticationInterceptor) = this.authenticationInterceptor = interceptor
@@ -46,11 +48,13 @@ class MessageHandler extends WebSocketHandler {
       //			)
       session.close(new CloseStatus(CloseStatus.TLS_HANDSHAKE_FAILURE.getCode, "Authentication error. You are not permitted to connect"))
     }
-    val user = authentication.getPrincipal.asInstanceOf[User]
+    val user = authentication.getCredentials.asInstanceOf[User]
 
-    val actor = new Actor(session)
+    val actor = new MessageActor(session)
     actorPool.addActor(user.getId, actor)
+
   }
+
 
   override def handleTransportError(webSocketSession: WebSocketSession, throwable: Throwable): Unit = {
 
@@ -58,7 +62,15 @@ class MessageHandler extends WebSocketHandler {
 
   override def handleMessage(session: WebSocketSession, message: WebSocketMessage[_]): Unit = {
     val headers = session.getHandshakeHeaders
-    session.sendMessage(new TextMessage("Hello"))
+    val receiver = headers.getFirst("RECEIVER")
+    val sender = headers.getFirst("SENDER")
+    val msg = message match {
+      case TextMessage => TextMessage(message.getPayload.toString, receiver, sender)
+
+    }
+
+    val actor = actorPool.findActor(receiver)
+    actor ! msg
   }
 
   override def supportsPartialMessages(): Boolean = true

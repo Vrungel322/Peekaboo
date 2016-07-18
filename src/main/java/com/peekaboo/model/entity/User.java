@@ -7,10 +7,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 //import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 //import java.util.stream.Collectors;
 
 @Entity
@@ -71,9 +68,10 @@ public class User implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
 
         List<GrantedAuthority> authorities = new ArrayList<>();
-        for (UserRole role : UserRole.values()) if(this.hasRole(role)){
-            authorities.add(new SimpleGrantedAuthority(role.toString()));
-        }
+        for (UserRole role : UserRole.values())
+            if (this.hasRole(role)) {
+                authorities.add(new SimpleGrantedAuthority(role.toString()));
+            }
 
         return authorities;
     }

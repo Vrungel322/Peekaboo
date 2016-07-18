@@ -8,23 +8,23 @@ import org.springframework.security.core.Authentication
 
 class JwtAuthenticationInterceptor extends AuthenticationInterceptor {
 
-	private var authenticationProvider: JwtAuthenticationProvider = _
-	private val logger = LogManager.getLogger(JwtAuthenticationInterceptor.this)
+  private var authenticationProvider: JwtAuthenticationProvider = _
+  private val logger = LogManager.getLogger(JwtAuthenticationInterceptor.this)
 
-	@Autowired
-	def setAuthenticationProvider(provider: JwtAuthenticationProvider) = this.authenticationProvider = provider
+  @Autowired
+  def setAuthenticationProvider(provider: JwtAuthenticationProvider) = this.authenticationProvider = provider
 
-	override def authenticate(headers: HttpHeaders): Authentication = {
-		val header = headers.getFirst("Authorization")
+  override def authenticate(headers: HttpHeaders): Authentication = {
+    val header = headers.getFirst("Authorization")
 
-		val authToken: String =
-			if (!header.startsWith("Bearer ")) {
-				logger.debug("No relevant headers were found")
-				""
-			} else {
-				header.substring(7)
-			}
+    val authToken: String =
+      if (!header.startsWith("Bearer ")) {
+        logger.debug("No relevant headers were found")
+        ""
+      } else {
+        header.substring(7)
+      }
 
-		authenticationProvider.authenticate(new JwtAuthenticationToken(authToken))
-	}
+    authenticationProvider.authenticate(new JwtAuthenticationToken(authToken))
+  }
 }

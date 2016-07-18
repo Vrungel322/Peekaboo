@@ -2,20 +2,18 @@ package com.peekaboo.messaging.socket
 
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.peekaboo.controller.sign.ErrorType
 import com.peekaboo.model.entity.User
 import com.peekaboo.security.AuthenticationInterceptor
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.web.socket._
+import org.springframework.web.socket.{TextMessage, _}
 
 import scala.collection.JavaConverters._
 
 class MessageHandler extends WebSocketHandler {
 
-	private val logger = LogManager.getLogger(MessageHandler.getClass)
+	private val logger = LogManager.getLogger(MessageHandler.this)
 
 	private var authenticationInterceptor: AuthenticationInterceptor = _
 
@@ -35,54 +33,69 @@ class MessageHandler extends WebSocketHandler {
 
 		logger.debug("Received new connection request.")
 		logger.debug("Attempting to authenticate it")
-		val authentication = authenticationInterceptor.authenticate(session.getHandshakeHeaders)
 
-		if (!authentication.getAuthorities.asScala.exists(_.getAuthority == "USER")) {
+		val user = authenticate(session.getHandshakeHeaders)
+		if (user.isEmpty) {
 			logger.debug("User don't have permissions to connect to websocket")
-			//			session.sendMessage(
-			//				new TextMessage(
-			//					MessageHandler.stringify(
-			//						new ErrorResponse(ErrorType.AUTHENTICATION_ERROR, "You don't have permissions to communicate")
-			//					)
-			//				)
-			//			)
 			session.close(new CloseStatus(CloseStatus.TLS_HANDSHAKE_FAILURE.getCode, "Authentication error. You are not permitted to connect"))
 		}
-		val user = authentication.getCredentials.asInstanceOf[User]
 
 		val actor = new MessageActor(session)
-		actorPool.addActor(user.getId, actor)
+		actorPool.addActor(user.get.getId, actor)
 
 	}
 
 
-	override def handleTransportError(webSocketSession: WebSocketSession, throwable: Throwable): Unit = {
+	override def handleTransportError(session: WebSocketSession, throwable: Throwable): Unit = {
+		val response =
+			MessageHandler.om.
+				writeValueAsString(
+					Map(
+						"type" -> "transport error",
+						"message" -> "what the hack is this error?"
+					).asJava
+				)
+		session.sendMessage(new TextMessage(response))
+	}
 
+	private def authenticate(headers: HttpHeaders): Option[User] = {
+		val authentication = authenticationInterceptor.authenticate(headers)
+		if (!authentication.getAuthorities.asScala.exists(_.getAuthority == "USER"))
+			None
+		else
+			Some(authentication.getPrincipal.asInstanceOf[User])
 	}
 
 	override def handleMessage(session: WebSocketSession, message: WebSocketMessage[_]): Unit = {
 		val headers = session.getHandshakeHeaders
-		val receiver = headers.getFirst("RECEIVER")
-		val sender = headers.getFirst("SENDER")
-		val msg = message match {
-			case TextMessage => TextMessage(message.getPayload.toString, receiver, sender)
+		val optionalUser = authenticate(headers)
+		if (optionalUser.isEmpty) {
+			logger.debug("User are not authenticated")
+			val response =
+				MessageHandler.om.
+					writeValueAsString(
+						Map(
+							"type" -> "send error",
+							"message" -> "Cannot send due to absence of authorization header"
+						).asJava
+					)
+			session.sendMessage(new TextMessage(response))
+		} else {
+			val receiver = headers.getFirst("Receiver")
+			val senderUser = optionalUser.get
+			val msg = message match {
+				case message: TextMessage => Text(message.getPayload, receiver, senderUser.getId)
 
+			}
+			val actor = actorPool.findActor(senderUser.getId)
+			actor ! msg
 		}
-
-		val actor = actorPool.findActor(receiver)
-		actor ! msg
 	}
 
 	override def supportsPartialMessages(): Boolean = true
 
-	def getId(httpHeaders: HttpHeaders): String = {
-		val httpHeader = httpHeaders.get("Id")
-		if (httpHeader.size() > 0) httpHeader.get(0) else null
-	}
 }
 
 object MessageHandler {
-	def stringify(obj: Object): String = {
-		new ObjectMapper().writeValueAsString(obj)
-	}
+	val om = new ObjectMapper()
 }

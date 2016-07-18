@@ -5,5 +5,5 @@ class ActorPool {
 
   def addActor(id: String, actor: MessageActor) = actorsMap + (id -> actor)
 
-  def findActor(id: String): MessageActor = actorsMap(id)
+	def findActor(id: String): MessageActor = actorsMap(id)
 }

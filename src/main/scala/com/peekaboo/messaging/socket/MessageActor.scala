@@ -1,7 +1,8 @@
 package com.peekaboo.messaging.socket
 
 import org.springframework.web.socket.{TextMessage, WebSocketSession}
-
+import org.springframework.web.socket.WebSocketSession
+import scala.collection.JavaConverters._
 import scala.actors.Actor
 
 class MessageActor(sock: WebSocketSession) extends Actor {
@@ -21,14 +22,21 @@ class MessageActor(sock: WebSocketSession) extends Actor {
   }
 
   private def sendTextMessage(message: Text): Unit = {
-    sock.sendMessage(new TextMessage(message.toString))
+    sock.sendMessage(
+      new TextMessage(
+        MessageHandler.om.writeValueAsString(
+          Map(
+            "sender" -> message.sender,
+            "payload" -> message.text
+          ).asJava
+        )
+      )
+    )
   }
 
   private def receiveAudioMessage(message: Audio): Unit = {
-
   }
 
   private def sendAudioMessage(message: Audio): Unit = {
-
   }
 }

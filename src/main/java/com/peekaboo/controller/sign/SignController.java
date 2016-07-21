@@ -81,7 +81,8 @@ public class SignController {
         SignResponse response = new SignResponse();
         response.setId(user.getId())
                 .setUsername(user.getUsername())
-                .setRole(user.getRoles());
+                .setRole(user.getRoles())
+                .setEnabled(user.isEnabled());
         String token = jwtUtil.generateToken(response);
         return new ResponseEntity(new SigninResponse(user.getId(), token), HttpStatus.OK);
     }

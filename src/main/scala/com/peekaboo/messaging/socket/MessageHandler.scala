@@ -32,8 +32,8 @@ class MessageHandler extends WebSocketHandler {
 
     logger.debug("Received new connection request.")
     logger.debug("Attempting to authenticate it")
-
-    val user = authenticate(session.getHandshakeHeaders)
+    val headers = session.getHandshakeHeaders
+    val user = authenticate(headers)
     if (user.isEmpty) {
       logger.debug("User don't have permissions to connect to websocket")
       session.close(new CloseStatus(CloseStatus.TLS_HANDSHAKE_FAILURE.getCode, "Authentication error. You are not permitted to connect"))
@@ -84,9 +84,9 @@ class MessageHandler extends WebSocketHandler {
       val senderUser = optionalUser.get
       val msg = message match {
         case message: TextMessage => Text(message.getPayload, receiver, senderUser.getId)
-
+        case message: BinaryMessage =>
       }
-      val actor = actorPool.findActor(senderUser.getId)
+      val actor = actorPool.findActor(receiver)
       actor ! msg
     }
   }

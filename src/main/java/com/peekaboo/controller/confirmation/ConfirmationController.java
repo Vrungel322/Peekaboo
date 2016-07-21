@@ -64,7 +64,8 @@ public class ConfirmationController {
             SignResponse response = new SignResponse();
             response.setId(user.getId())
                     .setUsername(user.getUsername())
-                    .setRole(user.getRoles());
+                    .setRole(user.getRoles())
+                    .setEnabled(user.isEnabled());
             return new ResponseEntity(
                     new ConfirmationResponse(jwtUtil.generateToken(response)),
                     HttpStatus.OK

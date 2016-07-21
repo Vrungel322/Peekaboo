@@ -38,6 +38,7 @@ public class JwtUtil {
             u.setLogin(body.getSubject());
             u.setId((String) body.get("userId"));
             u.setRoles((int) body.get("role"));
+            u.setEnabled((boolean) body.get("enabled"));
 
             return u;
         } catch (JwtException | ClassCastException | IllegalArgumentException e) {
@@ -56,6 +57,7 @@ public class JwtUtil {
         Claims claims = Jwts.claims().setSubject(signResponse.getUsername());
         claims.put("userId", signResponse.getId());
         claims.put("role", signResponse.getRole());
+        claims.put("enabled", signResponse.getEnabled());
 
         return Jwts.builder()
                 .setClaims(claims)

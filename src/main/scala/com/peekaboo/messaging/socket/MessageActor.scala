@@ -5,8 +5,8 @@ import org.springframework.web.socket.WebSocketSession
 import scala.collection.JavaConverters._
 import scala.actors.Actor
 
-class MessageActor(sock: WebSocketSession) extends Actor {
-  private val socket = sock
+class MessageActor(private val socket: WebSocketSession) extends Actor {
+
 
   override def act(): Unit = {
     loop {
@@ -22,7 +22,7 @@ class MessageActor(sock: WebSocketSession) extends Actor {
   }
 
   private def sendTextMessage(message: Text): Unit = {
-    sock.sendMessage(
+    socket.sendMessage(
       new TextMessage(
         MessageHandler.om.writeValueAsString(
           Map(

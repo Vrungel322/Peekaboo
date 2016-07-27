@@ -7,7 +7,7 @@ http://maven.apache.org/POM/4.0.0 ">
 
     <properties>
         <spring-version>4.2.5.RELEASE</spring-version>
-        <scala-version>2.11.8</scala-version>
+        <scala-version>2.11.7</scala-version>
         <spring-data>1.10.2.RELEASE</spring-data>
         <hibernate-version>5.1.0.Final</hibernate-version>
         <mysql-version>6.0.2</mysql-version>
@@ -26,10 +26,11 @@ http://maven.apache.org/POM/4.0.0 ">
         </dependency>
 
 
+        <!-- https://mvnrepository.com/artifact/com.typesafe.akka/akka-actor_2.11 -->
         <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-actors</artifactId>
-            <version>${scala-version}</version>
+            <groupId>com.typesafe.akka</groupId>
+            <artifactId>akka-actor_2.11</artifactId>
+            <version>2.4.8</version>
         </dependency>
 
 

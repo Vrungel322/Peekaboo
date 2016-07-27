@@ -2,10 +2,12 @@ package com.peekaboo.messaging.socket
 
 //import Map
 
-class ActorPool {
-  private val actorsMap = scala.collection.mutable.Map.empty[String, MessageActor]
+object ActorPool {
+  private var actorsMap = Map.empty[String, MessageActor]
 
-  def addActor(id: String, actor: MessageActor) = actorsMap += (id -> actor)
+  def addActor(id: String, actor: MessageActor) = actorsMap = actorsMap + (id -> actor)
 
-	def findActor(id: String): MessageActor = actorsMap(id)
+  def updateActor(id: String, actor: MessageActor) = actorsMap = actorsMap.updated(id, actor)
+
+	def findActor(id: String): Option[MessageActor] = actorsMap.get(id)
 }

@@ -6,12 +6,20 @@
 
     <bean id="messageHandler" class="com.peekaboo.messaging.socket.MessageHandler"/>
 
+
     <bean id="authenticationInterceptor" class="com.peekaboo.security.JwtAuthenticationInterceptor"/>
 
-    <bean id="actorPool" class="com.peekaboo.messaging.socket.ActorPool"/>
+
 
     <websockets:handlers>
         <websockets:mapping path="/socket/send" handler="messageHandler"/>
+        <websockets:handshake-interceptors>
+            <ref bean="handshakeInterceptor"/>
+        </websockets:handshake-interceptors>
     </websockets:handlers>
-    
+
+    <bean id="handshakeInterceptor" class="com.peekaboo.messaging.socket.SecurityHandshakeInterceptor">
+        <constructor-arg index="0" ref="authenticationInterceptor"/>
+    </bean>
+
 </beans>

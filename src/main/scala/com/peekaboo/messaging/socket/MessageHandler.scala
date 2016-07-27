@@ -1,46 +1,58 @@
 package com.peekaboo.messaging.socket
 
+import akka.actor.{ActorSystem, Props}
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.peekaboo.model.entity.User
-import com.peekaboo.security.AuthenticationInterceptor
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders
+import org.springframework.web.socket.handler.BinaryWebSocketHandler
 import org.springframework.web.socket.{TextMessage, _}
 
 import scala.collection.JavaConverters._
 
-class MessageHandler extends WebSocketHandler {
+@Autowired
+class MessageHandler extends BinaryWebSocketHandler {
 
-  private val logger = LogManager.getLogger(MessageHandler.this)
 
-  private var authenticationInterceptor: AuthenticationInterceptor = _
-
-  private var actorPool: ActorPool = _
-
-  @Autowired
-  def setAuthenticationInterceptor(interceptor: AuthenticationInterceptor) = this.authenticationInterceptor = interceptor
-
-  @Autowired
-  def setActorPool(pool: ActorPool) = this.actorPool = pool
-
-  override def afterConnectionClosed(webSocketSession: WebSocketSession, closeStatus: CloseStatus): Unit = {
+  override def handleBinaryMessage(session: WebSocketSession, message: BinaryMessage): Unit = {
+    try {
+      logger.debug("Got message")
+      val action = MessageInterceptor.handle(message.getPayload.array())
+      logger.debug("Action was successfully parsed. Fetching user id")
+      val ownerId = session.getHandshakeHeaders.get("id").get(0)
+      logger.debug(s"User id is ${ownerId}")
+      RequestDispatcher.process(action, ownerId)
+    } catch {
+      case e: IllegalArgumentException => {
+        logger.warn("Error. Cannot parse" + new String(message.getPayload.array()))
+      }
+    }
 
   }
 
+  val actorSystem = MessageActorSystem.system
+
   override def afterConnectionEstablished(session: WebSocketSession): Unit = {
+    logger.debug("Connection established.")
+    val id = session.getHandshakeHeaders.get("id").get(0)
+//    logger.debug("Attempting to find existing actor")
 
-    logger.debug("Received new connection request.")
-    logger.debug("Attempting to authenticate it")
-    val headers = session.getHandshakeHeaders
-    val user = authenticate(headers)
-    if (user.isEmpty) {
-      logger.debug("User don't have permissions to connect to websocket")
-      session.close(new CloseStatus(CloseStatus.TLS_HANDSHAKE_FAILURE.getCode, "Authentication error. You are not permitted to connect"))
-    }
+    //    val actor = new MessageActor(session)
 
-    val actor = new MessageActor(session)
-    actorPool.addActor(user.get.getId, actor)
+//    actorSystem.actorOf(Props(classOf[MessageActor], session), id)
+    val actRef = actorSystem.actorOf(Props(new MessageActor(session)), id)
+    logger.debug("Created actor " + actRef.toString())
+    session.sendMessage(new PongMessage())
+
+//
+//    if (ActorPool.findActor(id).isEmpty) {
+//      logger.debug("There is no actor for user id: " + id)
+//      logger.debug("Creating new actor")
+////      ActorPool.addActor(id, actor)
+//    } else {
+//      logger.debug(s"Found actor for user id: ${id}")
+//      logger.debug("Updating existing actor")
+////      ActorPool.updateActor(id, actor)
+//    }
 
   }
 
@@ -57,38 +69,38 @@ class MessageHandler extends WebSocketHandler {
     session.sendMessage(new TextMessage(response))
   }
 
-  private def authenticate(headers: HttpHeaders): Option[User] = {
-    val authentication = authenticationInterceptor.authenticate(headers)
-    if (!authentication.getAuthorities.asScala.exists(_.getAuthority == "USER"))
-      None
-    else
-      Some(authentication.getPrincipal.asInstanceOf[User])
-  }
 
-  override def handleMessage(session: WebSocketSession, message: WebSocketMessage[_]): Unit = {
-    val headers = session.getHandshakeHeaders
-    val optionalUser = authenticate(headers)
-    if (optionalUser.isEmpty) {
-      logger.debug("User are not authenticated")
-      val response =
-        MessageHandler.om.
-          writeValueAsString(
-            Map(
-              "type" -> "send error",
-              "message" -> "Cannot send due to absence of authorization header"
-            ).asJava
-          )
-      session.sendMessage(new TextMessage(response))
-    } else {
-      val receiver = headers.getFirst("Receiver")
-      val senderUser = optionalUser.get
-      val msg = message match {
-        case message: TextMessage => Text(message.getPayload, receiver, senderUser.getId)
-        case message: BinaryMessage =>
-      }
-      val actor = actorPool.findActor(receiver)
-      actor ! msg
-    }
+  //  override def handleMessage(session: WebSocketSession, message: WebSocketMessage[_]): Unit = {
+  //    val headers = session.getHandshakeHeaders
+  //    val optionalUser = authenticate(headers)
+  //    if (optionalUser.isEmpty) {
+  //      logger.debug("User are not authenticated")
+  //      val response =
+  //        MessageHandler.om.
+  //          writeValueAsString(
+  //            Map(
+  //              "type" -> "send error",
+  //              "message" -> "Cannot send due to absence of authorization header"
+  //            ).asJava
+  //          )
+  //      session.sendMessage(new TextMessage(response))
+  //    } else {
+  //      val receiver = headers.getFirst("Receiver")
+  //      val senderUser = optionalUser.get
+  //      val msg = message match {
+  //        case message: TextMessage => Text(message.getPayload, receiver, senderUser.getId)
+  //        case message: BinaryMessage =>
+  //      }
+  //      val actor = actorPool.findActor(receiver)
+  //      actor ! msg
+  //    }
+  //    println(new String(message.asInstanceOf[BinaryMessage].getPayload.array()))
+  //  }
+
+  private val logger = LogManager.getLogger(MessageHandler.this)
+
+  override def afterConnectionClosed(webSocketSession: WebSocketSession, closeStatus: CloseStatus): Unit = {
+
   }
 
   override def supportsPartialMessages(): Boolean = true

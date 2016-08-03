@@ -1,29 +1,31 @@
-package com.peekaboo.messaging.socket
+package com.peekaboo.messaging.socket.middleware
 
 import akka.actor.Props
-import com.fasterxml.jackson.databind.ObjectMapper
+import com.peekaboo.messaging.socket.worker.{MessageActor, MessageActorSystem}
 import org.apache.logging.log4j.LogManager
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.socket._
 import org.springframework.web.socket.handler.BinaryWebSocketHandler
 
-import scala.collection.JavaConverters._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-@Autowired
-class MessageHandler extends BinaryWebSocketHandler {
+
+class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: MessageInterceptor) extends BinaryWebSocketHandler {
 
 
   override def handleBinaryMessage(session: WebSocketSession, message: BinaryMessage): Unit = {
     try {
       logger.debug("Got message")
-      val action = MessageInterceptor.handle(message.getPayload.array())
+      val action = messageInterceptor.handle(message.getPayload.array())
       logger.debug("Action was successfully parsed. Fetching user id")
-      val ownerId = session.getHandshakeHeaders.get("id").get(0)
-      RequestDispatcher.process(action, ownerId)
-    } catch {
+      val ownerId = getId(session)
+//      val optionalProcessing = requestDispatcher.process(action, ownerId)
+      requestDispatcher.process(action, ownerId)
+
+
+    }
+    catch {
       case e: IllegalArgumentException => {
         logger.warn("Error. Cannot parse" + new String(message.getPayload.array()))
       }
@@ -35,8 +37,9 @@ class MessageHandler extends BinaryWebSocketHandler {
 
   override def afterConnectionEstablished(session: WebSocketSession): Unit = {
 
-    logger.debug("Connection established.")
-    val id = session.getHandshakeHeaders.get("id").get(0)
+    val id = getId(session)
+
+    logger.debug(s"Connection established. With user $id")
 
     //at first it looks if there was connection with client
     actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
@@ -50,45 +53,30 @@ class MessageHandler extends BinaryWebSocketHandler {
       }
 
       //after one second create new actor with connection
-      val future = Future {
+      Future {
         logger.debug("Creating new actor after 1 second")
         Thread.sleep(1000)
         logger.debug("1 second has been passed")
         actorSystem.actorOf(Props(new MessageActor(session)), id)
-      }
-
-      //here actor created send pong message to check it
-      future.onComplete(actRef => {
+      }.onComplete(actRef => {
+        //here created actor sends pong message to check it connection
         logger.debug("Created actor " + actRef.get.toString())
         session.sendMessage(new PongMessage())
       })
 
-
     })
 
   }
-
-  override def handleTransportError(session: WebSocketSession, throwable: Throwable): Unit = {
-//    val response =
-//      MessageHandler.om.
-//        writeValueAsString(
-//          Map(
-//            "type" -> "transport error",
-//            "message" -> "what the hack is this error?"
-//          ).asJava
-//        )
-//    session.sendMessage(new TextMessage(response))
-  }
-
-  private val logger = LogManager.getLogger(MessageHandler.this)
 
   override def afterConnectionClosed(session: WebSocketSession, closeStatus: CloseStatus): Unit = {
 
     logger.debug("Closing connection has been reached")
 
     val id = session.getHandshakeHeaders.get("id").get(0)
+    //looking for user's actor
     actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
-      logger.debug("Future has been reached")
+      logger.debug("The Future has been reached")
+      //if found stopping it
       if (a.isSuccess) {
         logger.debug("Future is success")
         logger.debug("Removing actor")
@@ -98,5 +86,10 @@ class MessageHandler extends BinaryWebSocketHandler {
   }
 
   override def supportsPartialMessages(): Boolean = true
+
+  private def getId(session: WebSocketSession): String =
+    session.getHandshakeHeaders get "id" get 0
+
+  private val logger = LogManager.getLogger(MessageHandler.this)
 
 }

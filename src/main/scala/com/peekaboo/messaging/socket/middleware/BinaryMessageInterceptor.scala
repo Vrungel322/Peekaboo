@@ -1,8 +1,9 @@
-package com.peekaboo.messaging.socket
+package com.peekaboo.messaging.socket.middleware
 
+import com.peekaboo.messaging.socket.worker.{Action, Send}
 import org.apache.logging.log4j.LogManager
 
-object MessageInterceptor {
+class BinaryMessageInterceptor extends MessageInterceptor{
 
   /**
     * Handles received message.
@@ -24,7 +25,7 @@ object MessageInterceptor {
   def handle(bytes: Array[Byte]): Action = {
     logger.debug("Parsing command name")
     val (commandName, remain) = getLine(bytes.toList)
-    logger.debug(s"Command is ${commandName}")
+    logger.debug(s"Command is $commandName")
     logger.debug("Parsing parameters")
     val (parameters, body) = getParameters(remain)
     commandName match {
@@ -84,18 +85,19 @@ object MessageInterceptor {
     internalParameterParser(bytes, Map())
   }
 
-  private val logger = LogManager.getLogger(MessageInterceptor.this)
+  private val logger = LogManager.getLogger(this)
 }
 
-object ParserTest extends App {
-  val str =
-      "SEND\n\r" +
-      "destination:/user/vladislav\n\r" +
-      "\n" +
-      "Hello, vlad"
-  val act = MessageInterceptor.handle(str.getBytes("UTF-8"))
-  println(act.name)
-  println(act.getParameter("destination"))
-  println(new String(act.getBody))
+object BinaryMessageInterceptor {
+  def compose(action: Action): Array[Byte] = {
+    logger.debug(s"Composing action ${action.name}")
+    val header = (action.parameters.foldLeft(action.name + "\n")((acc, item) => acc + s"${item._1}:${item._2}\n") + "\n").getBytes("UTF-8")
+    val body = action.getBody
+    val resultArray = new Array[Byte](header.length + body.length)
+    System.arraycopy(header, 0, resultArray, 0, header.length)
+    System.arraycopy(body, 0, resultArray, header.length, body.length)
+    resultArray
+  }
 
+  private val logger = LogManager.getLogger(this)
 }

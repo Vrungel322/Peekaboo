@@ -28,14 +28,11 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         String authToken = "";
         if (header == null || !header.startsWith("Bearer ")) {
             logger.debug("No relevant headers were found");
-//            throw new JwtTokenMissingException("No JWT token found in request header");
         } else {
             authToken = header.substring(7); //7 - is length of 'Bearer '
         }
 
-
         JwtAuthenticationToken authRequest = new JwtAuthenticationToken(authToken);
-
         return getAuthenticationManager().authenticate(authRequest);
     }
 

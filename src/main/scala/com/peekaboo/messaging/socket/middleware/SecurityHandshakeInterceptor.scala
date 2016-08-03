@@ -1,4 +1,4 @@
-package com.peekaboo.messaging.socket
+package com.peekaboo.messaging.socket.middleware
 
 import java.util
 

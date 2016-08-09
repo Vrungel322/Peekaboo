@@ -12,6 +12,7 @@ http://maven.apache.org/POM/4.0.0 ">
         <hibernate-version>5.1.0.Final</hibernate-version>
         <mysql-version>6.0.2</mysql-version>
         <springsecurity-version>4.1.0.RELEASE</springsecurity-version>
+        <neo4j-version>2.0.4</neo4j-version>
     </properties>
     <groupId>com.canyoncapital</groupId>
     <artifactId>peekaboo</artifactId>
@@ -220,7 +221,19 @@ http://maven.apache.org/POM/4.0.0 ">
             <version>1.4.7</version>
         </dependency>
         <!--=============Email================-->
+        <!--=============Neo4j================-->
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-ogm-core</artifactId>
+            <version>${neo4j-version}</version>
+        </dependency>
 
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-ogm-http-driver</artifactId>
+            <version>${neo4j-version}</version>
+        </dependency>
+        <!--=============Neo4j================-->
     </dependencies>
 
     <build>
@@ -275,6 +288,7 @@ http://maven.apache.org/POM/4.0.0 ">
                     </systemPropertyVariables>
                 </configuration>
             </plugin>
+
         </plugins>
     </build>
 </project>

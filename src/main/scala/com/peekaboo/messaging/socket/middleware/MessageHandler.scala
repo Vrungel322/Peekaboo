@@ -1,7 +1,7 @@
 package com.peekaboo.messaging.socket.middleware
 
 import akka.actor.Props
-import com.peekaboo.messaging.socket.worker.{MessageActor, MessageActorSystem}
+import com.peekaboo.messaging.socket.worker.{MessageActor, ActorSystems}
 import org.apache.logging.log4j.LogManager
 import org.springframework.web.socket._
 import org.springframework.web.socket.handler.BinaryWebSocketHandler
@@ -16,9 +16,10 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
 
   override def handleBinaryMessage(session: WebSocketSession, message: BinaryMessage): Unit = {
     try {
-      logger.debug("Got message")
+      logger.debug("Message size: " + message.getPayloadLength)
+//      logger.debug("First 100 symbols of message:\n" + new String(message.getPayload.array().splitAt(100)._1))
       val action = messageInterceptor.handle(message.getPayload.array())
-      logger.debug("Action was successfully parsed. Fetching user id")
+//      logger.debug("Action was successfully parsed. Fetching user id")
       val ownerId = getId(session)
 //      val optionalProcessing = requestDispatcher.process(action, ownerId)
       requestDispatcher.process(action, ownerId)
@@ -33,12 +34,12 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
 
   }
 
-  private val actorSystem = MessageActorSystem.system
+  private val actorSystem = ActorSystems.messageSystem
 
   override def afterConnectionEstablished(session: WebSocketSession): Unit = {
 
     val id = getId(session)
-
+    session.setBinaryMessageSizeLimit(session.getBinaryMessageSizeLimit*4)
     logger.debug(s"Connection established. With user $id")
 
     //at first it looks if there was connection with client

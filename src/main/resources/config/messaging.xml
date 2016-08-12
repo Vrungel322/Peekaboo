@@ -14,7 +14,7 @@
 
     <bean id="authenticationInterceptor" class="com.peekaboo.security.JwtAuthenticationInterceptor"/>
 
-    <bean id="requestDispatcher" class="com.peekaboo.messaging.socket.middleware.StandardSocketRequestDispatcher"/>
+    <bean id="requestDispatcher" class="com.peekaboo.messaging.socket.middleware.StandardSocketRequestDispatcher" init-method="init"/>
 
     <websockets:handlers>
         <websockets:mapping path="/socket/send" handler="messageHandler"/>

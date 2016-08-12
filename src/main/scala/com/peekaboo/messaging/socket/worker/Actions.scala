@@ -18,10 +18,13 @@ case class Send(text: Array[Byte], override val parameters: Map[String, String])
 
   def getDestination: String = getParameter(ParameterName.Destination).get
 
+
+
   def getType: String = getParameter(ParameterName.Type).get
 
-
 }
+
+case class FileAction(name: String, id: String, author: String)
 
 class Header(name: String, parameters: Map[String, String]) {
   def size = parameters.map { case (key, value) => key + ":" + value }.foldLeft(name)((res, cur) => res + "\n" + cur).length

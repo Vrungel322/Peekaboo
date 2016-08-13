@@ -1,7 +1,7 @@
 package com.peekaboo.messaging.socket.middleware
 
 import akka.actor.Props
-import com.peekaboo.messaging.socket.worker.{MessageActor, ActorSystems}
+import com.peekaboo.messaging.socket.worker.{ActorSystems, MessageActor}
 import org.apache.logging.log4j.LogManager
 import org.springframework.web.socket._
 import org.springframework.web.socket.handler.BinaryWebSocketHandler
@@ -10,39 +10,47 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 
-
+//Implementation of Spring BinaryWebSocketHandler
+//I'm not sure, but the container(tomcat) creates new thread for each request to this endpoint
+//So it would be a good idea to replace Spring websockets with something offered by one of the scala's frameworks
 class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: MessageInterceptor) extends BinaryWebSocketHandler {
 
-
+  //each message goes through this method
   override def handleBinaryMessage(session: WebSocketSession, message: BinaryMessage): Unit = {
     try {
       logger.debug("Message size: " + message.getPayloadLength)
-//      logger.debug("First 100 symbols of message:\n" + new String(message.getPayload.array().splitAt(100)._1))
-      val action = messageInterceptor.handle(message.getPayload.array())
-//      logger.debug("Action was successfully parsed. Fetching user id")
-      val ownerId = getId(session)
-//      val optionalProcessing = requestDispatcher.process(action, ownerId)
-      requestDispatcher.process(action, ownerId)
 
+      //at first we have to parse incoming message
+      val action = messageInterceptor.handle(message.getPayload.array())
+
+      //at second we have to recognize who is an initiator
+      val ownerId = getId(session)
+
+      //finally, we dispatch the message
+      requestDispatcher.process(action, ownerId)
 
     }
     catch {
-      case e: IllegalArgumentException => {
+      case e: IllegalArgumentException =>
         logger.warn("Error. Cannot parse" + new String(message.getPayload.array()))
-      }
+
     }
 
   }
 
   private val actorSystem = ActorSystems.messageSystem
 
+  //this method is invoked after successful handshake with client and the sever
+  //also it would be great to send this user all messages he has received while he was offline
   override def afterConnectionEstablished(session: WebSocketSession): Unit = {
 
+
     val id = getId(session)
-    session.setBinaryMessageSizeLimit(session.getBinaryMessageSizeLimit*4)
+      //next line was used when we had been trying to send binary data via sockets
+    //session.setBinaryMessageSizeLimit(session.getBinaryMessageSizeLimit * 4) //todo: check does it work
     logger.debug(s"Connection established. With user $id")
 
-    //at first it looks if there was connection with client
+    //at first it looks if there was a connection with a client
     actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
       logger.debug("Future has been reached")
 
@@ -54,13 +62,14 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
       }
 
       //after one second create new actor with connection
+      //this was done to give enough time for system to stop the actor
       Future {
         logger.debug("Creating new actor after 1 second")
         Thread.sleep(1000)
         logger.debug("1 second has been passed")
         actorSystem.actorOf(Props(new MessageActor(session)), id)
       }.onComplete(actRef => {
-        //here created actor sends pong message to check it connection
+        //here created actor sends pong message to check it's connection
         logger.debug("Created actor " + actRef.get.toString())
         session.sendMessage(new PongMessage())
       })
@@ -69,11 +78,13 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
 
   }
 
+  //this method will be invoked only if client manually invokes "close connection", or server do it
+  //this method wont be invoked if client lose connection with internet
   override def afterConnectionClosed(session: WebSocketSession, closeStatus: CloseStatus): Unit = {
 
     logger.debug("Closing connection has been reached")
 
-    val id = session.getHandshakeHeaders.get("id").get(0)
+    val id = getId(session)
     //looking for user's actor
     actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
       logger.debug("The Future has been reached")

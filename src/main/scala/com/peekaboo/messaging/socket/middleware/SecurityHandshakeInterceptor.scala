@@ -11,6 +11,7 @@ import org.springframework.web.socket.server.HandshakeInterceptor
 
 import scala.collection.JavaConverters._
 
+//Intercepts initial dialog to authenticate a user
 class SecurityHandshakeInterceptor(authenticationInterceptor: AuthenticationInterceptor) extends HandshakeInterceptor {
   override def beforeHandshake(request: ServerHttpRequest, response: ServerHttpResponse, wsHandler: WebSocketHandler, attributes: util.Map[String, AnyRef]): Boolean = {
 
@@ -18,12 +19,14 @@ class SecurityHandshakeInterceptor(authenticationInterceptor: AuthenticationInte
     logger.debug("Attempting to authenticate it")
     val authentication = authenticationInterceptor.authenticate(request.getHeaders)
 
+    //user has to have a "USER" authority to be able user the chat
     if (!authentication.getAuthorities.asScala.exists(_.getAuthority == "USER")) {
       logger.debug("Error authenticating user")
       false
     }
     else {
       logger.debug("User was successfully authenticated")
+      //remember user id for future needs
       request.getHeaders.add("id", authentication.getPrincipal.asInstanceOf[User].getId)
       true
     }

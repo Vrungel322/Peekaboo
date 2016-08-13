@@ -10,6 +10,6 @@ trait MessageInterceptor {
   def handle(bytes: Array[Byte]): Action
 
 
-  //todo: change AnyRef to class hierarchies
+
 //  def compose(action: Action): AnyRef
 }

@@ -1,8 +1,6 @@
 package com.peekaboo.messaging.socket.middleware
 
-import akka.actor.Actor.Receive
 import akka.actor.{Actor, ActorRef, Props}
-import com.peekaboo.messaging.socket._
 import com.peekaboo.messaging.socket.worker._
 import org.apache.logging.log4j.LogManager
 
@@ -14,22 +12,17 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
 
   val system = ActorSystems.messageSystem
 
-  def init = {
-    system.actorOf(Props(new FileSenderActor), "dispatcher")
-  }
-
   def process(action: Action, authorId: String) = {
     action match {
       case a: Send =>
         val destination = a.getDestination
         logger.debug(s"SEND action from ${authorId} to ${destination}")
 
-        //todo: if not found actor use default
-        //upd: doesn't work right now
-        val dest = if (a.getType == Type.Audio) authorId else a.getDestination
 
-        system.actorSelection("/user/" + dest).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
-          val actSel = getFromTry(aTry, dest)
+
+        //todo: if not found actor use default
+        system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
+          val actSel = getFromTry(aTry, destination)
 
           actSel ! (a, authorId)
         })
@@ -38,23 +31,25 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
     }
   }
 
-
+  /**
+    * Tries to get an actor from the Try.
+    * If there is no actor in the Try it means that client isn't connected to system in this moment
+    * should return default actor, which responsibility is saving messages to the database
+    *
+    * -----------------------------------------------
+    * For some unknown for me reasons it doesn't work
+    * Good luck fixing it
+    * -----------------------------------------------
+    *
+    * @param aTry Try from which actor is going to be fetched
+    * @param defaultHandler name of the defaultHandler for current user
+    * @return actor, which is able to receive Actions
+    */
   private def getFromTry(aTry: Try[ActorRef], defaultHandler: String): ActorRef = {
     if (aTry.isSuccess) aTry.get
-    else system.actorOf(Props(new DefaultMessageActor(defaultHandler)))
+    else system.actorOf(Props(new DefaultMessageActor(defaultHandler)), defaultHandler)
   }
 
   private val logger = LogManager.getLogger(this)
-
-  private class FileSenderActor extends Actor{
-    override def receive: Receive = {
-      case a: FileAction =>
-        system.actorSelection("/user/" + a.id).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
-          val actSel = getFromTry(aTry, a.id)
-
-          actSel ! a
-        })
-    }
-  }
 
 }

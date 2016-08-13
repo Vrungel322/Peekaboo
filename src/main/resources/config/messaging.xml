@@ -4,12 +4,17 @@
        xmlns:websockets="http://www.springframework.org/schema/websocket"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/websocket http://www.springframework.org/schema/websocket/spring-websocket.xsd">
 
-    <bean id="messageHandler" class="com.peekaboo.messaging.socket.MessageHandler"/>
+    <bean id="messageHandler" class="com.peekaboo.messaging.socket.middleware.MessageHandler">
+        <constructor-arg index="0" ref="requestDispatcher"/>
+        <constructor-arg index="1" ref="messageInterceptor"/>
+    </bean>
+
+    <bean id="messageInterceptor" class="com.peekaboo.messaging.socket.middleware.BinaryMessageInterceptor"/>
 
 
     <bean id="authenticationInterceptor" class="com.peekaboo.security.JwtAuthenticationInterceptor"/>
 
-
+    <bean id="requestDispatcher" class="com.peekaboo.messaging.socket.middleware.StandardSocketRequestDispatcher" init-method="init"/>
 
     <websockets:handlers>
         <websockets:mapping path="/socket/send" handler="messageHandler"/>
@@ -18,7 +23,7 @@
         </websockets:handshake-interceptors>
     </websockets:handlers>
 
-    <bean id="handshakeInterceptor" class="com.peekaboo.messaging.socket.SecurityHandshakeInterceptor">
+    <bean id="handshakeInterceptor" class="com.peekaboo.messaging.socket.middleware.SecurityHandshakeInterceptor">
         <constructor-arg index="0" ref="authenticationInterceptor"/>
     </bean>
 

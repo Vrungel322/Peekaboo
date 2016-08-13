@@ -2,6 +2,8 @@ package com.peekaboo.confirmation;
 
 import com.peekaboo.confirmation.mail.MailService;
 import com.peekaboo.confirmation.phone.PhoneService;
+import com.peekaboo.messaging.socket.middleware.BinaryMessageInterceptor;
+import com.peekaboo.messaging.socket.middleware.MessageInterceptor;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +29,7 @@ public class RegistrationConfirmService {
             confirmAction = new ConfirmAction(user, token, phoneService);
         }
         confirmAction.start();
+
     }
 
     public VerificationToken generateVerificationToken() {

@@ -29,23 +29,11 @@ import java.util.List;
 @RequestMapping("/")
 public class SignController {
 
-    private final Logger logger = LogManager.getLogger(SignController.class);
-
-    @Autowired
     private UserService userService;
-
-    @Autowired
     private VerificationTokenService verificationService;
-
-    @Autowired
     private RegistrationConfirmService registrationConfirmService;
-
-    @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
     private BCryptPasswordEncoder encoder;
-
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin(@Valid @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
@@ -163,14 +151,11 @@ public class SignController {
         for (ObjectError error : errors.getAllErrors()) {
             logger.debug(error.toString());
         }
-//        errors.getAllErrors().forEach(objectError -> {
-//            logger.debug(objectError.toString());
-//        });
     }
 
     private List<ErrorResponse> transformErrors(List<ObjectError> errors) {
         List<ErrorResponse> errorResponses = new ArrayList<>();
-        for(ObjectError error : errors) {
+        for (ObjectError error : errors) {
             errorResponses.add(
                     new ErrorResponse(
                             ErrorType.AUTHENTICATION_ERROR,
@@ -179,14 +164,31 @@ public class SignController {
             );
         }
         return errorResponses;
-//        return errors.stream()
-//                .map(objectError ->
-//                        new ErrorResponse(
-//                                ErrorType.AUTHENTICATION_ERROR,
-//                                objectError.getDefaultMessage()
-//                        )
-//                )
-//                .collect(Collectors.toList());
+    }
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setVerificationService(VerificationTokenService verificationService) {
+        this.verificationService = verificationService;
+    }
+
+    @Autowired
+    public void setJwtUtil(JwtUtil jwtUtil) {
+        this.jwtUtil = jwtUtil;
+    }
+
+    @Autowired
+    public void setRegistrationConfirmService(RegistrationConfirmService registrationConfirmService) {
+        this.registrationConfirmService = registrationConfirmService;
+    }
+
+    @Autowired
+    public void setEncoder(BCryptPasswordEncoder encoder) {
+        this.encoder = encoder;
     }
 
     private class SigninResponse {
@@ -218,4 +220,6 @@ public class SignController {
             return id;
         }
     }
+
+    private final Logger logger = LogManager.getLogger(this);
 }

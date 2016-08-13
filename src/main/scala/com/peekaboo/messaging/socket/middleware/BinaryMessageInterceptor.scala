@@ -1,8 +1,12 @@
-package com.peekaboo.messaging.socket
+package com.peekaboo.messaging.socket.middleware
 
+import com.peekaboo.messaging.socket.worker.{Action, Send}
 import org.apache.logging.log4j.LogManager
 
-object MessageInterceptor {
+//Originally we were thinking that we were going to send binary data through web sockets
+//But then I decided to use for this purpose an http post request
+//So feel free to write a TextMessageInterceptor and parse text instead binary data
+class BinaryMessageInterceptor extends MessageInterceptor{
 
   /**
     * Handles received message.
@@ -19,12 +23,12 @@ object MessageInterceptor {
     * Otherwise throws Error
     *
     * @param bytes - message to be parsed
-    * @return paresed <code>Action</code> with all parameters and a body
+    * @return parsed <code>Action</code> with all parameters and a body
     */
   def handle(bytes: Array[Byte]): Action = {
     logger.debug("Parsing command name")
     val (commandName, remain) = getLine(bytes.toList)
-    logger.debug(s"Command is ${commandName}")
+    logger.debug(s"Command is $commandName")
     logger.debug("Parsing parameters")
     val (parameters, body) = getParameters(remain)
     commandName match {
@@ -40,14 +44,12 @@ object MessageInterceptor {
 
   /**
     * Parses bytes array until finds new line symbol.
-    * Returns line and remainder from initial array
+    * Returns line and remainder from the initial array
     *
     * @param bytes - bytes to be parsed
     * @return line and remainder
     */
   private def getLine(bytes: List[Byte]): (String, List[Byte]) = {
-    //    val (lineBytes, remainder) = bytes.span(_ == newLine)
-    //    (new String(lineBytes.toArray), remainder)
     def findLine(line: List[Byte], bytes: List[Byte]): (List[Byte], List[Byte]) = {
       bytes match {
         case Nil => (line, Nil)
@@ -69,7 +71,7 @@ object MessageInterceptor {
     */
   def getParameters(bytes: List[Byte]): (Map[String, String], List[Byte]) = {
     def internalParameterParser(bytes: List[Byte], map: Map[String, String]): (Map[String, String], List[Byte]) = {
-      //gets current line and remain
+      //gets current line and a remain
       val (line, remain) = getLine(bytes)
 
       //if current line is empty then we've reached end of the parameters -> return result
@@ -84,18 +86,20 @@ object MessageInterceptor {
     internalParameterParser(bytes, Map())
   }
 
-  private val logger = LogManager.getLogger(MessageInterceptor.this)
+  private val logger = LogManager.getLogger(this)
 }
 
-object ParserTest extends App {
-  val str =
-      "SEND\n\r" +
-      "destination:/user/vladislav\n\r" +
-      "\n" +
-      "Hello, vlad"
-  val act = MessageInterceptor.handle(str.getBytes("UTF-8"))
-  println(act.name)
-  println(act.getParameter("destination"))
-  println(new String(act.getBody))
+//Is used for composing action into binary format for sending it via web socket
+object BinaryMessageInterceptor {
+  def compose(action: Action): Array[Byte] = {
+    logger.debug(s"Composing action ${action.name}")
+    val header = (action.parameters.foldLeft(action.name + "\n")((acc, item) => acc + s"${item._1}:${item._2}\n") + "\n").getBytes("UTF-8")
+    val body = action.getBody
+    val resultArray = new Array[Byte](header.length + body.length)
+    System.arraycopy(header, 0, resultArray, 0, header.length)
+    System.arraycopy(body, 0, resultArray, header.length, body.length)
+    resultArray
+  }
 
+  private val logger = LogManager.getLogger(this)
 }

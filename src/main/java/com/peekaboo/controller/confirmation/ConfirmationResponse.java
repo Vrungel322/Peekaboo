@@ -1,9 +1,7 @@
 package com.peekaboo.controller.confirmation;
 
-import javax.validation.constraints.NotNull;
-
 public class ConfirmationResponse {
-    @NotNull
+
     private String token;
 
     public ConfirmationResponse(String token) {

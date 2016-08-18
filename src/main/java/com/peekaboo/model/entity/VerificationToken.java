@@ -1,24 +1,16 @@
 package com.peekaboo.model.entity;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.NodeEntity;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "verification_tokens")
+@NodeEntity
 public class VerificationToken {
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "verification_token_id")
+    @GraphId
     private String id;
 
-    @Column()
     private String value;
 
-    @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
     public VerificationToken() {

@@ -1,20 +1,11 @@
 package com.peekaboo.controller.sign;
 
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
+;
 
 public class SigninRequestEntity {
 
-    @NotNull
-    @NotEmpty
     private String login;
 
-    @NotNull
-    @Pattern(regexp = "[\\d\\w_]+")
-    @Length(min = 6)
     private String password;
 
     public String getLogin() {
@@ -39,7 +30,7 @@ public class SigninRequestEntity {
 
     public boolean isPhone() {
 
-        for(char ch : login.toCharArray())
+        for (char ch : login.toCharArray())
             if (Character.isAlphabetic(ch))
                 return false;
 

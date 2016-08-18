@@ -1,49 +1,43 @@
 package com.peekaboo.model.entity;
 
-import org.hibernate.annotations.GenericGenerator;
+import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
-@Entity
-@Table(name = "users")
+@NodeEntity
 public class User implements UserDetails {
 
-    @Id
-    @GeneratedValue(generator = "system-uuid")
-    @GenericGenerator(name = "system-uuid", strategy = "uuid")
-    @Column(name = "user_id")
+    @GraphId
     private String id;
 
-    @Column(unique = true, nullable = false)
     private String username;
 
-    @Column
     private String displayName;
 
-    @Column(nullable = false)
     private String password;
 
-    @Column(unique = true)
     private String telephone;
 
-    @Column(unique = true)
     private String email;
 
-    @Column
     private int roles;
 
     //TODO: male = 0 , female = 1
-    @Column
     private int gender;
 
-    @Column
     private boolean enabled;
+
+    @Relationship(type = "FRIENDS", direction = Relationship.UNDIRECTED)
+    private Set<User> friends;
 
     public User() {
     }
@@ -58,6 +52,7 @@ public class User implements UserDetails {
         this.roles = roles;
         this.gender = gender;
         this.enabled = enabled;
+        this.friends = new HashSet<>();
     }
 
     @Override
@@ -68,7 +63,6 @@ public class User implements UserDetails {
             if (this.hasRole(role)) {
                 authorities.add(new SimpleGrantedAuthority(role.toString()));
             }
-
         return authorities;
     }
 

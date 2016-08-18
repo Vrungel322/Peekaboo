@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +32,7 @@ public class ConfirmationController {
     private VerificationTokenService tokenService;
 
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
-    public ResponseEntity confirm(@Valid @RequestBody ConfirmationRequestEntity requestEntity, Errors errors) {
+    public ResponseEntity confirm(@RequestBody ConfirmationRequestEntity requestEntity, Errors errors) {
         logger.debug("Got CONFIRMATION request");
         if (errors.hasErrors()) {
             logErrors(errors);
@@ -66,19 +65,19 @@ public class ConfirmationController {
 
     private void logErrors(Errors errors) {
         logger.info("User has entered invalid data.");
-        for(ObjectError error : errors.getAllErrors()) {
+        for (ObjectError error : errors.getAllErrors()) {
             logger.debug(error.toString());
         }
     }
 
     private List<ErrorResponse> transformErrors(List<ObjectError> errors) {
         List<ErrorResponse> errorResponses = new ArrayList<>();
-        for(ObjectError error : errors) {
+        for (ObjectError error : errors) {
             errorResponses.add(
                     new ErrorResponse(
-                                ErrorType.AUTHENTICATION_ERROR,
-                                error.getDefaultMessage()
-                        )
+                            ErrorType.AUTHENTICATION_ERROR,
+                            error.getDefaultMessage()
+                    )
             );
         }
         return errorResponses;

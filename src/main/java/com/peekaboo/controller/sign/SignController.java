@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +35,7 @@ public class SignController {
     private BCryptPasswordEncoder encoder;
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
-    public ResponseEntity signin(@Valid @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
+    public ResponseEntity signin( @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
         logger.debug("Got SIGN IN request");
         if (errors.hasErrors()) {
             logErrors(errors);
@@ -75,7 +74,7 @@ public class SignController {
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public ResponseEntity signup(@Valid @RequestBody SignupRequestEntity requestEntity, Errors errors) {
+    public ResponseEntity signup( @RequestBody SignupRequestEntity requestEntity, Errors errors) {
         logger.debug("Got SIGN UP request");
         logger.debug("Attempting to register new user");
         if (errors.hasErrors()) {

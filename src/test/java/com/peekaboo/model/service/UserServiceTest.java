@@ -1,5 +1,6 @@
 package com.peekaboo.model.service;
 
+import com.peekaboo.miscellaneous.PropertiesParser;
 import com.peekaboo.model.entity.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,38 +23,40 @@ public class UserServiceTest {
     @Autowired
     private UserService userService;
 
-    Logger logger = LogManager.getLogger(UserServiceTest.class);
+    private Logger logger = LogManager.getLogger(UserServiceTest.class);
 
     private ArrayList<User> defaultUsers;
 
     @Test
-    @Ignore
     public void testAdd() {
-        User user = new User();
-
-        user.setUsername("John");
-//        user.setLastName("Doe");
-        user.setLogin("john@gmail.com");
-        user.setPassword("qwerty");
-//        user.setTelephone("0954624456");
-//        user.setBirthdate(LocalDate.now());
-//        user.setGender(1);
-        user = userService.create(user);
-        User another = new User();
+//        User user = new User();
 //
-
-
-        Assert.assertEquals("User " + user.getUsername() + " should be equal to himself", another, userService.get(user.getId()));
-
+//        user.setUsername("John");
+////        user.setLastName("Doe");
+//        user.setLogin("john@gmail.com");
+//        user.setPassword("qwerty");
+////        user.setTelephone("0954624456");
+////        user.setBirthdate(LocalDate.now());
+////        user.setGender(1);
+//        user = userService.create(user);
+//        User another = new User();
+////
+//
+//
+//        Assert.assertEquals("User " + user.getUsername() + " should be equal to himself", another, userService.get(user.getId()));
+        logger.error(PropertiesParser.getValue("WatsonAudioToTextDefaultAudioType")+
+                PropertiesParser.getValue("WatsonAudioToTextDefaultModelOption")+
+                PropertiesParser.getValue("WatsonAudioToTextDefaultModelOption")+
+                PropertiesParser.getValue("WatsonAudioToTextDefaultThresholdOption"));
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testException() {
-        doSomething();
-    }
+//    @Test(expected = NullPointerException.class)
+//    public void testException() {
+//        doSomething();
+//    }
 
-    private void doSomething() {
-        throw new IllegalArgumentException();
-    }
+//    private void doSomething() {
+//        throw new IllegalArgumentException();
+//    }
 
 }

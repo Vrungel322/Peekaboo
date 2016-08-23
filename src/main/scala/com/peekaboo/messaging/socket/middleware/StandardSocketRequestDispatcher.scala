@@ -9,23 +9,28 @@ import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
 class StandardSocketRequestDispatcher extends RequestDispatcher {
-
   val system = ActorSystems.messageSystem
 
   def process(action: Action, authorId: String) = {
     action match {
       case a: Send =>
-        val destination = a.getDestination
-        logger.debug(s"SEND action from ${authorId} to ${destination}")
+        try{
+          val destinationId = a.getDestination
+        this.logger.debug(s"SEND action from $authorId to $destinationId")
 
 
 
         //todo: if not found actor use default
-        system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
-          val actSel = getFromTry(aTry, destination)
+        //todo: there is a big bullshit in the code- actor doesnot save
+        system.actorSelection("/user/" + destinationId).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
+          val actSel = getFromTry(aTry, destinationId)
 
-          actSel ! (a, authorId)
+          actSel ! (a,destinationId)
+
         })
+        }catch{case ex:Exception =>
+          logger.error(ex.getMessage)
+        }
 
 
     }

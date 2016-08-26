@@ -19,4 +19,5 @@
     <mvc:resources mapping="/node_modules/**" location="application/node_modules/"/>
     <mvc:resources mapping="/typings/**" location="application/typings/"/>
 
+
 </beans>

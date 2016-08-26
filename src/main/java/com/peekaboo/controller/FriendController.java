@@ -19,7 +19,7 @@ public class FriendController {
     public ResponseEntity<FriendResponse> findByUsername(FriendRequest request) {
         User user = userService.findByUsername(request.getUsername());
         if (user != null) {
-            FriendResponse response = new FriendResponse(user.getId());
+            FriendResponse response = new FriendResponse(user.getId().toString());
             return new ResponseEntity<>(response, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

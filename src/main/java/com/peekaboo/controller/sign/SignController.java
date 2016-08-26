@@ -2,10 +2,12 @@ package com.peekaboo.controller.sign;
 
 import com.peekaboo.confirmation.RegistrationConfirmService;
 import com.peekaboo.model.entity.User;
-import com.peekaboo.model.entity.UserRole;
+import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
 import com.peekaboo.model.service.VerificationTokenService;
+import com.peekaboo.model.service.impl.UserServiceImpl;
+import com.peekaboo.model.service.impl.VerificationTokenServiceImpl;
 import com.peekaboo.security.jwt.JwtUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,8 +30,8 @@ import java.util.List;
 @RequestMapping("/")
 public class SignController {
 
-    private UserService userService;
-    private VerificationTokenService verificationService;
+    private UserServiceImpl userService;
+    private VerificationTokenServiceImpl verificationService;
     private RegistrationConfirmService registrationConfirmService;
     private JwtUtil jwtUtil;
     private BCryptPasswordEncoder encoder;
@@ -52,10 +54,6 @@ public class SignController {
         }
         String password = requestEntity.getPassword();
 
-
-        //todo: BIG QUESTION! should we allow to sign in unverified user???
-
-
         if (user == null || !encoder.matches(password, user.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             return new ResponseEntity(
@@ -65,12 +63,12 @@ public class SignController {
         }
         logger.debug("User were successfully authorized");
         SignResponse response = new SignResponse();
-        response.setId(user.getId())
+        response.setId(user.getId().toString())
                 .setUsername(user.getUsername())
                 .setRole(user.getRoles())
                 .setEnabled(user.isEnabled());
         String token = jwtUtil.generateToken(response);
-        return new ResponseEntity(new SigninResponse(user.getId(), token), HttpStatus.OK);
+        return new ResponseEntity(new SigninResponse(user.getId().toString(), token), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
@@ -128,7 +126,7 @@ public class SignController {
             } else {
                 user = new User();
                 user.setUsername(requestEntity.getUsername());
-                user.setDisplayName(user.getUsername());
+                user.setname(user.getUsername());
                 user.setLogin(requestEntity.getLogin());
                 user.setPassword(password);
                 user.addRole(UserRole.USER);
@@ -140,7 +138,7 @@ public class SignController {
         verToken.setUser(user);
         verToken = verificationService.create(verToken);
         registrationConfirmService.confirm(user, verToken);
-        SignupResponse response = new SignupResponse(user.getId());
+        SignupResponse response = new SignupResponse(user.getId().toString());
         logger.debug("User were successfully created");
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -166,12 +164,12 @@ public class SignController {
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public void setUserService(UserServiceImpl userService) {
         this.userService = userService;
     }
 
     @Autowired
-    public void setVerificationService(VerificationTokenService verificationService) {
+    public void setVerificationService(VerificationTokenServiceImpl verificationService) {
         this.verificationService = verificationService;
     }
 

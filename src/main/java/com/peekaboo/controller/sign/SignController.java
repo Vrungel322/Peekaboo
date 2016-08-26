@@ -65,12 +65,12 @@ public class SignController {
         }
         logger.debug("User were successfully authorized");
         SignResponse response = new SignResponse();
-        response.setId(user.getId())
+        response.setId(user.getId().toString())
                 .setUsername(user.getUsername())
                 .setRole(user.getRoles())
                 .setEnabled(user.isEnabled());
         String token = jwtUtil.generateToken(response);
-        return new ResponseEntity(new SigninResponse(user.getId(), token), HttpStatus.OK);
+        return new ResponseEntity(new SigninResponse(user.getId().toString(), token), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
@@ -128,7 +128,7 @@ public class SignController {
             } else {
                 user = new User();
                 user.setUsername(requestEntity.getUsername());
-                user.setDisplayName(user.getUsername());
+                user.setname(user.getUsername());
                 user.setLogin(requestEntity.getLogin());
                 user.setPassword(password);
                 user.addRole(UserRole.USER);
@@ -140,7 +140,7 @@ public class SignController {
         verToken.setUser(user);
         verToken = verificationService.create(verToken);
         registrationConfirmService.confirm(user, verToken);
-        SignupResponse response = new SignupResponse(user.getId());
+        SignupResponse response = new SignupResponse(user.getId().toString());
         logger.debug("User were successfully created");
         return new ResponseEntity(response, HttpStatus.OK);
     }

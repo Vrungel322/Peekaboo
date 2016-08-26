@@ -31,7 +31,7 @@ public class FileDownload {
     @RequestMapping(path = "/audio/{fileName}", method = RequestMethod.GET)
     public void audio(HttpServletResponse response, @PathVariable String fileName) {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = u.getId();
+        String userId = u.getId().toString();
         Path file = Paths.get(rootDir.getAbsolutePath(), userId, fileName);
         if (Files.exists(file)) {
             response.setContentType("audio/wav");

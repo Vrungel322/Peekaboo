@@ -4,12 +4,14 @@ import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
 import org.springframework.stereotype.Repository;
 
-@Repository
 public interface VerificationTokenRepository  {
 
-    VerificationToken findByValue(String token);
-
-    String deleteByValue(String value);
-
+    void save(VerificationToken entity);
+    void delete(VerificationToken entity);
+    void update(VerificationToken verificationToken);
+    VerificationToken findById(Long id);
+    VerificationToken findByValue(String value);
+    void deleteByValue(String value);
     VerificationToken findByUser(User user);
+
 }

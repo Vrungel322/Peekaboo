@@ -3,6 +3,7 @@ package com.peekaboo.model.service.impl;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.repository.VerificationTokenRepository;
+import com.peekaboo.model.repository.impl.VerificationRepositoryImpl;
 import com.peekaboo.model.service.VerificationTokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -12,79 +13,46 @@ import org.springframework.stereotype.Service;
 public class VerificationTokenServiceImpl implements VerificationTokenService {
 
     @Autowired
-    private VerificationTokenRepository verificationTokenRepository;
+    private VerificationRepositoryImpl verificationTokenRepository;
 
     @Override
     public VerificationToken create(VerificationToken entity) {
-        return null;
+        verificationTokenRepository.save(entity);
+        return entity;
     }
-
     @Override
     public VerificationToken get(String id) {
-        return null;
-    }
-
-    @Override
-    public void update(VerificationToken entity) {
-
-    }
-
-    @Override
-    public void delete(VerificationToken entity) {
-
+        return verificationTokenRepository.findById(Long.valueOf(id));
     }
 
     @Override
     public VerificationToken findByValue(String token) {
-        return null;
+        return verificationTokenRepository.findByValue(token);
     }
 
     @Override
-    public String deleteByValue(String value) {
-        return null;
+    public void deleteByValue(String value) {
+        verificationTokenRepository.deleteByValue(value);
     }
 
     @Override
     public VerificationToken findByUser(User user) {
-        return null;
+        return verificationTokenRepository.findByUser(user);
     }
-//
-//    @Autowired
-////    private VerificationTokenRepository verificationTokenRepository;
-//
-//    @Override
-//    public VerificationToken create(VerificationToken entity) {
-//        return verificationTokenRepository.saveAndFlush(entity);
-//    }
-//
-//    @Override
-//    public VerificationToken get(String id) {
-//        return verificationTokenRepository.findOne(id);
-//    }
-//
-//    @Override
-//    public void update(VerificationToken entity) {
-//        verificationTokenRepository.saveAndFlush(entity);
-//    }
-//
-//    @Override
-//    public void delete(VerificationToken entity) {
-//        verificationTokenRepository.delete(entity);
-//    }
-//
-//    @Override
-//    public VerificationToken findByValue(String value) {
-//        return verificationTokenRepository.findByValue(value);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public String deleteByValue(String value) {
-//        return verificationTokenRepository.deleteByValue(value);
-//    }
-//
-//    @Override
-//    public VerificationToken findByUser(User user){
-//        return verificationTokenRepository.findByUser(user);
-//    }
+
+    @Override
+    public void save(VerificationToken entity) {
+        verificationTokenRepository.save(entity);
+    }
+
+    @Override
+    public void delete(VerificationToken entity) {
+        verificationTokenRepository.delete(entity);
+    }
+
+    @Override
+    public void update(VerificationToken verificationToken) {
+        save(verificationToken);
+    }
+
 }

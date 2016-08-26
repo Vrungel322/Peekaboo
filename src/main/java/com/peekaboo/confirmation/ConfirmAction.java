@@ -16,6 +16,8 @@ public class ConfirmAction extends Thread {
 
     @Override
     public void run() {
+        System.out.println(user.getLogin());
+        System.out.println(verificationToken.toString() + " null");
         confirmSender.send(user.getLogin(), verificationToken.getValue());
     }
 

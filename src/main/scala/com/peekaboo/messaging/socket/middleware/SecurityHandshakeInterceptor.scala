@@ -27,7 +27,7 @@ class SecurityHandshakeInterceptor(authenticationInterceptor: AuthenticationInte
     else {
       logger.debug("User was successfully authenticated")
       //remember user id for future needs
-      request.getHeaders.add("id", authentication.getPrincipal.asInstanceOf[User].getId)
+      request.getHeaders.add("id", authentication.getPrincipal.asInstanceOf[User].getId.toString)
       true
     }
 

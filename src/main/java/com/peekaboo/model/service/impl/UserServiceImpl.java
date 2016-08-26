@@ -1,40 +1,46 @@
 package com.peekaboo.model.service.impl;
 
 import com.peekaboo.model.entity.User;
-import com.peekaboo.model.repository.UserRepository;
+import com.peekaboo.model.repository.impl.UserRepositoryImpl;
 import com.peekaboo.model.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.*;
+
 @Service(value = "userService")
 public class UserServiceImpl implements UserService {
+    private final Logger logger = LogManager.getLogger(this);
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepositoryImpl userRepository;
 
     @Override
     public User create(User entity) {
-        return null;
+        userRepository.save(entity);
+        return entity;
     }
 
     @Override
     public User get(String id) {
-        return null;
+        return userRepository.findById(Long.valueOf(id));
     }
 
     @Override
     public void update(User entity) {
-
+        userRepository.update(entity);
     }
 
     @Override
     public void delete(User entity) {
-
+        userRepository.delete(entity);
     }
 
     @Override
     public User findByUsername(String username) {
-        return null;
+        return userRepository.findByUsername(username);
     }
 
     @Override
@@ -44,71 +50,71 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByLogin(String login) {
-        return null;
+        return userRepository.findByUsername(login);
     }
 
-//    @Autowired
-//    private UserRepository userRepository;
-//
-////    @Autowired
-////    private VerificationTokenRepository verificationTokenRepository;
-//
-//    @Override
-//    public User create(User user) {
-//        return userRepository.saveAndFlush(user);
-//    }
-//
-//    @Override
-//    public User get(String id) {
-//        return userRepository.findOne(id);
-//    }
-//
-//    @Override
-//    public void update(User user) {
-//        userRepository.saveAndFlush(user);
-//    }
-//
-//    @Override
-//    public void delete(User user) {
-//        userRepository.delete(user);
-//    }
-//
-//    @Override
-//    public User findByUsername(String username) {
-//        return userRepository.findByUsername(username);
-//    }
-//
-//    @Override
-//    public boolean loginExists(String login) {
-//        return userRepository.findByEmailOrTelephone(login, login) != null;
-//    }
+    @Override
+    public User save(User user) {
+        return userRepository.save(user);
+    }
 
-//    @Override
-//    @Transactional
-//    public User findByConfirmToken(String token) {
-//        return verificationTokenRepository.findByValue(token).getUser();
-//    }
+    @Override
+    public User findById(Long id) {
+        return userRepository.findById(id);
+    }
 
-//    @Override
-//    @Transactional
-//    public User findByTelephone(String telephone) {
-//        return userRepository.findByTelephone(telephone);
-//    }
-//
-//    @Override
-//    @Transactional
-//    public User findByEmail(String email) {
-//        return userRepository.findByEmail(email);
-//    }
+    @Override
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
 
-//    @Override
-//    @Transactional
-//    public boolean userExist(String login) {
-//        return userRepository.findByEmailOrTelephone(login, login) != null;
-//    }
+    @Override
+    public User findByTelephone(String telephone) {
+        return userRepository.findByTelephone(telephone);
+    }
 
-//    @Override
-//    public User findByLogin(String login) {
-//        return userRepository.findByEmailOrTelephone(login, login);
-//    }
+    @Override
+    public ArrayList<User> getAll() {
+        return userRepository.getAll();
+    }
+
+    @Override
+    public void clearDataBase() {
+        userRepository.clearDataBase();
+    }
+
+    @Override
+    public ArrayList<User> getFriends(User user) {
+        return userRepository.getFriends(user);
+    }
+
+    @Override
+    public void addNewFriend(User target, User whom) {
+        userRepository.addNewFriend(target, whom);
+    }
+
+    @Override
+    public void deleteFriend(User from, User to) {
+        userRepository.deleteFriend(from, to);
+    }
+
+    @Override
+    public void addToBlackList(User from, User to) {
+        userRepository.addToBlackList(from, to);
+    }
+
+    @Override
+    public void removeFromBlackList(User from, User to) {
+        userRepository.removeFromBlackList(from, to);
+    }
+
+    @Override
+    public ArrayList<User> getBlackListFriends(User user) {
+        return userRepository.getBlackListFriends(user);
+    }
 }
+
+
+
+
+

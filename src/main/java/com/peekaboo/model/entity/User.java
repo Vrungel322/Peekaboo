@@ -1,32 +1,34 @@
 package com.peekaboo.model.entity;
 
+import org.neo4j.graphdb.Node;
 import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
 
 @NodeEntity
 public class User implements UserDetails {
 
     @GraphId
-    private String id;
+    private Long id;
 
+    @Index(unique = true)
     private String username;
 
-    private String displayName;
+    private String name;
 
     private String password;
 
+    @Index(unique = true)
     private String telephone;
 
+    @Index(unique = true)
     private String email;
 
     private int roles;
@@ -36,23 +38,28 @@ public class User implements UserDetails {
 
     private boolean enabled;
 
-    @Relationship(type = "FRIENDS", direction = Relationship.UNDIRECTED)
-    private Set<User> friends;
+    @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
+    private List<User> friends = new ArrayList<>();
 
-    public User() {
-    }
+    @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
+    private Storage storage;
 
-    public User(String username, String displayName, String password, String telephone,
-                String email, /*LocalDate birthdate,*/ int roles, int gender, boolean enabled) {
+    @Relationship(type = "USE", direction = Relationship.DIRECTION)
+    private List<Storage> storages = new ArrayList<>();
+
+    public User() {}
+
+    public User(String username, String name, String password, String telephone, String email, int roles, int gender, boolean enabled
+                /*LocalDate birthdate,*/) {
         this.username = username;
-        this.displayName = displayName;
+        this.name = name;
         this.password = password;
         this.telephone = telephone;
         this.email = email;
         this.roles = roles;
         this.gender = gender;
         this.enabled = enabled;
-        this.friends = new HashSet<>();
+        this.friends = new ArrayList<>();
     }
 
     @Override
@@ -105,11 +112,11 @@ public class User implements UserDetails {
         this.roles |= userRole.getId();
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -149,6 +156,14 @@ public class User implements UserDetails {
         this.enabled = enabled;
     }
 
+    public List<User> getFriends() {
+        return friends;
+    }
+
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
+    }
+
     public void setLogin(String login) {
         if (login.contains("@")) {
             this.email = login;
@@ -162,12 +177,12 @@ public class User implements UserDetails {
         this.telephone = null;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public String getname() {
+        return name;
     }
 
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
+    public void setname(String name) {
+        this.name = name;
     }
 
     public boolean hasLogin(String login) {
@@ -182,6 +197,21 @@ public class User implements UserDetails {
         return email == null ? telephone : email;
     }
 
+    public Storage getStorage() {
+        return storage;
+    }
+
+    public void setStorage(Storage storage) {
+        this.storage = storage;
+    }
+
+    public List<Storage> getStorages() {
+        return storages;
+    }
+
+    public void setStorages(List<Storage> storages) {
+        this.storages = storages;
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -206,7 +236,7 @@ public class User implements UserDetails {
         final StringBuilder sb = new StringBuilder("User{");
         sb.append("id='").append(id).append('\'');
         sb.append(", username='").append(username).append('\'');
-        sb.append(", displayName='").append(displayName).append('\'');
+        sb.append(", name='").append(name).append('\'');
         sb.append(", password='").append(password).append('\'');
         sb.append(", telephone='").append(telephone).append('\'');
         sb.append(", email='").append(email).append('\'');
@@ -217,3 +247,5 @@ public class User implements UserDetails {
         return sb.toString();
     }
 }
+
+

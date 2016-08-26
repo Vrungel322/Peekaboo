@@ -1,16 +1,25 @@
 package com.peekaboo.model.repository;
 
 import com.peekaboo.model.entity.User;
-import org.springframework.stereotype.Repository;
 
-@Repository
+import java.util.ArrayList;
+import java.util.Collection;
+
 public interface UserRepository {
 
+    User save(User user);
+    User update(User user);
+    void delete (User user);
+    User findById(Long id);
     User findByUsername(String username);
-
     User findByEmail(String email);
-
     User findByTelephone(String telephone);
-
-    User findByEmailOrTelephone(String email, String telephone);
+    ArrayList<User> getAll();
+    void clearDataBase();
+    ArrayList<User> getFriends(User user);
+    void addNewFriend(User target,User whom);
+    void deleteFriend(User from, User to);
+    void addToBlackList(User from, User to);
+    void removeFromBlackList(User from, User to);
+    ArrayList<User> getBlackListFriends(User user);
 }

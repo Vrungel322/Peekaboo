@@ -2,35 +2,35 @@ package com.peekaboo.model.entity;
 
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.NodeEntity;
+import org.neo4j.ogm.annotation.Relationship;
 
 @NodeEntity
 public class VerificationToken {
 
     @GraphId
-    private String id;
-
+    private Long id;
     private String value;
 
+    @Relationship(type = "RELATES", direction = Relationship.DIRECTION)
     private User user;
 
-    public VerificationToken() {
-    }
+    public VerificationToken() {}
 
     public VerificationToken(String token, User user) {
         this.value = token;
         this.user = user;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 
     public void setValue(String token) {

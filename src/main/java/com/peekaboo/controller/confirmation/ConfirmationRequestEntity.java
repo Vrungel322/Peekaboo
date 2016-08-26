@@ -21,4 +21,12 @@ public class ConfirmationRequestEntity {
     public void setKey(String key) {
         this.key = key;
     }
+
+    @Override
+    public String toString() {
+        return "ConfirmationRequestEntity{" +
+                "id='" + id + '\'' +
+                ", key='" + key + '\'' +
+                '}';
+    }
 }

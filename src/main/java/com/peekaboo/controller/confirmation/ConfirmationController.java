@@ -7,6 +7,8 @@ import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
 import com.peekaboo.model.service.VerificationTokenService;
+import com.peekaboo.model.service.impl.UserServiceImpl;
+import com.peekaboo.model.service.impl.VerificationTokenServiceImpl;
 import com.peekaboo.security.jwt.JwtUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,8 +30,8 @@ import java.util.List;
 public class ConfirmationController {
 
     private JwtUtil jwtUtil;
-    private UserService userService;
-    private VerificationTokenService tokenService;
+    private UserServiceImpl userService;
+    private VerificationTokenServiceImpl tokenService;
 
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     public ResponseEntity confirm(@RequestBody ConfirmationRequestEntity requestEntity, Errors errors) {
@@ -41,18 +43,24 @@ public class ConfirmationController {
                     HttpStatus.BAD_REQUEST
             );
         }
+
         VerificationToken key = tokenService.findByValue(requestEntity.getKey());
-        if (key == null || !key.getUser().getId().equals(requestEntity.getId())) {
+        if (key == null || !key.getUser().getId().toString().equals(requestEntity.getId())) {
             return new ResponseEntity(
                     new ErrorResponse(ErrorType.INVALID_CONFIRM_TOKEN, "User entered invalid verification token"),
                     HttpStatus.BAD_REQUEST);
         } else {
+            logger.error(requestEntity.getId() + "    sdfjhsdjkfhsdjkfsjkd");
             User user = userService.get(requestEntity.getId());
+            logger.error("1     " + requestEntity.toString());
             user.setEnabled(true);
             tokenService.deleteByValue(requestEntity.getKey());
+            logger.error("2     " + requestEntity.toString());
             userService.update(user);
+            logger.error("3     " + requestEntity.toString());
             SignResponse response = new SignResponse();
-            response.setId(user.getId())
+            logger.error("5     " + requestEntity.toString());
+            response.setId(user.getId().toString())
                     .setUsername(user.getUsername())
                     .setRole(user.getRoles())
                     .setEnabled(user.isEnabled());
@@ -89,15 +97,14 @@ public class ConfirmationController {
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public void setUserService(UserServiceImpl userService) {
         this.userService = userService;
     }
 
     @Autowired
-    public void setTokenService(VerificationTokenService tokenService) {
+    public void setTokenService(VerificationTokenServiceImpl tokenService) {
         this.tokenService = tokenService;
     }
-
 
     private final Logger logger = LogManager.getLogger(ConfirmationController.class);
 

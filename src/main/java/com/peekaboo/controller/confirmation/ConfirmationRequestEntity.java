@@ -1,12 +1,9 @@
 package com.peekaboo.controller.confirmation;
 
-import javax.validation.constraints.NotNull;
-
 public class ConfirmationRequestEntity {
-    @NotNull
+
     private String id;
 
-    @NotNull
     private String key;
 
     public String getId() {

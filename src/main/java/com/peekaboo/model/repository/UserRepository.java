@@ -1,9 +1,10 @@
 package com.peekaboo.model.repository;
 
 import com.peekaboo.model.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface UserRepository extends JpaRepository<User, String> {
+@Repository
+public interface UserRepository {
 
     User findByUsername(String username);
 

@@ -2,9 +2,10 @@ package com.peekaboo.model.repository;
 
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface VerificationTokenRepository extends JpaRepository<VerificationToken, String> {
+@Repository
+public interface VerificationTokenRepository  {
 
     VerificationToken findByValue(String token);
 

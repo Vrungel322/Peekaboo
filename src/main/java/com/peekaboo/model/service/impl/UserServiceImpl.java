@@ -5,7 +5,6 @@ import com.peekaboo.model.repository.UserRepository;
 import com.peekaboo.model.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service(value = "userService")
 public class UserServiceImpl implements UserService {
@@ -13,44 +12,76 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
 
-//    @Autowired
-//    private VerificationTokenRepository verificationTokenRepository;
-
     @Override
-    @Transactional
-    public User create(User user) {
-        return userRepository.saveAndFlush(user);
+    public User create(User entity) {
+        return null;
     }
 
     @Override
-    @Transactional
     public User get(String id) {
-        return userRepository.findOne(id);
+        return null;
     }
 
     @Override
-    @Transactional
-    public void update(User user) {
-        userRepository.saveAndFlush(user);
+    public void update(User entity) {
+
     }
 
     @Override
-    @Transactional
-    public void delete(User user) {
-        userRepository.delete(user);
+    public void delete(User entity) {
+
     }
 
     @Override
-    @Transactional
     public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return null;
     }
 
     @Override
-    @Transactional
     public boolean loginExists(String login) {
-        return userRepository.findByEmailOrTelephone(login, login) != null;
+        return false;
     }
+
+    @Override
+    public User findByLogin(String login) {
+        return null;
+    }
+
+//    @Autowired
+//    private UserRepository userRepository;
+//
+////    @Autowired
+////    private VerificationTokenRepository verificationTokenRepository;
+//
+//    @Override
+//    public User create(User user) {
+//        return userRepository.saveAndFlush(user);
+//    }
+//
+//    @Override
+//    public User get(String id) {
+//        return userRepository.findOne(id);
+//    }
+//
+//    @Override
+//    public void update(User user) {
+//        userRepository.saveAndFlush(user);
+//    }
+//
+//    @Override
+//    public void delete(User user) {
+//        userRepository.delete(user);
+//    }
+//
+//    @Override
+//    public User findByUsername(String username) {
+//        return userRepository.findByUsername(username);
+//    }
+//
+//    @Override
+//    public boolean loginExists(String login) {
+//        return userRepository.findByEmailOrTelephone(login, login) != null;
+//    }
 
 //    @Override
 //    @Transactional
@@ -76,10 +107,8 @@ public class UserServiceImpl implements UserService {
 //        return userRepository.findByEmailOrTelephone(login, login) != null;
 //    }
 
-
-    @Override
-    @Transactional
-    public User findByLogin(String login) {
-        return userRepository.findByEmailOrTelephone(login, login);
-    }
+//    @Override
+//    public User findByLogin(String login) {
+//        return userRepository.findByEmailOrTelephone(login, login);
+//    }
 }

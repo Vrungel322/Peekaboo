@@ -66,8 +66,9 @@ public class SignController {
         response.setId(user.getId().toString())
                 .setUsername(user.getUsername())
                 .setRole(user.getRoles())
-                .setEnabled(user.isEnabled());
+                .setEnabled(true);
         String token = jwtUtil.generateToken(response);
+        logger.error(token);
         return new ResponseEntity(new SigninResponse(user.getId().toString(), token), HttpStatus.OK);
     }
 
@@ -82,12 +83,13 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
+
         User user = userService.findByUsername(requestEntity.getUsername());
         String password = encoder.encode(requestEntity.getPassword());
         if (user != null) {
             logger.debug("User has registered before");
             logger.debug("Checking maybe he hasn't been verified yet");
-
+            logger.debug(user.isEnabled() + " ffffff");
             if (user.isEnabled()) {
                 logger.debug("User has already been registered. Send him error");
                 return new ResponseEntity(
@@ -129,6 +131,7 @@ public class SignController {
                 user.setname(user.getUsername());
                 user.setLogin(requestEntity.getLogin());
                 user.setPassword(password);
+                user.setEnabled(true);
                 user.addRole(UserRole.USER);
                 user = userService.create(user);
             }

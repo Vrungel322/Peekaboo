@@ -45,7 +45,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean loginExists(String login) {
-        return false;
+
+        User user = findByEmail(login);
+        if (user == null)
+            return false;
+        else
+            return true;
     }
 
     @Override

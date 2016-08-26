@@ -30,17 +30,15 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(User user) {
         Session session = sessionFactory.getSession();
-        if (findByUsername(user.getUsername())==null && (findByEmail(user.getEmail())==null)) {
-            session.save(user);
-            return user;
-        } else {
-            return null;
-        }
+        session.save(user);
+        return user;
     }
 
     @Override
     public User update(User user) {
-       return save(user);
+        Session session = sessionFactory.getSession();
+        session.save(user);
+        return user;
     }
 
     @Override
@@ -58,34 +56,31 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByUsername(String username) {
         Session session = sessionFactory.getSession();
-        Collection<User> res = session.loadAll(User.class, new Filters().add("username", username));
-        ArrayList<User> resList = new ArrayList<>(res);
-        if (resList.size() == 0) {
+        Collection<User> res = session.loadAll(User.class, new Filter("username", username));
+        if (res.isEmpty()) {
             return null;
         }
-        return resList.get(0);
+        return res.iterator().next();
     }
 
     @Override
     public User findByEmail(String email) {
         Session session = sessionFactory.getSession();
         Collection<User> res = session.loadAll(User.class, new Filters().add("email", email));
-        ArrayList<User> resList = new ArrayList<>(res);
-        if (resList.size() == 0) {
-            return null;
+        if (!res.isEmpty()) {
+            return res.iterator().next();
         }
-        return resList.get(0);
+        return null;
     }
 
     @Override
     public User findByTelephone(String telephone) {
         Session session = sessionFactory.getSession();
         Collection<User> res = session.loadAll(User.class, new Filters().add("telephone", telephone));
-        ArrayList<User> resList = new ArrayList<>(res);
-        if (resList.size() == 0) {
-            return null;
+        if (!res.isEmpty()) {
+            return res.iterator().next();
         }
-        return resList.get(0);
+        return null;
     }
 
     @Override

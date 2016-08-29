@@ -34,14 +34,15 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
         JwtAuthenticationToken jwtAuthenticationToken = (JwtAuthenticationToken) authentication;
         String token = jwtAuthenticationToken.getToken();
 
-         logger.error("Token is:");
-         logger.error(token);
+        logger.error("Token is:");
+        logger.error(token);
         logger.debug("Retrieving user from token");
         User parsedUser = jwtUtil.parse(token);
         logger.debug("HERE IS USER");
         logger.debug(parsedUser);
-//        logger.error("Here is User from token:");
-//        logger.error(parsedUser);
+        //logger.error("Here is User from token:");
+        //logger.error(parsedUser);
+
         if (parsedUser == null) {
             logger.debug("Error with retrieving user. Warn: authorization as anonymous user without any role");
             //todo: find better way

@@ -20,7 +20,7 @@ public class AudioToTextWatson extends SpeechToText implements AudioToTextInterf
     private double confidenceValue;
 
     public AudioToTextWatson() {
-        this.setUsernameAndPassword(PropertiesParser.getValue("WatsonAudioToTextLogin" ), PropertiesParser.getValue("WatsonAudioToTextPassword"));
+        this.setUsernameAndPassword(PropertiesParser.getValue("WatsonAudioToTextLogin"), PropertiesParser.getValue("WatsonAudioToTextPassword"));
     }
 
     @Override
@@ -76,15 +76,17 @@ public class AudioToTextWatson extends SpeechToText implements AudioToTextInterf
         w.append(".");
         return w.toString();
     }
+
     @Override
-    public String RunServiceWithDefaults(File file){
-        SpeechRecognitionOptions options  = new SpeechRecognitionOptions();
+    public String RunServiceWithDefaults(File file) {
+        SpeechRecognitionOptions options = new SpeechRecognitionOptions();
         options.setAudioType(PropertiesParser.getValue("WatsonAudioToTextDefaultAudioType"));
         options.setLanguageOption(PropertiesParser.getValue("WatsonAudioToTextDefaultWatsonlanguageOption"));
         options.setModelOption(PropertiesParser.getValue("WatsonAudioToTextDefaultModelOption"));
         options.setThresholdOption(Double.parseDouble(PropertiesParser.getValue("WatsonAudioToTextDefaultThresholdOption")));
-        return this.RunService(file,options);
+        return this.RunService(file, options);
     }
+
     public List<String> LoadAudioList() {
         List<String> list = new ArrayList<>();
         list.add("audio/flac");
@@ -105,7 +107,7 @@ public class AudioToTextWatson extends SpeechToText implements AudioToTextInterf
 
     public List<String> LoadModelList() {
         List<String> list = new LinkedList<>();
-       list.add("BroadbandModel");
+        list.add("BroadbandModel");
         list.add("NarrowbandModel");
         return list;
     }

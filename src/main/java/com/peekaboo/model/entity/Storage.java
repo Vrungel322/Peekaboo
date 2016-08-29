@@ -11,8 +11,9 @@ public class Storage {
 
     private String filePath;
 
-    public Storage(){
-
+    public Storage(String fileName, String filePath){
+        this.fileName = fileName;
+        this.filePath = filePath;
     }
 
     public Long getId() {

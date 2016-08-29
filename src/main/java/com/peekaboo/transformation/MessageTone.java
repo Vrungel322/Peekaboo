@@ -26,7 +26,7 @@ public class MessageTone extends ToneAnalyzer {
     }
 
     public String GetMessageTone() {
-      ToneScore tScore=tonesList
+        ToneScore tScore=tonesList
                 .stream().max((t1, t2) -> Double.compare(t1.getScore(), t2.getScore()))
                 .get();
         if (tScore.getScore()>0.5 ){

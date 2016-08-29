@@ -28,10 +28,10 @@ public class TextToAudioWatson implements TextToAudioInterface {
     }
     public InputStream RunService(String text, SpeechRecognitionOptions options) throws IOException {
         InputStream out;
-            String voice = options.getLanguageOption() + "_" + options.getModelOption();
-            String audioformat = options.getAudioType();
-            InputStream stream = service.synthesize(text, Voice.getByName(voice), AudioFormat.valueOf(audioformat)).execute();
-            out = WaveUtils.reWriteWaveHeader(stream);
+        String voice = options.getLanguageOption() + "_" + options.getModelOption();
+        String audioformat = options.getAudioType();
+        InputStream stream = service.synthesize(text, Voice.getByName(voice), AudioFormat.valueOf(audioformat)).execute();
+        out = WaveUtils.reWriteWaveHeader(stream);
 
         return out;
     }
@@ -57,27 +57,27 @@ public class TextToAudioWatson implements TextToAudioInterface {
         List <String> list=new LinkedList<>();
         switch (language) {
             case "de-DE":
-            list.add("DieterVoice");
-            list.add("BirgitVoice");
+                list.add("DieterVoice");
+                list.add("BirgitVoice");
                 break;
             case "en-US":
-            list.add("AllisonVoice");
-            list.add("LisaVoice");
+                list.add("AllisonVoice");
+                list.add("LisaVoice");
                 break;
             case "es-ES":
-            list.add("EnriqueVoice");
-            list.add("LauraVoice");
+                list.add("EnriqueVoice");
+                list.add("LauraVoice");
                 break;
             case "es-US":
-            list.add("SofiaVoice");
+                list.add("SofiaVoice");
             case "fr-FR":
-            list.add("ReneeVoice");
+                list.add("ReneeVoice");
                 break;
             case "en-GB":
-            list.add("KateVoice");
+                list.add("KateVoice");
                 break;
             case "it-IT":
-            list.add("FrancescaVoice");
+                list.add("FrancescaVoice");
                 break;
         }
         return list;

@@ -21,7 +21,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
   //probably we can't add state to the actor
   //so it would be great to find the way how to store User's state (receive audio, receive text, receive any)
 
-//  @scala.throws[Exception](classOf[Exception])
+  //  @scala.throws[Exception](classOf[Exception])
   override def postStop(): Unit = {
 
     // Here might be a possibility that connection with socket wasn't closed due to some errors on client side.
@@ -37,39 +37,39 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
 
   def receive = {
     case (msg: Send, id: String) =>
-        //nice place to add conversion
+      //nice place to add conversion
       //have to check user's state
       //and than if needed perform some actions
       logger.error("Got to message Actor")
       try{
-      val rootPath = System.getProperty("catalina.home")
-      val rootDir = new File(rootPath + File.separator + "tmp")
-      if (!rootDir.exists) rootDir.mkdirs()
-      rootDir.mkdirs()
-      val uploadedFile = new File(rootDir.getAbsolutePath + File.separator + "aaa.wav")
-      if (!uploadedFile.exists) uploadedFile.createNewFile
-      val stream=new FileOutputStream(uploadedFile)
-      val o=new FileOutputStream(uploadedFile)
-      val buffer: Array[Byte] = new Array[Byte](1024)
-      var length: Int = 0
-      val t=new TextToAudioWatson
-      val in:InputStream=t.RunServiceWithDefaults("hello world")
-      IOUtils.copy(in, o)
+        val rootPath = System.getProperty("catalina.home")
+        val rootDir = new File(rootPath + File.separator + "tmp")
+        if (!rootDir.exists) rootDir.mkdirs()
+        rootDir.mkdirs()
+        val uploadedFile = new File(rootDir.getAbsolutePath + File.separator + "aaa.wav")
+        if (!uploadedFile.exists) uploadedFile.createNewFile
+        val stream=new FileOutputStream(uploadedFile)
+        val o=new FileOutputStream(uploadedFile)
+        val buffer: Array[Byte] = new Array[Byte](1024)
+        var length: Int = 0
+        val t=new TextToAudioWatson
+        val in:InputStream=t.RunServiceWithDefaults("hello world")
+        IOUtils.copy(in, o)
         o.close()
-//      o.write(
-//        Stream.continually(in.read).takeWhile(-1 !=).map(_.toByte).toArray
-//      )
-//        o.close()
+        //      o.write(
+        //        Stream.continually(in.read).takeWhile(-1 !=).map(_.toByte).toArray
+        //      )
+        //        o.close()
       }
-//      var i=in.read(buffer)
-//
-//        do{
-//          stream.write(buffer, 0, length)
-//          i=in.read(buffer)
-//        }
-//        while (i>0)
-//      stream.flush()
-//      stream.close()}
+      //      var i=in.read(buffer)
+      //
+      //        do{
+      //          stream.write(buffer, 0, length)
+      //          i=in.read(buffer)
+      //        }
+      //        while (i>0)
+      //      stream.flush()
+      //      stream.close()}
       catch{case e: Exception =>logger.error(e.toString)}
 
 

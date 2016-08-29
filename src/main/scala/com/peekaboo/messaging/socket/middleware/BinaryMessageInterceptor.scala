@@ -1,3 +1,4 @@
+
 package com.peekaboo.messaging.socket.middleware
 
 import com.peekaboo.messaging.socket.worker.{Action, Send, Switchmode}

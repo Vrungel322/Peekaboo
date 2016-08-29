@@ -41,6 +41,12 @@ public class User implements UserDetails {
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
     private List<User> friends = new ArrayList<>();
 
+    @Relationship(type = "PENDINGFRIENDSHIP", direction = Relationship.UNDIRECTED)
+    private List<User> pendingFriends = new ArrayList<>();
+
+    @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
+    private List<User> requestFriends = new ArrayList<>();
+
     @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
     private Storage storage;
 
@@ -159,9 +165,23 @@ public class User implements UserDetails {
     public List<User> getFriends() {
         return friends;
     }
+    public List<User> getPendingFriends() {
+        return pendingFriends;
+    }
+    public List<User> getRequestFriends() {
+        return requestFriends;
+    }
 
     public void setFriends(List<User> friends) {
         this.friends = friends;
+    }
+
+    public void setPendingFriends(List<User> pendingFriends) {
+        this.pendingFriends = pendingFriends;
+    }
+
+    public void setRequestFriends(List<User> requestFriends) {
+        this.pendingFriends = requestFriends;
     }
 
     public void setLogin(String login) {

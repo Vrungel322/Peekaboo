@@ -50,16 +50,10 @@ public class ConfirmationController {
                     new ErrorResponse(ErrorType.INVALID_CONFIRM_TOKEN, "User entered invalid verification token"),
                     HttpStatus.BAD_REQUEST);
         } else {
-            logger.error(requestEntity.getId() + "    sdfjhsdjkfhsdjkfsjkd");
             User user = userService.get(requestEntity.getId());
-            logger.error("1     " + requestEntity.toString());
             user.setEnabled(true);
-            tokenService.deleteByValue(requestEntity.getKey());
-            logger.error("2     " + requestEntity.toString());
             userService.update(user);
-            logger.error("3     " + requestEntity.toString());
             SignResponse response = new SignResponse();
-            logger.error("5     " + requestEntity.toString());
             response.setId(user.getId().toString())
                     .setUsername(user.getUsername())
                     .setRole(user.getRoles())

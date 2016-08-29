@@ -13,9 +13,14 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
   val system = ActorSystems.messageSystem
 
   def process(action: Action, authorId: String) = {
+    logger.debug("Got to process")
     action match {
       case a: Send =>
         val destination = a.getDestination
+
+        logger.error("HERE IS SOMETHING")
+        logger.error("destination is:"+destination)
+
         logger.debug(s"SEND action from ${authorId} to ${destination}")
 
 
@@ -25,8 +30,12 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
           val actSel = getFromTry(aTry, destination)
 
           actSel ! (a, authorId)
-        })
+          }
+      )
 
+
+      case a:Switchmode=>
+        logger.debug("no such element")
 
     }
   }
@@ -46,8 +55,14 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
     * @return actor, which is able to receive Actions
     */
   private def getFromTry(aTry: Try[ActorRef], defaultHandler: String): ActorRef = {
-    if (aTry.isSuccess) aTry.get
-    else system.actorOf(Props(new DefaultMessageActor(defaultHandler)), defaultHandler)
+    if (aTry.isSuccess) {
+      logger.error("Atry is success")
+      aTry.get
+    }
+    else {
+      logger.error("default handler")
+      system.actorOf(Props(new DefaultMessageActor(defaultHandler)), defaultHandler)
+    }
   }
 
   private val logger = LogManager.getLogger(this)

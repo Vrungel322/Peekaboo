@@ -25,7 +25,7 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
 
       //at second we have to recognize who is an initiator
       val ownerId = getId(session)
-
+logger.debug("want to process action")
       //finally, we dispatch the message
       requestDispatcher.process(action, ownerId)
 

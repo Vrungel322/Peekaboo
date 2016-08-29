@@ -4,30 +4,39 @@ import com.peekaboo.confirmation.ConfirmSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.mail.MailSendException;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.*;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 
 @Service
 public class MailService implements ConfirmSender {
     public static final String REGISTRATION_CONFIRMATION = "Registration Confirmation";
 
     @Autowired
-    private MailSender mailSender;
+    private JavaMailSenderImpl mailSender;
 
     private final Logger logger = LogManager.getLogger(MailService.class);
 
     @Override
     public void send(String to, String body) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(to);
-        message.setSubject(REGISTRATION_CONFIRMATION);
-        message.setText(body);
-        send(message);
+        MimeMessage message = mailSender.createMimeMessage();
+        try {
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+            helper.setTo(to);
+            helper.setSubject(REGISTRATION_CONFIRMATION);
+            helper.setText(body, true);
+
+            send(message);
+        } catch (MessagingException ex) {
+            ex.printStackTrace();
+        }
     }
 
-    public void send(SimpleMailMessage mailMessage) {
+    public void send(MimeMessage mailMessage) {
         logger.debug("Start send message");
         boolean toSend = false;
         final int numberOfSend = 5;

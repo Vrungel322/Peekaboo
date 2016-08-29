@@ -18,7 +18,7 @@ class SecurityHandshakeInterceptor(authenticationInterceptor: AuthenticationInte
     logger.debug("Received new connection request.")
     logger.debug("Attempting to authenticate it")
     val authentication = authenticationInterceptor.authenticate(request.getHeaders)
-
+    logger.error("took here");
     //user has to have a "USER" authority to be able user the chat
     if (!authentication.getAuthorities.asScala.exists(_.getAuthority == "USER")) {
       logger.debug("Error authenticating user")

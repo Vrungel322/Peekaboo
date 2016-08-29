@@ -31,6 +31,25 @@ case class Send(text: Array[Byte], override val parameters: Map[String, String])
 
 }
 
+case class Switchmode(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) {
+
+  override val name = "SWITCHMODE"
+
+  override def getBody = text
+
+  /**
+    * Converts SEND command from client1 to MESSAGE command to client2
+    * @param author author of the SEND command
+    * @return MESSAGE command
+    */
+  def toMessage(author: String): Message = Message(text, parameters.filter { case (param, _) => param != ParameterName.Destination } + (ParameterName.From -> author))
+
+  def getDestination: String = getParameter(ParameterName.Destination).get
+
+  def getType: String = getParameter(ParameterName.Type).get
+
+}
+
 //Message command from server to client
 case class Message(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) {
 

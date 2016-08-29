@@ -1,4 +1,4 @@
-package com.peekaboo.model.entity;
+package com.peekaboo.model.entity.enums;
 
 public enum UserRole {
     USER(1), ADMIN(2);

@@ -1,6 +1,6 @@
 package com.peekaboo.model.entity;
 
-import org.neo4j.graphdb.Node;
+import com.peekaboo.model.entity.enums.UserRole;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -33,29 +33,34 @@ public class User implements UserDetails {
 
     private int roles;
 
+    private int state;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
     //TODO: male = 0 , female = 1
     private int gender;
 
     private boolean enabled;
 
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
-    private List<User> friends = new ArrayList<>();
-
-    @Relationship(type = "PENDINGFRIENDSHIP", direction = Relationship.UNDIRECTED)
-    private List<User> pendingFriends = new ArrayList<>();
-
-    @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
-    private List<User> requestFriends = new ArrayList<>();
+    private ArrayList<User> friends = new ArrayList<>();
 
     @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
     private Storage storage;
 
     @Relationship(type = "USE", direction = Relationship.DIRECTION)
-    private List<Storage> storages = new ArrayList<>();
+    private ArrayList<Storage> storages = new ArrayList<>();
 
     public User() {}
 
-    public User(String username, String name, String password, String telephone, String email, int roles, int gender, boolean enabled
+    public User(String username, String name, String password, String telephone,
+                String email, int roles, int gender, boolean enabled, int state
                 /*LocalDate birthdate,*/) {
         this.username = username;
         this.name = name;
@@ -66,6 +71,7 @@ public class User implements UserDetails {
         this.gender = gender;
         this.enabled = enabled;
         this.friends = new ArrayList<>();
+        this.state = state;
     }
 
     @Override
@@ -162,26 +168,12 @@ public class User implements UserDetails {
         this.enabled = enabled;
     }
 
-    public List<User> getFriends() {
+    public ArrayList<User> getFriends() {
         return friends;
     }
-    public List<User> getPendingFriends() {
-        return pendingFriends;
-    }
-    public List<User> getRequestFriends() {
-        return requestFriends;
-    }
 
-    public void setFriends(List<User> friends) {
+    public void setFriends(ArrayList<User> friends) {
         this.friends = friends;
-    }
-
-    public void setPendingFriends(List<User> pendingFriends) {
-        this.pendingFriends = pendingFriends;
-    }
-
-    public void setRequestFriends(List<User> requestFriends) {
-        this.pendingFriends = requestFriends;
     }
 
     public void setLogin(String login) {
@@ -221,6 +213,22 @@ public class User implements UserDetails {
         return storage;
     }
 
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
     public void setStorage(Storage storage) {
         this.storage = storage;
     }
@@ -229,7 +237,7 @@ public class User implements UserDetails {
         return storages;
     }
 
-    public void setStorages(List<Storage> storages) {
+    public void setStorages(ArrayList<Storage> storages) {
         this.storages = storages;
     }
 

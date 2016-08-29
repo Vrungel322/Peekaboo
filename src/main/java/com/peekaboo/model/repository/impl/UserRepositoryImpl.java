@@ -21,37 +21,24 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Autowired
     private Neo4jSessionFactory sessionFactory;
-    private ObjectMapper objectMapper = new ObjectMapper();
 
-    public UserRepositoryImpl() {
-    }
-
+    public UserRepositoryImpl() {}
     public UserRepositoryImpl(Neo4jSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
 
     @Override
     public User save(User user) {
-//        Session session = sessionFactory.getSession();
-//        //TODO:custom filters by unique fields
-//        session.save(user);
         Session session = sessionFactory.getSession();
-        Collection<User> userwithmail = session.loadAll(User.class, new Filter("email", user.getLogin()));
-        Collection<User> username = session.loadAll(User.class, new Filter("username", user.getUsername()));
-        if ((username == null) && (userwithmail == null)) {
-            session.save(user);
-            return user;
-        }
-        return null;
+        session.save(user);
+        return user;
     }
 
     @Override
     public User update(User user) {
-        Session session= sessionFactory.getSession();
+        Session session = sessionFactory.getSession();
         session.save(user);
-        //TODO: check whether update fields of user is unique
         return user;
-
     }
 
     @Override
@@ -70,11 +57,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User findByUsername(String username) {
         Session session = sessionFactory.getSession();
         Collection<User> res = session.loadAll(User.class, new Filter("username", username));
-       // ArrayList<User> resList = res.toArray();//new ArrayList<>(res);
-       // System.out.println(resList.size());
-
         if (res.isEmpty()) {
-            logger.error("list is empty");
             return null;
         }
         return res.iterator().next();
@@ -84,22 +67,20 @@ public class UserRepositoryImpl implements UserRepository {
     public User findByEmail(String email) {
         Session session = sessionFactory.getSession();
         Collection<User> res = session.loadAll(User.class, new Filters().add("email", email));
-        ArrayList<User> resList = new ArrayList<>(res);
-        if (resList.size() == 0) {
-            return null;
+        if (!res.isEmpty()) {
+            return res.iterator().next();
         }
-        return resList.get(0);
+        return null;
     }
 
     @Override
     public User findByTelephone(String telephone) {
         Session session = sessionFactory.getSession();
         Collection<User> res = session.loadAll(User.class, new Filters().add("telephone", telephone));
-        ArrayList<User> resList = new ArrayList<>(res);
-        if (resList.size() == 0) {
-            return null;
+        if (!res.isEmpty()) {
+            return res.iterator().next();
         }
-        return resList.get(0);
+        return null;
     }
 
     @Override
@@ -132,15 +113,11 @@ public class UserRepositoryImpl implements UserRepository {
         session.save(whom);
     }
 
-
-
     @Override
     public void deleteFriend(User from, User whom) {
         Session session = sessionFactory.getSession();
         from.getFriends().remove(whom);
-        from.getFriends().remove(from);
         session.save(from);
-        session.save(whom);
     }
 
     @Override
@@ -186,5 +163,8 @@ public class UserRepositoryImpl implements UserRepository {
         }
         return friends;
     }
-    private final Logger logger = LogManager.getLogger(this);
+
+    public int getUserState(User user) {
+        return findByUsername(user.getUsername()).getState();
+    }
 }

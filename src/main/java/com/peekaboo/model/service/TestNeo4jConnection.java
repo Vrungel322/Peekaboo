@@ -16,5 +16,8 @@ public class TestNeo4jConnection {
         VerificationRepositoryImpl verificationRepository = new VerificationRepositoryImpl(new Neo4jSessionFactory());
 
         userRepository.clearDataBase();
+
     }
+
+
 }

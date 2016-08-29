@@ -52,6 +52,7 @@ public class ConfirmationController {
         } else {
             User user = userService.get(requestEntity.getId());
             user.setEnabled(true);
+            tokenService.deleteByValue(requestEntity.getKey());
             userService.update(user);
             SignResponse response = new SignResponse();
             response.setId(user.getId().toString())
@@ -89,17 +90,14 @@ public class ConfirmationController {
     public void setJwtUtil(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
     }
-
     @Autowired
     public void setUserService(UserServiceImpl userService) {
         this.userService = userService;
     }
-
     @Autowired
     public void setTokenService(VerificationTokenServiceImpl tokenService) {
         this.tokenService = tokenService;
     }
-
     private final Logger logger = LogManager.getLogger(ConfirmationController.class);
 
 }

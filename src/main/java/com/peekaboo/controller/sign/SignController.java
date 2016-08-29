@@ -2,10 +2,12 @@ package com.peekaboo.controller.sign;
 
 import com.peekaboo.confirmation.RegistrationConfirmService;
 import com.peekaboo.model.entity.User;
-import com.peekaboo.model.entity.UserRole;
+import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.service.UserService;
 import com.peekaboo.model.service.VerificationTokenService;
+import com.peekaboo.model.service.impl.UserServiceImpl;
+import com.peekaboo.model.service.impl.VerificationTokenServiceImpl;
 import com.peekaboo.security.jwt.JwtUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,8 +30,8 @@ import java.util.List;
 @RequestMapping("/")
 public class SignController {
 
-    private UserService userService;
-    private VerificationTokenService verificationService;
+    private UserServiceImpl userService;
+    private VerificationTokenServiceImpl verificationService;
     private RegistrationConfirmService registrationConfirmService;
     private JwtUtil jwtUtil;
     private BCryptPasswordEncoder encoder;
@@ -52,10 +54,6 @@ public class SignController {
         }
         String password = requestEntity.getPassword();
 
-
-        //todo: BIG QUESTION! should we allow to sign in unverified user???
-
-
         if (user == null || !encoder.matches(password, user.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             return new ResponseEntity(
@@ -68,8 +66,9 @@ public class SignController {
         response.setId(user.getId().toString())
                 .setUsername(user.getUsername())
                 .setRole(user.getRoles())
-                .setEnabled(user.isEnabled());
+                .setEnabled(true);
         String token = jwtUtil.generateToken(response);
+        logger.error(token);
         return new ResponseEntity(new SigninResponse(user.getId().toString(), token), HttpStatus.OK);
     }
 
@@ -84,12 +83,13 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
+
         User user = userService.findByUsername(requestEntity.getUsername());
         String password = encoder.encode(requestEntity.getPassword());
         if (user != null) {
             logger.debug("User has registered before");
             logger.debug("Checking maybe he hasn't been verified yet");
-
+            logger.debug(user.isEnabled() + " ffffff");
             if (user.isEnabled()) {
                 logger.debug("User has already been registered. Send him error");
                 return new ResponseEntity(
@@ -131,6 +131,7 @@ public class SignController {
                 user.setname(user.getUsername());
                 user.setLogin(requestEntity.getLogin());
                 user.setPassword(password);
+                user.setEnabled(true);
                 user.addRole(UserRole.USER);
                 user = userService.create(user);
             }
@@ -166,12 +167,12 @@ public class SignController {
     }
 
     @Autowired
-    public void setUserService(UserService userService) {
+    public void setUserService(UserServiceImpl userService) {
         this.userService = userService;
     }
 
     @Autowired
-    public void setVerificationService(VerificationTokenService verificationService) {
+    public void setVerificationService(VerificationTokenServiceImpl verificationService) {
         this.verificationService = verificationService;
     }
 

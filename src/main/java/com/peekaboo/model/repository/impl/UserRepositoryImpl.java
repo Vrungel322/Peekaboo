@@ -48,18 +48,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User update(User user) {
         Session session= sessionFactory.getSession();
-        User userToUpdate=findById(user.getId());
-        if (userToUpdate != null) {
-            userToUpdate.setPassword(user.getPassword());
-            userToUpdate.setLogin(user.getLogin());
-            userToUpdate.setFriends(user.getFriends());
-            userToUpdate.setUsername(user.getUsername());
-            session.save(userToUpdate);
-            return userToUpdate;
-        }
-
-
-            return null;
+        session.save(user);
+        //TODO: check whether update fields of user is unique
+        return user;
 
     }
 
@@ -130,20 +121,26 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void addNewFriend(User target, User whom) {
+        Session session = sessionFactory.getSession();
         ArrayList<User> targetfriends = (ArrayList<User>) target.getFriends();
         targetfriends.add(whom);
         target.setFriends(targetfriends);
-        save(target);
+        session.save(target);
         ArrayList<User> whomfriends = (ArrayList<User>) whom.getFriends();
         whomfriends.add(target);
         whom.setFriends(whomfriends);
-        save(whom);
+        session.save(whom);
     }
+
+
 
     @Override
     public void deleteFriend(User from, User whom) {
+        Session session = sessionFactory.getSession();
         from.getFriends().remove(whom);
-        save(from);
+        from.getFriends().remove(from);
+        session.save(from);
+        session.save(whom);
     }
 
     @Override

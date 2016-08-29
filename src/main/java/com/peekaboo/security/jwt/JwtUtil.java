@@ -7,6 +7,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
@@ -33,15 +35,17 @@ public class JwtUtil {
                     .setSigningKey(secret)
                     .parseClaimsJws(token)
                     .getBody();
-
+            logger.error("The body is:");
+            logger.error(body);
             User u = new User();
             u.setLogin(body.getSubject());
-            u.setId((Long) body.get("userId"));
+            u.setId(Long.parseLong((String) body.get("userId")));
             u.setRoles((int) body.get("role"));
             u.setEnabled((boolean) body.get("enabled"));
 
             return u;
         } catch (JwtException | ClassCastException | IllegalArgumentException e) {
+            logger.error(e.toString());
             return null;
         }
     }
@@ -64,4 +68,5 @@ public class JwtUtil {
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
+    private final Logger logger = LogManager.getLogger(JwtAuthenticationProvider.class);
 }

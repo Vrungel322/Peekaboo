@@ -17,7 +17,6 @@ import java.util.Locale;
 
 public class TestNeo4jConnection {
     public static void main(String[] args) {
-
         UserRepositoryImpl userRepository = new UserRepositoryImpl(new Neo4jSessionFactory());
         userRepository.clearDataBase();
     }

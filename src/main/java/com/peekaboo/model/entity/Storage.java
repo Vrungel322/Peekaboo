@@ -2,8 +2,11 @@ package com.peekaboo.model.entity;
 
 
 import org.neo4j.ogm.annotation.GraphId;
+import org.neo4j.ogm.annotation.NodeEntity;
 
+@NodeEntity
 public class Storage {
+
     @GraphId
     private Long id;
 
@@ -11,8 +14,11 @@ public class Storage {
 
     private String filePath;
 
-    public Storage(){
+    public Storage(){}
 
+    public Storage(String fileName, String filePath){
+        this.fileName = fileName;
+        this.filePath = filePath;
     }
 
     public Long getId() {
@@ -46,8 +52,9 @@ public class Storage {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("VerificationToken{");
+        final StringBuilder sb = new StringBuilder("Storage{");
         sb.append("id='").append(id).append('\'');
+        sb.append("fileName='").append(fileName).append('\'');
         sb.append("path='").append(filePath).append('\'');
         sb.append('}');
         return sb.toString();

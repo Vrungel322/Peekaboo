@@ -89,7 +89,6 @@ public class SignController {
         if (user != null) {
             logger.debug("User has registered before");
             logger.debug("Checking maybe he hasn't been verified yet");
-            logger.debug(user.isEnabled() + " ffffff");
             if (user.isEnabled()) {
                 logger.debug("User has already been registered. Send him error");
                 return new ResponseEntity(

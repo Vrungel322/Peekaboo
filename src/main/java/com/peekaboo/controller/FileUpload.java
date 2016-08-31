@@ -1,9 +1,17 @@
 package com.peekaboo.controller;
 
+import com.peekaboo.model.Neo4jSessionFactory;
+import com.peekaboo.model.entity.Storage;
+import com.peekaboo.model.entity.User;
+import com.peekaboo.model.repository.impl.StorageRepositoryImpl;
+import com.peekaboo.model.service.impl.StorageServiceImpl;
+import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import scala.math.Ordering;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -17,6 +25,9 @@ public class FileUpload {
 
     private File rootDir;
 
+    private StorageServiceImpl storageService;
+    private UserServiceImpl userService;
+
     public FileUpload() {
         //all temporary files are going to be stored in "$CATALINA_HOME/tmp"
         String rootPath = System.getProperty("catalina.home");
@@ -24,29 +35,49 @@ public class FileUpload {
         if (!rootDir.exists())
             rootDir.mkdirs();
     }
-
-
     @RequestMapping(path = "/audio/{userId}", method = RequestMethod.POST)
     public String audio(@PathVariable String userId, @RequestParam("file") MultipartFile file) {
+        logger.error("1");
 
         if (!file.isEmpty()) {
             try {
+                logger.error("sdfg");
                 byte[] bytes = file.getBytes();
 
                 //file name should be unique, so generating UUID for it's name
                 String fileName = UUID.randomUUID().toString();
 
                 //file path is "$rootDir/{userId}/fileName"
+                logger.error("4");
                 File parent = new File(rootDir.getAbsolutePath() + File.separator + userId);
+
                 if (!parent.exists()) parent.mkdir();
 
+                logger.error("5");
                 File uploadedFile = new File(parent.getAbsolutePath() + File.separator + fileName);
                 if (!uploadedFile.exists()) uploadedFile.createNewFile();
 
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedFile));
+
+                logger.error("6");
                 stream.write(bytes);
                 stream.close();
+                logger.error("7");
 
+                StringBuilder fileBaseName = new StringBuilder("");
+                fileBaseName.append(userId).append(fileName);
+                Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath());
+                logger.error("Slut");
+                storageService.save(storage);
+
+                logger.error("8");
+
+
+                User user = userService.get(userId);
+
+                user.getOwnStorages().add(storage);
+                logger.error("sdfgh");
+                userService.update(user);
                 logger.debug("Server File Location=" + uploadedFile.getAbsolutePath());
 
                 //for now just return upload status
@@ -58,4 +89,12 @@ public class FileUpload {
             return "{\"result\": \"Fail\"}";
         }
     }
+
+    @Autowired
+    public void setUserService(UserServiceImpl userService) {
+        this.userService = userService;
+    }
+
+    @Autowired
+    public void setStorageService(StorageServiceImpl storageService) { this.storageService = storageService; }
 }

@@ -9,7 +9,7 @@ public interface UserService extends EntityService<User, String> {
     User findByLogin(String login);
     User save(User user);
     void update(User user);
-    void delete (User user);
+    void delete(User user);
     User findById(Long id);
     User findByUsername(String username);
     boolean loginExists(String login);
@@ -18,7 +18,7 @@ public interface UserService extends EntityService<User, String> {
     ArrayList<User> getAll();
     void clearDataBase();
     ArrayList<User> getFriends(User user);
-    void addNewFriend(User target,User whom);
+    void addNewFriend(User target, User whom);
     void deleteFriend(User from, User to);
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);

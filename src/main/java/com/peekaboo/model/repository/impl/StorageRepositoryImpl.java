@@ -5,8 +5,13 @@ import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.repository.StorageRepository;
+import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
+@Repository
 public class StorageRepositoryImpl implements StorageRepository {
 
     @Autowired
@@ -41,12 +46,12 @@ public class StorageRepositoryImpl implements StorageRepository {
     }
 
     @Override
-    public Storage findByUser(User user) {
-        return user.getStorage();
+    public List<Storage> findByUser(User user) {
+        return user.getOwnStorages();
     }
 
     @Override
     public void addUser(Storage storage, User user) {
-        user.getStorages().add(storage);
+        user.getUsesStorages().add(storage);
     }
 }

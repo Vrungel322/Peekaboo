@@ -9,7 +9,7 @@ public interface UserRepository {
 
     User save(User user);
     User update(User user);
-    void delete (User user);
+    void delete(User user);
     User findById(Long id);
     User findByUsername(String username);
     User findByEmail(String email);
@@ -17,7 +17,7 @@ public interface UserRepository {
     ArrayList<User> getAll();
     void clearDataBase();
     ArrayList<User> getFriends(User user);
-    void addNewFriend(User target,User whom);
+    void addNewFriend(User target, User whom);
     void deleteFriend(User from, User to);
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);

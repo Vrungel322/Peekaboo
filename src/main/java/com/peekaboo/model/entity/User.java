@@ -5,6 +5,7 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
+import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,21 +19,18 @@ public class User implements UserDetails {
     @GraphId
     private Long id;
 
-    @Index(unique = true)
+    @Indexed(unique = true,failOnDuplicate = true)
     private String username;
 
-    private String name;
-
-    private String password;
-
-    @Index(unique = true)
+    @Indexed(unique = true,failOnDuplicate = true)
     private String telephone;
 
-    @Index(unique = true)
+    @Indexed(unique = true,failOnDuplicate = true)
     private String email;
 
+    private String name;
+    private String password;
     private int roles;
-
     private int state;
 
     public String getName() {
@@ -52,10 +50,10 @@ public class User implements UserDetails {
     private ArrayList<User> friends = new ArrayList<>();
 
     @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
-    private Storage storage;
+    private List<Storage> ownStorages = new ArrayList<>();
 
     @Relationship(type = "USE", direction = Relationship.DIRECTION)
-    private ArrayList<Storage> storages = new ArrayList<>();
+    private List<Storage> usesStorages = new ArrayList<>();
 
     public User() {}
 
@@ -209,10 +207,6 @@ public class User implements UserDetails {
         return email == null ? telephone : email;
     }
 
-    public Storage getStorage() {
-        return storage;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -229,16 +223,20 @@ public class User implements UserDetails {
         this.state = state;
     }
 
-    public void setStorage(Storage storage) {
-        this.storage = storage;
+    public List<Storage> getOwnStorages() {
+        return ownStorages;
     }
 
-    public List<Storage> getStorages() {
-        return storages;
+    public List<Storage> getUsesStorages() {
+        return usesStorages;
     }
 
-    public void setStorages(ArrayList<Storage> storages) {
-        this.storages = storages;
+    public void setOwnStorages(List<Storage> ownStorages) {
+        this.ownStorages = ownStorages;
+    }
+
+    public void setUsesStorages(List<Storage> usesStorages) {
+        this.usesStorages = usesStorages;
     }
 
     @Override

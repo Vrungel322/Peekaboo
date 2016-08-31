@@ -191,6 +191,20 @@ http://maven.apache.org/POM/4.0.0 ">
         </dependency>
         <!--=============Neo4j================-->
 
+        <!--=============Watson Engine================-->
+        <dependency>
+            <groupId>com.ibm.watson.developer_cloud</groupId>
+            <artifactId>java-sdk</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-neo4j</artifactId>
+            <version>3.2.2.RELEASE</version>
+        </dependency>
+        <!--=============Watson Engine================-->
+
+
     </dependencies>
 
     <build>

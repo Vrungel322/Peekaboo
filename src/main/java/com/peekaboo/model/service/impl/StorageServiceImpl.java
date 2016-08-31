@@ -6,7 +6,11 @@ import com.peekaboo.model.entity.User;
 import com.peekaboo.model.repository.impl.StorageRepositoryImpl;
 import com.peekaboo.model.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service(value = "storageServices")
 public class StorageServiceImpl implements StorageService {
 
     @Autowired
@@ -23,8 +27,8 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
-    public Storage findByUser(User user) {
-        return user.getStorage();
+    public List<Storage> findByUser(User user) {
+        return user.getOwnStorages();
     }
 
     @Override

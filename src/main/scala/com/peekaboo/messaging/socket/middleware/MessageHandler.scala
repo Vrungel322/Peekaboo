@@ -25,7 +25,7 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
 
       //at second we have to recognize who is an initiator
       val ownerId = getId(session)
-
+      logger.debug("want to process action")
       //finally, we dispatch the message
       requestDispatcher.process(action, ownerId)
 
@@ -46,7 +46,7 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
 
 
     val id = getId(session)
-      //next line was used when we had been trying to send binary data via sockets
+    //next line was used when we had been trying to send binary data via sockets
     //session.setBinaryMessageSizeLimit(session.getBinaryMessageSizeLimit * 4) //todo: check does it work
     logger.debug(s"Connection established. With user $id")
 

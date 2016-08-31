@@ -9,6 +9,7 @@ import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -55,7 +56,14 @@ public class User implements UserDetails {
     @Relationship(type = "USE", direction = Relationship.DIRECTION)
     private List<Storage> usesStorages = new ArrayList<>();
 
-    public User() {}
+    @Relationship(type = "PENDINGFRIENDSHIP", direction = Relationship.UNDIRECTED)
+    private List<User> pendingFriends = new ArrayList<>();
+
+    @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
+    private List<User> requestFriends = new ArrayList<>();
+
+    public User() {
+    }
 
     public User(String username, String name, String password, String telephone,
                 String email, int roles, int gender, boolean enabled, int state
@@ -173,6 +181,23 @@ public class User implements UserDetails {
     public void setFriends(ArrayList<User> friends) {
         this.friends = friends;
     }
+
+    public List<User> getPendingFriends() {
+        return pendingFriends;
+    }
+
+    public List<User> getRequestFriends() {
+        return requestFriends;
+    }
+
+    public void setPendingFriends(List<User> pendingFriends) {
+        this.pendingFriends = pendingFriends;
+    }
+
+    public void setRequestFriends(List<User> requestFriends) {
+        this.pendingFriends = requestFriends;
+    }
+
 
     public void setLogin(String login) {
         if (login.contains("@")) {

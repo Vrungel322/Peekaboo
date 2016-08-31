@@ -22,7 +22,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Autowired
     private Neo4jSessionFactory sessionFactory;
 
-    public UserRepositoryImpl() {}
+    public UserRepositoryImpl() {
+    }
+
     public UserRepositoryImpl(Neo4jSessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
@@ -115,9 +117,13 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void deleteFriend(User from, User whom) {
+
         Session session = sessionFactory.getSession();
         from.getFriends().remove(whom);
+        save(from);
+        from.getFriends().remove(from);
         session.save(from);
+        session.save(whom);
     }
 
     @Override

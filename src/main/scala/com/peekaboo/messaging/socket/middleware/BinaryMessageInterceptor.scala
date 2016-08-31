@@ -1,6 +1,7 @@
+
 package com.peekaboo.messaging.socket.middleware
 
-import com.peekaboo.messaging.socket.worker.{Action, Send}
+import com.peekaboo.messaging.socket.worker.{Action, Send, Switchmode}
 import org.apache.logging.log4j.LogManager
 
 //Originally we were thinking that we were going to send binary data through web sockets
@@ -31,8 +32,11 @@ class BinaryMessageInterceptor extends MessageInterceptor{
     logger.debug(s"Command is $commandName")
     logger.debug("Parsing parameters")
     val (parameters, body) = getParameters(remain)
+    logger.debug("passed first parse")
     commandName match {
       case "SEND" => Send(body.toArray, parameters)
+      case "SWITCHMODE" => logger.debug("got to mode")
+        Switchmode(body.toArray, parameters)
       case _ =>
         logger.debug("Command is unknown. Throwing an error")
         throw new Error("Unknown command name")

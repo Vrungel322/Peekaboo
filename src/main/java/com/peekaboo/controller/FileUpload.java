@@ -9,6 +9,7 @@ import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import scala.math.Ordering;
@@ -24,8 +25,12 @@ public class FileUpload {
 
     private static final Logger logger = LogManager.getLogger(FileUpload.class);
     private File rootDir;
-    private StorageServiceImpl storageService;
-    private UserServiceImpl userService;
+
+    @Autowired
+    StorageServiceImpl storageService;
+
+    @Autowired
+    UserServiceImpl userService;
 
     public FileUpload() {
         String rootPath = System.getProperty("catalina.home");
@@ -33,6 +38,7 @@ public class FileUpload {
         if (!rootDir.exists())
             rootDir.mkdirs();
     }
+
     @RequestMapping(path = "/audio/{userId}", method = RequestMethod.POST)
     public String audio(@PathVariable String userId, @RequestParam("file") MultipartFile file) {
         if (!file.isEmpty()) {
@@ -46,12 +52,20 @@ public class FileUpload {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedFile));
                 stream.write(bytes);
                 stream.close();
+
                 StringBuilder fileBaseName = new StringBuilder("");
                 fileBaseName.append(userId).append(fileName);
+
                 Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath());
                 storageService.save(storage);
-                User user = userService.get(userId);
+
+                User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+                User user = userService.get(u.getId().toString());
+                User receiver = userService.get(userId);
+
                 user.getOwnStorages().add(storage);
+                receiver.getUsesStorages().add(storage);
+                userService.update(receiver);
                 userService.update(user);
                 logger.debug("Server File Location=" + uploadedFile.getAbsolutePath());
                 //for now just return upload status
@@ -63,12 +77,4 @@ public class FileUpload {
             return "{\"result\": \"Fail\"}";
         }
     }
-
-    @Autowired
-    public void setUserService(UserServiceImpl userService) {
-        this.userService = userService;
-    }
-
-    @Autowired
-    public void setStorageService(StorageServiceImpl storageService) { this.storageService = storageService; }
 }

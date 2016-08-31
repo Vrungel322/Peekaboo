@@ -21,6 +21,4 @@ public class TestNeo4jConnection {
         UserRepositoryImpl userRepository = new UserRepositoryImpl(new Neo4jSessionFactory());
         userRepository.clearDataBase();
     }
-
-
 }

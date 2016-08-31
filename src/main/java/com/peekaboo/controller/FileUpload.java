@@ -21,15 +21,13 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/upload")
 public class FileUpload {
+
     private static final Logger logger = LogManager.getLogger(FileUpload.class);
-
     private File rootDir;
-
     private StorageServiceImpl storageService;
     private UserServiceImpl userService;
 
     public FileUpload() {
-        //all temporary files are going to be stored in "$CATALINA_HOME/tmp"
         String rootPath = System.getProperty("catalina.home");
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
@@ -37,49 +35,25 @@ public class FileUpload {
     }
     @RequestMapping(path = "/audio/{userId}", method = RequestMethod.POST)
     public String audio(@PathVariable String userId, @RequestParam("file") MultipartFile file) {
-        logger.error("1");
-
         if (!file.isEmpty()) {
             try {
-                logger.error("sdfg");
                 byte[] bytes = file.getBytes();
-
-                //file name should be unique, so generating UUID for it's name
                 String fileName = UUID.randomUUID().toString();
-
-                //file path is "$rootDir/{userId}/fileName"
-                logger.error("4");
                 File parent = new File(rootDir.getAbsolutePath() + File.separator + userId);
-
                 if (!parent.exists()) parent.mkdir();
-
-                logger.error("5");
                 File uploadedFile = new File(parent.getAbsolutePath() + File.separator + fileName);
                 if (!uploadedFile.exists()) uploadedFile.createNewFile();
-
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedFile));
-
-                logger.error("6");
                 stream.write(bytes);
                 stream.close();
-                logger.error("7");
-
                 StringBuilder fileBaseName = new StringBuilder("");
                 fileBaseName.append(userId).append(fileName);
                 Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath());
-                logger.error("Slut");
                 storageService.save(storage);
-
-                logger.error("8");
-
-
                 User user = userService.get(userId);
-
                 user.getOwnStorages().add(storage);
-                logger.error("sdfgh");
                 userService.update(user);
                 logger.debug("Server File Location=" + uploadedFile.getAbsolutePath());
-
                 //for now just return upload status
                 return "{\"result\": \"Ok\", \"name\": \"" + fileName + "\"}";
             } catch (Exception e) {

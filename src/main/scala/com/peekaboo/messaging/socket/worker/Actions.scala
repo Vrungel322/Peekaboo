@@ -50,10 +50,35 @@ case class Switchmode(text: Array[Byte], override val parameters: Map[String, St
 
 }
 
+case class ReadNotification(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) {
+
+  override val name = "READNOTIFICATION"
+
+  override def getBody = text
+
+  /**
+    * Converts SEND command from client1 to MESSAGE command to client2
+    * @param author author of the SEND command
+    * @return MESSAGE command
+    */
+  def toMessage(author: String): SystemMessage = SystemMessage(text, parameters.filter { case (param, _) => param != ParameterName.Destination } + (ParameterName.From -> author))
+
+  def getDestination: String = getParameter(ParameterName.Destination).get
+
+  def getType: String = getParameter(ParameterName.Type).get
+
+}
 //Message command from server to client
 case class Message(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) {
 
   override val name = "MESSAGE"
+
+  override def getBody = text
+}
+
+case class SystemMessage(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) {
+
+  override val name = "READ_NOTIFICATION"
 
   override def getBody = text
 }

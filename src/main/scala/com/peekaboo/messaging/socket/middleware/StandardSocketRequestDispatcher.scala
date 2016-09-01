@@ -1,7 +1,11 @@
 package com.peekaboo.messaging.socket.middleware
 
 import akka.actor.{Actor, ActorRef, Props}
-import com.peekaboo.messaging.socket.worker._
+import com.peekaboo.messaging.socket.worker.{ReadNotification, _}
+import com.peekaboo.model.Neo4jSessionFactory
+import com.peekaboo.model.entity.enums.UserState
+import com.peekaboo.model.repository.impl.UserRepositoryImpl
+import com.peekaboo.model.service.impl.UserServiceImpl
 import org.apache.logging.log4j.LogManager
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -9,7 +13,7 @@ import scala.concurrent.duration.FiniteDuration
 import scala.util.Try
 
 class StandardSocketRequestDispatcher extends RequestDispatcher {
-
+  val userRepository = new UserRepositoryImpl(new Neo4jSessionFactory);
   val system = ActorSystems.messageSystem
 
   def process(action: Action, authorId: String) = {
@@ -17,9 +21,9 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
     action match {
       case a: Send =>
         val destination = a.getDestination
-
+        val messageType=a.getType
         logger.error("HERE IS SOMETHING")
-        logger.error("destination is:"+destination)
+        logger.error("messageType:"+messageType)
 
         logger.debug(s"SEND action from ${authorId} to ${destination}")
 
@@ -29,14 +33,35 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
         system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
           val actSel = getFromTry(aTry, destination)
 
-          actSel ! (a, authorId)
+          actSel ! (a, authorId,destination,messageType)
         }
         )
 
 
       case a:Switchmode=>
-        logger.debug("no such element")
+        var text = new String(a.getBody)
+        logger.debug(new String(a.getBody))
+        logger.debug(a.getBody(0))
+        val user=userRepository.findById(authorId.toLong)
+        user.setState(a.getBody(0).toInt)
+        userRepository.save(user)
+      //        user.setState(a.getBody(0).toInt)
+      case a:ReadNotification=>
+        val destination = a.getDestination
+        logger.error("Read messagi is processed")
 
+        logger.debug(s"READ action from ${authorId} to ${destination}")
+
+
+
+        //todo: if not found actor use default
+        system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
+          val actSel = getFromTry(aTry, destination)
+
+          actSel ! (a, authorId,destination)
+        })
+
+      case a=> logger.error("unknown command")
     }
   }
 

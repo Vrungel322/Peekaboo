@@ -1,4 +1,4 @@
-package com.peekaboo.controller;
+package com.peekaboo.controller.filemanage;
 
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
@@ -31,7 +31,7 @@ public class FileDownload {
     UserServiceImpl userService;
 
     public FileDownload() {
-        String rootPath = System.getProperty("catalina.home");
+        String rootPath = System.getProperty("user.dir");
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
             rootDir.mkdirs();

@@ -1,9 +1,7 @@
-package com.peekaboo.controller;
+package com.peekaboo.controller.filemanage;
 
-import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
-import com.peekaboo.model.repository.impl.StorageRepositoryImpl;
 import com.peekaboo.model.service.impl.StorageServiceImpl;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -12,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import scala.math.Ordering;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -33,7 +30,7 @@ public class FileUpload {
     UserServiceImpl userService;
 
     public FileUpload() {
-        String rootPath = System.getProperty("catalina.home");
+        String rootPath = System.getProperty("user.dir");
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
             rootDir.mkdirs();

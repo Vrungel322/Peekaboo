@@ -52,17 +52,13 @@ public class FileUpload {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedFile));
                 stream.write(bytes);
                 stream.close();
-
                 StringBuilder fileBaseName = new StringBuilder("");
                 fileBaseName.append(userId).append(fileName);
-
                 Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath());
                 storageService.save(storage);
-
                 User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 User user = userService.get(u.getId().toString());
                 User receiver = userService.get(userId);
-
                 user.getOwnStorages().add(storage);
                 receiver.getUsesStorages().add(storage);
                 userService.update(receiver);

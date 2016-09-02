@@ -5,7 +5,7 @@ import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.stereotype.Component;
 
-@Component
+@Component(value = "sessionFactory")
 public class Neo4jSessionFactory {
 
     public static final String NEO4J_URL = "http://localhost:7474";

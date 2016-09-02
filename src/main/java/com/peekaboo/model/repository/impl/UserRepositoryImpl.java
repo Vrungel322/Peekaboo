@@ -3,6 +3,7 @@ package com.peekaboo.model.repository.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.relations.Friendship;
 import com.peekaboo.model.repository.UserRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,6 +22,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Autowired
     private Neo4jSessionFactory sessionFactory;
+    final Logger logger = LogManager.getLogger(UserRepositoryImpl.class);
 
     public UserRepositoryImpl() {
     }
@@ -105,68 +107,58 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void addNewFriend(User target, User whom) {
         Session session = sessionFactory.getSession();
-        ArrayList<User> targetfriends = (ArrayList<User>) target.getFriends();
-        targetfriends.add(whom);
-        target.setFriends(targetfriends);
+        target.getFriends().add(new Friendship(target, whom));
         session.save(target);
-        ArrayList<User> whomfriends = (ArrayList<User>) whom.getFriends();
-        whomfriends.add(target);
-        whom.setFriends(whomfriends);
+        whom.getFriends().add(new Friendship(whom, target));
         session.save(whom);
     }
 
     @Override
     public void deleteFriend(User from, User whom) {
-
         Session session = sessionFactory.getSession();
-        from.getFriends().remove(whom);
+        Friendship friendship = session.loadAll(Friendship.class, new Filter("fromto", from.getId().toString() + whom.getId().toString())).iterator().next();
+        from.getFriends().remove(friendship);
         save(from);
-        from.getFriends().remove(from);
-        session.save(from);
-        session.save(whom);
+        friendship = session.loadAll(Friendship.class, new Filter("fromto", whom.getId().toString() + from.getId().toString())).iterator().next();
+        whom.getFriends().remove(friendship);
+        save(whom);
     }
 
     @Override
     public void addToBlackList(User from, User to) {
         Session session = sessionFactory.getSession();
-        String targetid = from.getId().toString();
-        String whomid = to.getId().toString();
-        String query = "MATCH (m:User)-[r:FRIENDS]-(n:User) " +
-                "WHERE ID(m)=" + targetid + " AND ID(n)=" + whomid + "\n" +
-                "AND r.from=" + targetid + "\n" +
-                "AND r.to=" + whomid + "\n" +
-                "        SET r.availability=0";
-        session.query(query, Collections.EMPTY_MAP);
+        Friendship friendship = session.loadAll(Friendship.class, new Filter("fromto", to.getId().toString() + from.getId().toString())).iterator().next();
+        friendship.setAvailibility(0);
+        save(from);
     }
 
     @Override
     public void removeFromBlackList(User from, User to) {
         Session session = sessionFactory.getSession();
-        String targetid = from.getId().toString();
-        String whomid = to.getId().toString();
-        String query = "MATCH (m:User)-[r:FRIENDS]-(n:User) " +
-                "WHERE ID(m)=" + targetid + " AND ID(n)=" + whomid + "\n" +
-                "AND r.from=" + targetid + "\n" +
-                "AND r.to=" + whomid + "\n" +
-                "        SET r.availability=1";
-        session.query(query, Collections.EMPTY_MAP);
+        Friendship friendship = session.loadAll(Friendship.class, new Filter("fromto", to.getId().toString() + from.getId().toString())).iterator().next();
+        friendship.setAvailibility(1);
+        save(from);
     }
 
     @Override
     public ArrayList<User> getFriends(User user) {
-        return (ArrayList<User>) user.getFriends();
+        ArrayList<User> friends = new ArrayList<>();
+        user.getFriends().forEach(v -> {
+            if (v.getAvailibility() == 1) {
+                friends.add(v.getUserto());
+            }
+        });
+        return friends;
     }
 
     @Override
     public ArrayList<User> getBlackListFriends(User user) {
-        String query = "MATCH (u:User)-[r:FRIENDS]-(m:User) WHERE ID(u) ="
-                + user.getId().toString() + " AND r.availability='0' RETURN m;";
-        Map<String, String> map = new HashMap<>();
-        Iterator<User> users = sessionFactory.getSession().query(User.class, query, map).iterator();
         ArrayList<User> friends = new ArrayList<>();
-        while (users.hasNext()) {
-            friends.add(users.next());
-        }
+        user.getFriends().forEach(v -> {
+            if (v.getAvailibility() == 0) {
+                friends.add(v.getUserto());
+            }
+        });
         return friends;
     }
 

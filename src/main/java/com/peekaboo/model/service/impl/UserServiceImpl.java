@@ -1,5 +1,6 @@
 package com.peekaboo.model.service.impl;
 
+import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.repository.impl.UserRepositoryImpl;
 import com.peekaboo.model.service.UserService;
@@ -12,10 +13,13 @@ import java.util.*;
 
 @Service(value = "userService")
 public class UserServiceImpl implements UserService {
-    private final Logger logger = LogManager.getLogger(this);
 
     @Autowired
     private UserRepositoryImpl userRepository;
+
+
+    public UserServiceImpl() {
+    }
 
     @Override
     public User create(User entity) {

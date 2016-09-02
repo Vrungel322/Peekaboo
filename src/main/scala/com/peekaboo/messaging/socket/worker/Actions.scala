@@ -23,7 +23,8 @@ case class Send(text: Array[Byte], override val parameters: Map[String, String])
     * @param author author of the SEND command
     * @return MESSAGE command
     */
-  def toMessage(author: String): Message = Message(text, parameters.filter { case (param, _) => param != ParameterName.Destination } + (ParameterName.From -> author))
+  def toMessage(author: String): Message =
+    Message(text, parameters.filter { case (param, _) => param != ParameterName.Destination } + (ParameterName.From -> author))
 
   def getDestination: String = getParameter(ParameterName.Destination).get
 
@@ -42,7 +43,8 @@ case class Switchmode(text: Array[Byte], override val parameters: Map[String, St
     * @param author author of the SEND command
     * @return MESSAGE command
     */
-  def toMessage(author: String): Message = Message(text, parameters.filter { case (param, _) => param != ParameterName.Destination } + (ParameterName.From -> author))
+  def toMessage(author: String): Message =
+    Message(text, parameters.filter { case (param, _) => param != ParameterName.Destination } + (ParameterName.From -> author))
 
   def getDestination: String = getParameter(ParameterName.Destination).get
 

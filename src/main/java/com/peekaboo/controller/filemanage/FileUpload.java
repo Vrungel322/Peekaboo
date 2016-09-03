@@ -22,10 +22,8 @@ public class FileUpload {
 
     private static final Logger logger = LogManager.getLogger(FileUpload.class);
     private File rootDir;
-
     @Autowired
     StorageServiceImpl storageService;
-
     @Autowired
     UserServiceImpl userService;
 

@@ -30,11 +30,16 @@ import java.util.List;
 @RequestMapping("/")
 public class SignController {
 
-    private UserServiceImpl userService;
-    private VerificationTokenServiceImpl verificationService;
-    private RegistrationConfirmService registrationConfirmService;
-    private JwtUtil jwtUtil;
-    private BCryptPasswordEncoder encoder;
+    @Autowired
+    UserServiceImpl userService;
+    @Autowired
+    VerificationTokenServiceImpl verificationService;
+    @Autowired
+    RegistrationConfirmService registrationConfirmService;
+    @Autowired
+    JwtUtil jwtUtil;
+    @Autowired
+    BCryptPasswordEncoder encoder;
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin( @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
@@ -163,31 +168,6 @@ public class SignController {
             );
         }
         return errorResponses;
-    }
-
-    @Autowired
-    public void setUserService(UserServiceImpl userService) {
-        this.userService = userService;
-    }
-
-    @Autowired
-    public void setVerificationService(VerificationTokenServiceImpl verificationService) {
-        this.verificationService = verificationService;
-    }
-
-    @Autowired
-    public void setJwtUtil(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
-
-    @Autowired
-    public void setRegistrationConfirmService(RegistrationConfirmService registrationConfirmService) {
-        this.registrationConfirmService = registrationConfirmService;
-    }
-
-    @Autowired
-    public void setEncoder(BCryptPasswordEncoder encoder) {
-        this.encoder = encoder;
     }
 
     private class SigninResponse {

@@ -22,7 +22,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Autowired
     private Neo4jSessionFactory sessionFactory;
-    final Logger logger = LogManager.getLogger(UserRepositoryImpl.class);
 
     public UserRepositoryImpl() {
     }
@@ -34,7 +33,19 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User save(User user) {
         Session session = sessionFactory.getSession();
-        session.save(user);
+        try {
+            if (getAll().size()==1) {
+                session.query("create constraint on (user:User) assert user.username is unique", Collections.EMPTY_MAP);
+//            session.query("create constraint on (user:User) assert user.telephone is unique",Collections.EMPTY_MAP);
+                session.query("create constraint on (user:User) assert user.email is unique",Collections.EMPTY_MAP);
+            }
+        }catch (NullPointerException e) {}
+        try {
+            session.save(user);
+        } catch (Exception e) {
+            return null;
+        }
+
         return user;
     }
 

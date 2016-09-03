@@ -29,9 +29,14 @@ import java.util.List;
 @SuppressWarnings("unchecked")
 public class ConfirmationController {
 
-    private JwtUtil jwtUtil;
-    private UserServiceImpl userService;
-    private VerificationTokenServiceImpl tokenService;
+    @Autowired
+    JwtUtil jwtUtil;
+    @Autowired
+    UserServiceImpl userService;
+    @Autowired
+    VerificationTokenServiceImpl tokenService;
+
+    private final Logger logger = LogManager.getLogger(ConfirmationController.class);
 
     @RequestMapping(value = "/confirm", method = RequestMethod.POST)
     public ResponseEntity confirm(@RequestBody ConfirmationRequestEntity requestEntity, Errors errors) {
@@ -85,19 +90,4 @@ public class ConfirmationController {
         }
         return errorResponses;
     }
-
-    @Autowired
-    public void setJwtUtil(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
-    @Autowired
-    public void setUserService(UserServiceImpl userService) {
-        this.userService = userService;
-    }
-    @Autowired
-    public void setTokenService(VerificationTokenServiceImpl tokenService) {
-        this.tokenService = tokenService;
-    }
-    private final Logger logger = LogManager.getLogger(ConfirmationController.class);
-
 }

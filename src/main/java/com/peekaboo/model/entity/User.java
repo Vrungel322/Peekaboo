@@ -6,7 +6,6 @@ import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,14 +17,8 @@ public class User implements UserDetails {
 
     @GraphId
     private Long id;
-
-    @Indexed(unique = true,failOnDuplicate = true)
     private String username;
-
-    @Indexed(unique = true,failOnDuplicate = true)
     private String telephone;
-
-    @Indexed(unique = true,failOnDuplicate = true)
     private String email;
 
     private String name;

@@ -38,7 +38,6 @@ public class UserServiceTest {
         Assert.assertEquals(u.getUsername(), "jack");
         userService.delete(userService.findByUsername("jack"));
     }
-
     @Test
     public void managingWithFriends() {
         userService.clearDataBase();
@@ -56,10 +55,18 @@ public class UserServiceTest {
         userService.addNewFriend(user, user2);
         userService.addNewFriend(user, user3);
         userService.addNewFriend(user, user4);
-        System.out.println(userService.getFriends(user).size());
-//        userService.addToBlackList(user,user1);
-//        userService.deleteFriend(user, user1);
-//        userService.delete(user);
-//        userService.delete(user1);
+    }
+
+    @Test
+    public void constraintFiledsTest() {
+        userService.clearDataBase();
+        userService.save(new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0));
+        //check for email - failed
+        userService.save(new User("username1", "maksim", "sss", "telephone1", "email", 0, 0, true, 0));
+        //check for username - failed
+        userService.save(new User("username", "maksim", "sss", "telephone1", "email1", 0, 0, true, 0));
+        //result - success
+        userService.save(new User("username1", "maksim", "sss", "telephone1", "email1", 0, 0, true, 0));
+        Assert.assertEquals(2,userService.getAll().size());
     }
 }

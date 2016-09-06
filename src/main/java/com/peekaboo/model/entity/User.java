@@ -1,54 +1,36 @@
 package com.peekaboo.model.entity;
 
 import com.peekaboo.model.entity.enums.UserRole;
+import com.peekaboo.model.entity.relations.Friendship;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
-import org.springframework.data.neo4j.annotation.Indexed;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 @NodeEntity
 public class User implements UserDetails {
 
     @GraphId
     private Long id;
-
-    @Indexed(unique = true,failOnDuplicate = true)
     private String username;
-
-    @Indexed(unique = true,failOnDuplicate = true)
     private String telephone;
-
-    @Indexed(unique = true,failOnDuplicate = true)
     private String email;
 
     private String name;
     private String password;
     private int roles;
     private int state;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     //TODO: male = 0 , female = 1
     private int gender;
-
     private boolean enabled;
 
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
-    private ArrayList<User> friends = new ArrayList<>();
+    private Set<Friendship> friends = new HashSet<>();
 
     @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
     private List<Storage> ownStorages = new ArrayList<>();
@@ -61,6 +43,7 @@ public class User implements UserDetails {
 
     @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
     private List<User> requestFriends = new ArrayList<>();
+
 
     public User() {
     }
@@ -76,8 +59,16 @@ public class User implements UserDetails {
         this.roles = roles;
         this.gender = gender;
         this.enabled = enabled;
-        this.friends = new ArrayList<>();
+        this.friends = new HashSet<>();
         this.state = state;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     @Override
@@ -174,11 +165,11 @@ public class User implements UserDetails {
         this.enabled = enabled;
     }
 
-    public ArrayList<User> getFriends() {
+    public Set<Friendship> getFriends() {
         return friends;
     }
 
-    public void setFriends(ArrayList<User> friends) {
+    public void setFriends(Set<Friendship> friends) {
         this.friends = friends;
     }
 

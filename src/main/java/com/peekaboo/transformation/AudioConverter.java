@@ -88,15 +88,15 @@ public class AudioConverter {
 //        }
 //    }
 //
-    public static void main(String[] args){
-        AudioConverter aed = new AudioConverter();
-        File source = new  File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.ogg");
-        File target = new File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.wav");
-
-        //Test Mp3 To Ogg Convertion
-        String mimeType = "audio/mp3";
-        aed.encodeAudio(source, target, mimeType);
-
-        //Test Ogg To Mp3 Convertion
-    }
+//    public static void main(String[] args){
+//        AudioConverter aed = new AudioConverter();
+//        File source = new  File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.ogg");
+//        File target = new File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.wav");
+//
+//        //Test Mp3 To Ogg Convertion
+//        String mimeType = "audio/mp3";
+//        aed.encodeAudio(source, target, mimeType);
+//
+//        //Test Ogg To Mp3 Convertion
+//    }
 }

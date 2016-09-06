@@ -49,7 +49,6 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
     //next line was used when we had been trying to send binary data via sockets
     //session.setBinaryMessageSizeLimit(session.getBinaryMessageSizeLimit * 4) //todo: check does it work
     logger.debug(s"Connection established. With user $id")
-
     //at first it looks if there was a connection with a client
     actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
       logger.debug("Future has been reached")
@@ -60,10 +59,18 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
         logger.debug("Removing actor")
         actorSystem.stop(a.get)
       }
-
+      Thread.sleep(1000)
       //after one second create new actor with connection
       //this was done to give enough time for system to stop the actor
       Future {
+        //        actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
+        //          logger.debug("IF actor is alive, kill it")
+        //          //if found stopping it
+        //          if (a.isSuccess) {
+        //            logger.debug("Removing actor")
+        //            actorSystem.stop(a.get)
+        //          }
+        //        })
         logger.debug("Creating new actor after 1 second")
         Thread.sleep(1000)
         logger.debug("1 second has been passed")

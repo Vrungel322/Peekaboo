@@ -32,6 +32,11 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    public Storage findByFileName(String fileName) {
+        return storageRepository.findByFileName(fileName);
+    }
+
+    @Override
     public void update(Storage entity) {
         storageRepository.save(entity);
     }

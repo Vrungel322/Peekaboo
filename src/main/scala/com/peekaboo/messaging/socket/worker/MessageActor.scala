@@ -34,8 +34,8 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
     }
   }
 
-  def receive = {
-    case (msg: Send, id: String) =>
+  def receive: Receive = {
+    case (msg: Message, id: String) =>
       //nice place to add conversion
       //have to check user's state
       //and than if needed perform some actions

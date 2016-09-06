@@ -51,6 +51,13 @@ public class StorageRepositoryImpl implements StorageRepository {
     }
 
     @Override
+    public Storage findByFileName(String fileName) {
+        return sessionFactory.getSession().loadAll(Storage.class)
+                .stream().filter(x -> x.getFileName().equals(fileName))
+                .findFirst().get();
+    }
+
+    @Override
     public void addUser(Storage storage, User user) {
         user.getUsesStorages().add(storage);
     }

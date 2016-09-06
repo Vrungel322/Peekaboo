@@ -42,9 +42,10 @@ public class FileDownload {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = u.getId().toString();
         User receiver = userService.get(userId);
-        Storage storage = receiver.getUsesStorages().stream()
-                .filter(x -> x.getFileName().equals(fileName))
-                .findFirst().get();
+        List<Storage> storages = receiver.getUsesStorages();
+        storages.addAll(receiver.getOwnStorages());
+        Storage storage = storages.stream().filter(x -> x.getFileName()
+                .equals(fileName)).findFirst().get();
         Path file = Paths.get(storage.getFilePath());
         if (Files.exists(file)) {
             response.setContentType("audio/wav");

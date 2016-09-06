@@ -247,12 +247,12 @@ public class User implements UserDetails {
         return usesStorages;
     }
 
-    public void setOwnStorages(List<Storage> ownStorages) {
-        this.ownStorages = ownStorages;
+    public void addOwnStorages(List<Storage> ownStorages) {
+        this.ownStorages.addAll(ownStorages);
     }
 
-    public void setUsesStorages(List<Storage> usesStorages) {
-        this.usesStorages = usesStorages;
+    public void addUsesStorages(List<Storage> usesStorages) {
+        this.usesStorages.addAll(usesStorages);
     }
 
     @Override

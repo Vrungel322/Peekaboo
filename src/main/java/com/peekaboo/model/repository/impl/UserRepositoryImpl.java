@@ -1,21 +1,19 @@
 package com.peekaboo.model.repository.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.relations.Friendship;
 import com.peekaboo.model.repository.UserRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.neo4j.ogm.cypher.Filter;
 import org.neo4j.ogm.cypher.Filters;
 import org.neo4j.ogm.session.Session;
-import org.neo4j.ogm.session.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -71,42 +69,28 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByUsername(String username) {
         Session session = sessionFactory.getSession();
-        Collection<User> res = session.loadAll(User.class, new Filter("username", username));
-        if (res.isEmpty()) {
-            return null;
-        }
-        return res.iterator().next();
+        return session.loadAll(User.class, new Filter("username", username))
+                .stream().findFirst().get();
     }
 
     @Override
     public User findByEmail(String email) {
         Session session = sessionFactory.getSession();
-        Collection<User> res = session.loadAll(User.class, new Filters().add("email", email));
-        if (!res.isEmpty()) {
-            return res.iterator().next();
-        }
-        return null;
+        return session.loadAll(User.class, new Filter("email", email))
+                .stream().findFirst().get();
     }
 
     @Override
     public User findByTelephone(String telephone) {
         Session session = sessionFactory.getSession();
-        Collection<User> res = session.loadAll(User.class, new Filters().add("telephone", telephone));
-        if (!res.isEmpty()) {
-            return res.iterator().next();
-        }
-        return null;
+        return session.loadAll(User.class, new Filter("telephone", telephone))
+                .stream().findFirst().get();
     }
 
     @Override
-    public ArrayList<User> getAll() {
+    public List<User> getAll() {
         Session session = sessionFactory.getSession();
-        Collection<User> res = session.loadAll(User.class);
-        ArrayList<User> resList = new ArrayList<>(res);
-        if (resList.size() == 0) {
-            return null;
-        }
-        return resList;
+        return new ArrayList<>(session.loadAll(User.class));
     }
 
     @Override
@@ -152,8 +136,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public ArrayList<User> getFriends(User user) {
-        ArrayList<User> friends = new ArrayList<>();
+    public List<User> getFriends(User user) {
+        List<User> friends = new ArrayList<>();
         user.getFriends().forEach(v -> {
             if (v.getAvailibility() == 1) {
                 friends.add(v.getUserto());
@@ -163,8 +147,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public ArrayList<User> getBlackListFriends(User user) {
-        ArrayList<User> friends = new ArrayList<>();
+    public List<User> getBlackListFriends(User user) {
+        List<User> friends = new ArrayList<>();
         user.getFriends().forEach(v -> {
             if (v.getAvailibility() == 0) {
                 friends.add(v.getUserto());

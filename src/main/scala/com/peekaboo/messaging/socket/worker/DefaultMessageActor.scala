@@ -11,6 +11,7 @@ class DefaultMessageActor(private val id: String) extends Actor {
 
   override def receive: Receive = {
     case (a: Message, id: String) =>
+
       logger.debug(s"User ${id} is offline now. Let's pretend that I can save his message in database.")
       logger.debug(s"The message was ${new String(a.getBody)}")
 

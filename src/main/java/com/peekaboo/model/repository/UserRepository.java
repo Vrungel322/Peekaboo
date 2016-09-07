@@ -3,7 +3,8 @@ package com.peekaboo.model.repository;
 import com.peekaboo.model.entity.User;
 
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public interface UserRepository {
 
@@ -22,4 +23,6 @@ public interface UserRepository {
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);
     ArrayList<User> getBlackListFriends(User user);
+    void addPendingMessage(User from, User target, Object object);
+    HashMap<String, LinkedList<Object>> getPendingMessagesFor(User target);
 }

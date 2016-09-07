@@ -131,11 +131,12 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           sendMessage(action)
         }
         //
+        
         if ((messageType==UserState.TEXT.getName)&&(state==UserState.AUDIO.getId)){
           logger.error("processing text2audio")
           val messageText=new String(msg.getBody, "UTF-8")
           val rootPath = System.getProperty("catalina.home")
-          //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
+          //TODO:fix exrrors
           val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
           if (!rootDir.exists) rootDir.mkdirs()
           val fileName: String = UUID.randomUUID.toString

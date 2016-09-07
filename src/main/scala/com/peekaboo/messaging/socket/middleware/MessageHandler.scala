@@ -1,7 +1,7 @@
 package com.peekaboo.messaging.socket.middleware
 
 import akka.actor.Props
-import com.peekaboo.messaging.socket.worker.{ActorSystems, MessageActor}
+import com.peekaboo.messaging.socket.worker.{ActorSystems, DefaultMessageActor, MessageActor}
 import org.apache.logging.log4j.LogManager
 import org.springframework.web.socket._
 import org.springframework.web.socket.handler.BinaryWebSocketHandler
@@ -50,6 +50,10 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
     //session.setBinaryMessageSizeLimit(session.getBinaryMessageSizeLimit * 4) //todo: check does it work
     logger.debug(s"Connection established. With user $id")
     //at first it looks if there was a connection with a client
+    try {
+      actorSystem.actorOf(Props(new DefaultMessageActor("0")), "0")
+    }
+    catch{case e:Exception=>}
     actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
       logger.debug("Future has been reached")
 

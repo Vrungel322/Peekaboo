@@ -2,6 +2,7 @@ package com.peekaboo.model.entity;
 
 import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.entity.relations.Friendship;
+import com.peekaboo.model.entity.relations.PendingMessages;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -20,7 +21,6 @@ public class User implements UserDetails {
     private String username;
     private String telephone;
     private String email;
-
     private String name;
     private String password;
     private int roles;
@@ -31,19 +31,16 @@ public class User implements UserDetails {
 
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
     private Set<Friendship> friends = new HashSet<>();
-
+    @Relationship(type = "PENDING_MESSAGES", direction = Relationship.DIRECTION)
+    private Set<PendingMessages> pendingMessages = new HashSet<>();
     @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
     private List<Storage> ownStorages = new ArrayList<>();
-
     @Relationship(type = "USE", direction = Relationship.DIRECTION)
     private List<Storage> usesStorages = new ArrayList<>();
-
     @Relationship(type = "PENDINGFRIENDSHIP", direction = Relationship.UNDIRECTED)
     private List<User> pendingFriends = new ArrayList<>();
-
     @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
     private List<User> requestFriends = new ArrayList<>();
-
 
     public User() {
     }
@@ -255,6 +252,14 @@ public class User implements UserDetails {
         this.usesStorages = usesStorages;
     }
 
+    public Set<PendingMessages> getPendingMessages() {
+        return pendingMessages;
+    }
+
+    public void setPendingMessages(Set<PendingMessages> pendingMessages) {
+        this.pendingMessages = pendingMessages;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -288,6 +293,18 @@ public class User implements UserDetails {
         sb.append('}');
         return sb.toString();
     }
-}
 
+    public boolean wantsToSendMessages(String username) {
+        HashSet<PendingMessages> pendings = (HashSet<PendingMessages>) this.getPendingMessages();
+        for (PendingMessages pending: pendings) {
+            if (pending.pendingTo(username)) {return true;}
+        }
+        return false;
+    }
+
+    public List<Object> getPendingMessagesFor(String username) {
+        return this.getPendingMessages().stream().
+                filter(m -> (m.getUserto().getUsername().equals(username))).findFirst().get().getMessages();
+    }
+}
 

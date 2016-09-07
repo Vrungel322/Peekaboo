@@ -1,21 +1,18 @@
 package com.peekaboo.model.repository.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.relations.Friendship;
+import com.peekaboo.model.entity.relations.PendingMessages;
 import com.peekaboo.model.repository.UserRepository;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.neo4j.ogm.cypher.Filter;
 import org.neo4j.ogm.cypher.Filters;
 import org.neo4j.ogm.session.Session;
-import org.neo4j.ogm.session.result.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.io.Serializable;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -34,12 +31,13 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(User user) {
         Session session = sessionFactory.getSession();
         try {
-            if (getAll().size()==1) {
+            if (getAll().size() == 1) {
                 session.query("create constraint on (user:User) assert user.username is unique", Collections.EMPTY_MAP);
 //            session.query("create constraint on (user:User) assert user.telephone is unique",Collections.EMPTY_MAP);
-                session.query("create constraint on (user:User) assert user.email is unique",Collections.EMPTY_MAP);
+                session.query("create constraint on (user:User) assert user.email is unique", Collections.EMPTY_MAP);
             }
-        }catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+        }
         try {
             session.save(user);
         } catch (Exception e) {
@@ -171,6 +169,38 @@ public class UserRepositoryImpl implements UserRepository {
             }
         });
         return friends;
+    }
+
+    @Override
+    public void addPendingMessage(User from, User target, Object object) {
+        Session session = sessionFactory.getSession();
+        PendingMessages pendings = null;
+        try {
+            pendings = from.getPendingMessages().stream()
+                    .filter(x -> x.getFromto().equals(from.getId().toString() + target.getId().toString()))
+                    .findFirst().get();
+            LinkedList<Object> messages = (LinkedList<Object>) pendings.getMessages();
+            messages.add(object);
+            pendings.setMessages(messages);
+            from.getPendingMessages().add(pendings);
+        } catch (Exception e) {
+            from.getPendingMessages().add(new PendingMessages(from, target, object));
+
+        }
+        session.save(from);
+        session.save(target);
+    }
+
+    @Override
+    public HashMap<String, LinkedList<Object>> getPendingMessagesFor(User target) {
+        List<User> pendings = getFriends(target).stream()
+                .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
+        HashMap<String, LinkedList<Object>> resultPendings = new HashMap<>();
+        pendings.forEach(p -> {
+            resultPendings.put(p.getUsername(),(LinkedList<Object>) p.getPendingMessagesFor(target.getUsername()));
+        });
+        return resultPendings;
+
     }
 
     public int getUserState(User user) {

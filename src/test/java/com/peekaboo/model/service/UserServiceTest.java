@@ -2,9 +2,11 @@ package com.peekaboo.model.service;
 
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.relations.PendingMessages;
 import com.peekaboo.model.repository.impl.StorageRepositoryImpl;
 import com.peekaboo.model.repository.impl.UserRepositoryImpl;
 import com.peekaboo.model.repository.impl.VerificationRepositoryImpl;
+import javafx.scene.image.Image;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -13,7 +15,10 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/config/rootTest.xml"})
@@ -68,5 +73,42 @@ public class UserServiceTest {
         //result - success
         userService.save(new User("username1", "maksim", "sss", "telephone1", "email1", 0, 0, true, 0));
         Assert.assertEquals(2,userService.getAll().size());
+    }
+
+    @Test
+    public void pendingMessagesQueryForOfflineUser() {
+        userService.clearDataBase();
+        userService.save(new User("maks", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
+        userService.save(new User("Vasyan", "Vasyan", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
+        userService.save(new User("Lola", "Lola Shkoora", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
+
+        User user = userService.findByUsername("maks");
+        User user1 = userService.findByUsername("Vasyan");
+        User user2 = userService.findByUsername("Lola");
+        userService.addNewFriend(user,user1);
+        userService.addNewFriend(user2  ,user1);
+        userService.addPendingMessage(user, user1, new String("привет"));
+        userService.addPendingMessage(user2, user1, new String("привет"));
+        userService.addPendingMessage(user2, user1, new String("я - Лола"));
+        userService.addPendingMessage(user2, user1, new String("хочу познакомиться"));
+        userService.addPendingMessage(user, user1, new String("как дела?"));
+        userService.addPendingMessage(user, user1, new String("что делаешь?"));
+        userService.addPendingMessage(user, user1, new String("смотри какие мемы мне чепурной скинул)))"));
+        userService.addPendingMessage(user, user1, new File("/User/Desktop/mem1.png"));
+        userService.addPendingMessage(user, user1, new File("/User/Desktop/mem2.png"));
+        userService.addPendingMessage(user, user1, new File("/User/Desktop/mem3.png"));
+        userService.addPendingMessage(user, user1, new File("/User/Desktop/sticker.png"));
+        userService.addPendingMessage(user, user1, new String("я просто угораю, это лютый треш!!!"));
+
+        userService.getPendingMessagesFor(userService.findByUsername(user1.getUsername()))
+                .forEach((k,v) -> {
+                    System.out.println();
+                    System.out.println();
+                    System.out.println("unread messages from " + k);
+                    v.forEach(m -> System.out.println(m.toString()));
+                    System.out.println();
+                    System.out.println();
+                    System.out.println();
+                });
     }
 }

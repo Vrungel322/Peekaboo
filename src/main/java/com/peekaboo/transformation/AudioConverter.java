@@ -4,18 +4,14 @@ package com.peekaboo.transformation;
  * Created by Oleksii on 06.09.2016.
  */
 import java.io.File;
-import it.sauronsoftware.jave.AudioAttributes;
-import it.sauronsoftware.jave.Encoder;
-import it.sauronsoftware.jave.EncoderException;
-import it.sauronsoftware.jave.EncodingAttributes;
-import it.sauronsoftware.jave.InputFormatException;
+
 
 
 /*  required jars(jave-1.0.2.jar)
  *  Handles Encoding and Decoding
  *  Audio to different file formats
  */
-public class AudioConverter {
+public  class AudioConverter {
 
     private static final Integer bitrate = 8;//Minimal bitrate only
     private static final Integer channels = 1; //2 for stereo, 1 for mono
@@ -53,11 +49,12 @@ public class AudioConverter {
         audioAttr.setSamplingRate(samplingRate);
     }
 
-    public void encodeAudio(File source, File target, String mimeType){
+    public String encodeAudio(File source, File target, String mimeType){
         //Change the hardcoded mime type later on
         if(mimeType.equals("audio/mp3")){
             this.wavToOgg(source, target);
         }
+        return "ok";
     }
 
     private void wavToOgg(File source, File target){
@@ -67,10 +64,6 @@ public class AudioConverter {
         encoAttrs.setAudioAttributes(audioAttr);
         try{
             encoder.encode(source, target, encoAttrs);
-            String[] a=encoder.getAudioEncoders();
-            for (int i= 1;i<10;i++) {
-                System.out.println(a[i]);
-            }
         }catch(Exception e){
             System.out.println("Encoding Failed"+e.toString());
         }

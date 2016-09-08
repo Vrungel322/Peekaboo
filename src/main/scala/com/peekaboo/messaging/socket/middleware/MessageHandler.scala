@@ -1,11 +1,14 @@
 package com.peekaboo.messaging.socket.middleware
 
 import akka.actor.Props
-import com.peekaboo.messaging.socket.worker.{ActorSystems, DefaultMessageActor, MessageActor}
+import com.peekaboo.messaging.socket.worker._
+import com.peekaboo.model.Neo4jSessionFactory
+import com.peekaboo.model.repository.impl.UserRepositoryImpl
 import org.apache.logging.log4j.LogManager
 import org.springframework.web.socket._
 import org.springframework.web.socket.handler.BinaryWebSocketHandler
 
+import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -14,7 +17,7 @@ import scala.concurrent.duration.FiniteDuration
 //I'm not sure, but the container(tomcat) creates new thread for each request to this endpoint
 //So it would be a good idea to replace Spring websockets with something offered by one of the scala's frameworks
 class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: MessageInterceptor) extends BinaryWebSocketHandler {
-
+  val userRepository = new UserRepositoryImpl(new Neo4jSessionFactory);
   //each message goes through this method
   override def handleBinaryMessage(session: WebSocketSession, message: BinaryMessage): Unit = {
     try {
@@ -63,7 +66,7 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
         logger.debug("Removing actor")
         actorSystem.stop(a.get)
       }
-      Thread.sleep(1000)
+
       //after one second create new actor with connection
       //this was done to give enough time for system to stop the actor
       Future {
@@ -83,6 +86,27 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
         //here created actor sends pong message to check it's connection
         logger.debug("Created actor " + actRef.get.toString())
         session.sendMessage(new PongMessage())
+        val actSel = actRef.get
+        val map=new mutable.HashMap[String,String]
+        try{val user=userRepository.findById(id.toLong)
+        logger.error("found user")
+
+        val tmp=userRepository.getPendingMessagesFor(user)
+        logger.error(tmp.toString)
+        val z=tmp.keySet().iterator()
+        while(!z.hasNext){
+          z.next()
+         logger.error(tmp.get(z))
+          while(!tmp.get(z).isEmpty){
+            logger.error(tmp.get(z).pop())
+          }
+          }}
+        catch{case a:Exception=>logger.error(a.getStackTrace)}
+
+
+//        map.+=(ParameterName.From,)
+//        val message a=new Message()
+//        actSel ! ()
       })
 
     })

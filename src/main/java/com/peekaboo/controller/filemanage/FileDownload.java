@@ -3,6 +3,8 @@ package com.peekaboo.controller.filemanage;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.impl.UserServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,7 +33,7 @@ public class FileDownload {
     UserServiceImpl userService;
 
     public FileDownload() {
-        String rootPath = System.getProperty("user.dir");
+        String rootPath = System.getProperty("catalina.home");
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
             rootDir.mkdirs();
@@ -42,14 +44,22 @@ public class FileDownload {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String userId = u.getId().toString();
         User receiver = userService.get(userId);
-        Storage storage = receiver.getUsesStorages().stream()
-                .filter(x -> x.getFileName().equals(fileName))
-                .findFirst().get();
-        Path file = Paths.get(storage.getFilePath());
+//        Storage storage = receiver.getUsesStorages().stream()
+//                .filter(x -> x.getFileName().equals(fileName))
+//                .findFirst().get();
+        String rootPath = System.getProperty("catalina.home");
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
+       File rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + userId);
+        if (!rootDir.exists()) rootDir.mkdirs();
+        File uploadedFile = new File(rootDir.getAbsolutePath() + File.separator+fileName );
+        logger.error(uploadedFile.getAbsolutePath());
+        Path file = Paths.get(uploadedFile.getAbsolutePath());
         if (Files.exists(file)) {
             response.setContentType("audio/wav");
+            logger.error("file found");
             try {
                 Files.copy(file, response.getOutputStream());
+                logger.error("file copied");
                 response.getOutputStream().flush();
             } catch (IOException e) {
                 try {
@@ -60,4 +70,5 @@ public class FileDownload {
             }
         }
     }
+    private Logger logger = LogManager.getLogger(this);
 }

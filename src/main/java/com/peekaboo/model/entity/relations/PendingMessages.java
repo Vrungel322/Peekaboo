@@ -23,15 +23,18 @@ public class PendingMessages {
     private List<Object> messages = new LinkedList<Object>() {};
     @Property
     private String fromto;
+    @Property
+    private String typeMessage;
 
 
     public PendingMessages() {}
 
-    public PendingMessages(User from, User to,Object message) {
+    public PendingMessages(User from, User to,String type,Object message) {
         this.userfrom = from;
         this.userto = to;
         this.fromto = from.getId().toString()+to.getId().toString();
         this.messages.add(message);
+        this.typeMessage=type;
 
     }
 
@@ -58,7 +61,12 @@ public class PendingMessages {
     public void setMessages(List<Object> messages) {
         this.messages = messages;
     }
-
+    public void setType(String type) {
+        this.typeMessage = type;
+    }
+    public String getType() {
+        return this.typeMessage;
+    }
     /**android devices have to check instance of messages - Text, Audio or Video**/
 
 

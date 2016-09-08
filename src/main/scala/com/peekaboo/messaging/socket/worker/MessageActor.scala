@@ -10,16 +10,18 @@ import java.io.InputStream
 import akka.actor.Actor
 import com.peekaboo.messaging.socket.middleware.BinaryMessageInterceptor
 import com.peekaboo.model.Neo4jSessionFactory
-import com.peekaboo.model.entity.Storage
+import com.peekaboo.model.entity.{Storage, User}
 import com.peekaboo.model.entity.enums.UserState
 import com.peekaboo.model.repository.impl.{StorageRepositoryImpl, UserRepositoryImpl}
 import com.peekaboo.model.service.impl.UserServiceImpl
-import com.peekaboo.transformation.{AudioToTextInterface, AudioToTextWatson, TextToAudioWatson}
+import com.peekaboo.transformation._
 import org.apache.commons.io.IOUtils
 import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.socket.{BinaryMessage, WebSocketSession}
 
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 class MessageActor(private val socket: WebSocketSession) extends Actor {
   //small problem
   //probably we can't add state to the actor
@@ -131,16 +133,16 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           sendMessage(action)
         }
         //
-        
+
         if ((messageType==UserState.TEXT.getName)&&(state==UserState.AUDIO.getId)){
           logger.error("processing text2audio")
           val messageText=new String(msg.getBody, "UTF-8")
-          val rootPath = System.getProperty("catalina.home")
-          //TODO:fix exrrors
+          val rootPath = System.getProperty("user.dir")
+          //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
           val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
           if (!rootDir.exists) rootDir.mkdirs()
           val fileName: String = UUID.randomUUID.toString
-          val uploadedFile = new File(rootDir.getAbsolutePath + File.separator+fileName )
+          val uploadedFile = new File(rootDir.getAbsolutePath + File.separator+fileName+".temp" )
           logger.error(uploadedFile.getPath)
           uploadedFile.createNewFile
           val o=new FileOutputStream(uploadedFile)
@@ -151,16 +153,41 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           o.flush()
           o.close()
           in.close()
-          //          val storage: Storage = new Storage(fileName.toString, uploadedFile.getAbsolutePath)
-          //          val storageService=new StorageRepositoryImpl()
-          //          storageService.save(storage)
+
+
+
+
+          //Test Mp3 To Ogg Convertion
+          val target: File = new File(rootDir.getAbsolutePath + File.separator + fileName)
+          logger.error(target)
+          logger.error(uploadedFile)
+          logger.error("we are before future")
+           val hello=new Thread(new Runnable {
+             def run(): Unit = {
+
+               val audioAttr = new AudioAttributes
+               val mimeType: String = "audio/mp3"
+
+               val aed: AudioConverter = new AudioConverter()
+
+                aed.encodeAudio(uploadedFile, target, mimeType)
+             }
+           })
+          hello.start()
+//          Thread.sleep(10000)
+          hello.stop()
+            val storage: Storage = new Storage(fileName, target.getAbsolutePath)
+            val storageService=new StorageRepositoryImpl(new Neo4jSessionFactory)
+
+            storageService.save(storage)
+          user.getOwnStorages.add(storage)
+          userRepository.save(user)
           var parameters:scala.Predef.Map[String,String]=Map()
           parameters+=("type"->"audio")
           val message=new Message(fileName.getBytes,parameters)
           val action=message.toMessage(sender)
           sendMessage(action)
         }
-
         logger.error("state is:"+state)
         //Here is all other routines not connected with text or audio
         if(state!=UserState.AUDIO.getId && state!=UserState.TEXT.getId){
@@ -178,14 +205,14 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
       val reason=msg.getReason
 
       reason match{
-        case Reason.Mode=>
-          logger.error("got to REASON:MODE")
-          val userRepository = new UserRepositoryImpl(new Neo4jSessionFactory)
-          logger.debug(new String(msg.getBody))
-          logger.debug(msg.getBody(0))
-          val user=userRepository.findById(sender.toLong)
-          user.setState(msg.getBody(0).toInt)
-          userRepository.save(user)
+//        case Reason.Mode=>
+//          logger.error("got to REASON:MODE")
+//          val userRepository = new UserRepositoryImpl()
+//          logger.error(new String(msg.getBody))
+//          logger.debug(msg.getBody(0))
+//          val user=userRepository.findById(sender.toLong)
+//          user.setState(msg.getBody(0).toInt)
+//          userRepository.save(user)
         case Reason.Read=>
           logger.error("got to REASON:READ")
           val action = msg.toMessage(sender)
@@ -197,6 +224,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
 
 
   }
+
 
   //sends binary message via socket
   private def sendMessage(message: Action): Unit = {

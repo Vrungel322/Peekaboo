@@ -172,7 +172,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void addPendingMessage(User from, User target, Object object) {
+    public void addPendingMessage(User from, User target,String type, Object object) {
         Session session = sessionFactory.getSession();
         PendingMessages pendings = null;
         try {
@@ -182,9 +182,10 @@ public class UserRepositoryImpl implements UserRepository {
             LinkedList<Object> messages = (LinkedList<Object>) pendings.getMessages();
             messages.add(object);
             pendings.setMessages(messages);
+            pendings.setType(type);
             from.getPendingMessages().add(pendings);
         } catch (Exception e) {
-            from.getPendingMessages().add(new PendingMessages(from, target, object));
+            from.getPendingMessages().add(new PendingMessages(from, target,type, object));
 
         }
         session.save(from);

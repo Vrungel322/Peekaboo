@@ -302,7 +302,7 @@ public class User implements UserDetails {
         return false;
     }
 
-    public List<Object> getPendingMessagesFor(String username) {
+    public List<String> getPendingMessagesFor(String username) {
         return this.getPendingMessages().stream().
                 filter(m -> (m.getUserto().getUsername().equals(username))).findFirst().get().getMessages();
     }

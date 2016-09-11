@@ -1,5 +1,6 @@
 package com.peekaboo.model.service;
 
+import com.google.gson.Gson;
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.relations.PendingMessages;
@@ -87,17 +88,17 @@ public class UserServiceTest {
         User user2 = userService.findByUsername("Lola");
         userService.addNewFriend(user,user1);
         userService.addNewFriend(user2  ,user1);
-        userService.addPendingMessage(user, user1, "type",new String("привет"));
+        userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
         userService.addPendingMessage(user2, user1,"type", new String("привет"));
         userService.addPendingMessage(user2, user1,"type", new String("я - Лола"));
         userService.addPendingMessage(user2, user1,"type", new String("хочу познакомиться"));
         userService.addPendingMessage(user, user1,"type", new String("как дела?"));
         userService.addPendingMessage(user, user1,"type", new String("что делаешь?"));
         userService.addPendingMessage(user, user1,"type", new String("смотри какие мемы мне чепурной скинул)))"));
-        userService.addPendingMessage(user, user1,"type", new File("/User/Desktop/mem1.png"));
-        userService.addPendingMessage(user, user1,"type", new File("/User/Desktop/mem2.png"));
-        userService.addPendingMessage(user, user1,"type", new File("/User/Desktop/mem3.png"));
-        userService.addPendingMessage(user, user1,"type", new File("/User/Desktop/sticker.png"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem1.png"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem2.png"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem3.png"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/sticker.png"));
         userService.addPendingMessage(user, user1,"type", new String("я просто угораю, это лютый треш!!!"));
 
         userService.getPendingMessagesFor(userService.findByUsername(user1.getUsername()))

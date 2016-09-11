@@ -1,6 +1,7 @@
 package com.peekaboo.messaging.socket.worker
 
 import akka.actor.Actor
+import com.google.gson.Gson
 import com.peekaboo.model.Neo4jSessionFactory
 import com.peekaboo.model.entity.User
 import com.peekaboo.model.repository.impl.UserRepositoryImpl
@@ -19,6 +20,6 @@ class DefaultMessageActor(private val id: String) extends Actor {
       //TODO: add java-code modify relationship with pending messages
       val userFrom: User = userService.findById(receiver.toLong)
       val userTo: User = userService.findById(destination.toLong)
-      userService.addPendingMessage(userFrom, userTo,a.getType, a.getBody);
+      userService.addPendingMessage(userFrom, userTo,a.getType, new Gson().toJson(a.getBody));
   }
 }

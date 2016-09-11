@@ -172,36 +172,33 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void addPendingMessage(User from, User target,String type, Object object) {
+    public void addPendingMessage(User from, User target,String type, String object) {
         Session session = sessionFactory.getSession();
-        PendingMessages pendings = null;
         try {
-            pendings = from.getPendingMessages().stream()
+            PendingMessages pendings = from.getPendingMessages().stream()
                     .filter(x -> x.getFromto().equals(from.getId().toString() + target.getId().toString()))
                     .findFirst().get();
-            LinkedList<Object> messages = (LinkedList<Object>) pendings.getMessages();
+            LinkedList<String> messages = (LinkedList<String>) pendings.getMessages();
             messages.add(object);
             pendings.setMessages(messages);
             pendings.setType(type);
             from.getPendingMessages().add(pendings);
         } catch (Exception e) {
             from.getPendingMessages().add(new PendingMessages(from, target,type, object));
-
         }
         session.save(from);
         session.save(target);
     }
 
     @Override
-    public HashMap<String, LinkedList<Object>> getPendingMessagesFor(User target) {
+    public HashMap<String, LinkedList<String>> getPendingMessagesFor(User target) {
         List<User> pendings = getFriends(target).stream()
                 .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
-        HashMap<String, LinkedList<Object>> resultPendings = new HashMap<>();
+        HashMap<String, LinkedList<String>> resultPendings = new HashMap<>();
         pendings.forEach(p -> {
-            resultPendings.put(p.getUsername(),(LinkedList<Object>) p.getPendingMessagesFor(target.getUsername()));
+            resultPendings.put(p.getUsername(),(LinkedList<String>) p.getPendingMessagesFor(target.getUsername()));
         });
         return resultPendings;
-
     }
 
     public int getUserState(User user) {

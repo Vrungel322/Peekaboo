@@ -23,6 +23,6 @@ public interface UserRepository {
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);
     ArrayList<User> getBlackListFriends(User user);
-    void addPendingMessage(User from, User target,String type, Object object);
-    HashMap<String, LinkedList<Object>> getPendingMessagesFor(User target);
+    void addPendingMessage(User from, User target,String type, String object);
+    HashMap<String, LinkedList<String>> getPendingMessagesFor(User target);
 }

@@ -20,7 +20,7 @@ public class PendingMessages {
     @EndNode
     private User userto;
     @Property
-    private List<Object> messages = new LinkedList<Object>() {};
+    private List<String> messages = new LinkedList<String>() {};
     @Property
     private String fromto;
     @Property
@@ -29,7 +29,7 @@ public class PendingMessages {
 
     public PendingMessages() {}
 
-    public PendingMessages(User from, User to,String type,Object message) {
+    public PendingMessages(User from, User to,String type,String message) {
         this.userfrom = from;
         this.userto = to;
         this.fromto = from.getId().toString()+to.getId().toString();
@@ -54,11 +54,11 @@ public class PendingMessages {
         this.userto = userto;
     }
 
-    public List<Object> getMessages() {
+    public List<String> getMessages() {
         return messages;
     }
 
-    public void setMessages(List<Object> messages) {
+    public void setMessages(List<String> messages) {
         this.messages = messages;
     }
     public void setType(String type) {

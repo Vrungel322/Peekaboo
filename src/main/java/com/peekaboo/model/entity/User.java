@@ -24,6 +24,8 @@ public class User implements UserDetails {
     private String name;
     private String password;
     private int roles;
+    private String avatar = null;
+
     private int state;
     //TODO: male = 0 , female = 1
     private int gender;
@@ -42,8 +44,7 @@ public class User implements UserDetails {
     @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
     private List<User> requestFriends = new ArrayList<>();
 
-    public User() {
-    }
+    public User() {}
 
     public User(String username, String name, String password, String telephone,
                 String email, int roles, int gender, boolean enabled, int state
@@ -59,7 +60,6 @@ public class User implements UserDetails {
         this.friends = new HashSet<>();
         this.state = state;
     }
-
     public String getName() {
         return name;
     }
@@ -70,7 +70,6 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (UserRole role : UserRole.values())
             if (this.hasRole(role)) {
@@ -290,6 +289,7 @@ public class User implements UserDetails {
         sb.append(", roles=").append(roles);
         sb.append(", gender=").append(gender);
         sb.append(", enabled=").append(enabled);
+        sb.append(", avatar=").append(avatar);
         sb.append('}');
         return sb.toString();
     }
@@ -305,6 +305,14 @@ public class User implements UserDetails {
     public List<String> getPendingMessagesFor(String username) {
         return this.getPendingMessages().stream().
                 filter(m -> (m.getUserto().getUsername().equals(username))).findFirst().get().getMessages();
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
 

@@ -17,7 +17,6 @@ class DefaultMessageActor(private val id: String) extends Actor {
     case (a: Message, receiver: String,destination:String,messageType:String) =>
       logger.debug(s"User ${receiver} is offline now. Let's pretend that I can save his message in database.")
       logger.debug(s"The message was ${new String(a.getBody)}")
-      //TODO: add java-code modify relationship with pending messages
       val userFrom: User = userService.findById(receiver.toLong)
       val userTo: User = userService.findById(destination.toLong)
       userService.addPendingMessage(userFrom, userTo,a.getType, new Gson().toJson(a.getBody));

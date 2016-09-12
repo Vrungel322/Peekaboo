@@ -2,6 +2,7 @@ package com.peekaboo.model.entity;
 
 import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.entity.relations.Friendship;
+import com.peekaboo.model.entity.relations.PendingMessages;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
@@ -20,10 +21,11 @@ public class User implements UserDetails {
     private String username;
     private String telephone;
     private String email;
-
     private String name;
     private String password;
     private int roles;
+    private String avatar = null;
+
     private int state;
     //TODO: male = 0 , female = 1
     private int gender;
@@ -31,22 +33,18 @@ public class User implements UserDetails {
 
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
     private Set<Friendship> friends = new HashSet<>();
-
+    @Relationship(type = "PENDING_MESSAGES", direction = Relationship.DIRECTION)
+    private Set<PendingMessages> pendingMessages = new HashSet<>();
     @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
     private List<Storage> ownStorages = new ArrayList<>();
-
     @Relationship(type = "USE", direction = Relationship.DIRECTION)
     private List<Storage> usesStorages = new ArrayList<>();
-
     @Relationship(type = "PENDINGFRIENDSHIP", direction = Relationship.UNDIRECTED)
     private List<User> pendingFriends = new ArrayList<>();
-
     @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
     private List<User> requestFriends = new ArrayList<>();
 
-
-    public User() {
-    }
+    public User() {}
 
     public User(String username, String name, String password, String telephone,
                 String email, int roles, int gender, boolean enabled, int state
@@ -62,7 +60,6 @@ public class User implements UserDetails {
         this.friends = new HashSet<>();
         this.state = state;
     }
-
     public String getName() {
         return name;
     }
@@ -73,7 +70,6 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-
         List<GrantedAuthority> authorities = new ArrayList<>();
         for (UserRole role : UserRole.values())
             if (this.hasRole(role)) {
@@ -255,6 +251,14 @@ public class User implements UserDetails {
         this.usesStorages.addAll(usesStorages);
     }
 
+    public Set<PendingMessages> getPendingMessages() {
+        return pendingMessages;
+    }
+
+    public void setPendingMessages(Set<PendingMessages> pendingMessages) {
+        this.pendingMessages = pendingMessages;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
@@ -285,9 +289,30 @@ public class User implements UserDetails {
         sb.append(", roles=").append(roles);
         sb.append(", gender=").append(gender);
         sb.append(", enabled=").append(enabled);
+        sb.append(", avatar=").append(avatar);
         sb.append('}');
         return sb.toString();
     }
-}
 
+    public boolean wantsToSendMessages(String username) {
+        HashSet<PendingMessages> pendings = (HashSet<PendingMessages>) this.getPendingMessages();
+        for (PendingMessages pending: pendings) {
+            if (pending.pendingTo(username)) {return true;}
+        }
+        return false;
+    }
+
+    public List<String> getPendingMessagesFor(String username) {
+        return this.getPendingMessages().stream().
+                filter(m -> (m.getUserto().getUsername().equals(username))).findFirst().get().getMessages();
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
+    }
+}
 

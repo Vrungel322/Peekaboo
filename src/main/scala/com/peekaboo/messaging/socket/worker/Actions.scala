@@ -33,8 +33,8 @@ case class SystemMessage(text: Array[Byte], override val parameters: Map[String,
   def getReason: String = getParameter(ParameterName.Reason).get
 
 }
-
-case class Message(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) {
+@SerialVersionUID(123L)
+case class Message(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) with Serializable {
 
   override val name = "MESSAGE"
 

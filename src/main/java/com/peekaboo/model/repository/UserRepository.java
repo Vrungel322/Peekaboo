@@ -2,7 +2,9 @@ package com.peekaboo.model.repository;
 
 import com.peekaboo.model.entity.User;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 public interface UserRepository {
 
@@ -13,12 +15,14 @@ public interface UserRepository {
     User findByUsername(String username);
     User findByEmail(String email);
     User findByTelephone(String telephone);
-    List<User> getAll();
+    ArrayList<User> getAll();
     void clearDataBase();
-    List<User> getFriends(User user);
+    ArrayList<User> getFriends(User user);
     void addNewFriend(User target, User whom);
     void deleteFriend(User from, User to);
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);
-    List<User> getBlackListFriends(User user);
+    ArrayList<User> getBlackListFriends(User user);
+    void addPendingMessage(User from, User target,String type, String object);
+    HashMap<String, LinkedList<String>> getPendingMessagesFor(User target);
 }

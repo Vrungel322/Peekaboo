@@ -3,6 +3,7 @@ package com.peekaboo.model.repository.impl;
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.relations.Friendship;
+import com.peekaboo.model.entity.relations.PendingMessages;
 import com.peekaboo.model.repository.UserRepository;
 import org.neo4j.ogm.cypher.Filter;
 import org.neo4j.ogm.cypher.Filters;
@@ -10,10 +11,8 @@ import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Repository
 public class UserRepositoryImpl implements UserRepository {
@@ -32,12 +31,13 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(User user) {
         Session session = sessionFactory.getSession();
         try {
-            if (getAll().size()==1) {
+            if (getAll().size() == 1) {
                 session.query("create constraint on (user:User) assert user.username is unique", Collections.EMPTY_MAP);
 //            session.query("create constraint on (user:User) assert user.telephone is unique",Collections.EMPTY_MAP);
-                session.query("create constraint on (user:User) assert user.email is unique",Collections.EMPTY_MAP);
+                session.query("create constraint on (user:User) assert user.email is unique", Collections.EMPTY_MAP);
             }
-        }catch (NullPointerException e) {}
+        } catch (NullPointerException e) {
+        }
         try {
             session.save(user);
         } catch (Exception e) {
@@ -69,28 +69,42 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByUsername(String username) {
         Session session = sessionFactory.getSession();
-        return session.loadAll(User.class, new Filter("username", username))
-                .stream().findFirst().get();
+        Collection<User> res = session.loadAll(User.class, new Filter("username", username));
+        if (res.isEmpty()) {
+            return null;
+        }
+        return res.iterator().next();
     }
 
     @Override
     public User findByEmail(String email) {
         Session session = sessionFactory.getSession();
-        return session.loadAll(User.class, new Filter("email", email))
-                .stream().findFirst().get();
+        Collection<User> res = session.loadAll(User.class, new Filters().add("email", email));
+        if (!res.isEmpty()) {
+            return res.iterator().next();
+        }
+        return null;
     }
 
     @Override
     public User findByTelephone(String telephone) {
         Session session = sessionFactory.getSession();
-        return session.loadAll(User.class, new Filter("telephone", telephone))
-                .stream().findFirst().get();
+        Collection<User> res = session.loadAll(User.class, new Filters().add("telephone", telephone));
+        if (!res.isEmpty()) {
+            return res.iterator().next();
+        }
+        return null;
     }
 
     @Override
-    public List<User> getAll() {
+    public ArrayList<User> getAll() {
         Session session = sessionFactory.getSession();
-        return new ArrayList<>(session.loadAll(User.class));
+        Collection<User> res = session.loadAll(User.class);
+        ArrayList<User> resList = new ArrayList<>(res);
+        if (resList.size() == 0) {
+            return null;
+        }
+        return resList;
     }
 
     @Override
@@ -136,8 +150,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> getFriends(User user) {
-        List<User> friends = new ArrayList<>();
+    public ArrayList<User> getFriends(User user) {
+        ArrayList<User> friends = new ArrayList<>();
         user.getFriends().forEach(v -> {
             if (v.getAvailibility() == 1) {
                 friends.add(v.getUserto());
@@ -147,14 +161,44 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> getBlackListFriends(User user) {
-        List<User> friends = new ArrayList<>();
+    public ArrayList<User> getBlackListFriends(User user) {
+        ArrayList<User> friends = new ArrayList<>();
         user.getFriends().forEach(v -> {
             if (v.getAvailibility() == 0) {
                 friends.add(v.getUserto());
             }
         });
         return friends;
+    }
+
+    @Override
+    public void addPendingMessage(User from, User target,String type, String object) {
+        Session session = sessionFactory.getSession();
+        try {
+            PendingMessages pendings = from.getPendingMessages().stream()
+                    .filter(x -> x.getFromto().equals(from.getId().toString() + target.getId().toString()))
+                    .findFirst().get();
+            LinkedList<String> messages = (LinkedList<String>) pendings.getMessages();
+            messages.add(object);
+            pendings.setMessages(messages);
+            pendings.setType(type);
+            from.getPendingMessages().add(pendings);
+        } catch (Exception e) {
+            from.getPendingMessages().add(new PendingMessages(from, target,type, object));
+        }
+        session.save(from);
+        session.save(target);
+    }
+
+    @Override
+    public HashMap<String, LinkedList<String>> getPendingMessagesFor(User target) {
+        List<User> pendings = getFriends(target).stream()
+                .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
+        HashMap<String, LinkedList<String>> resultPendings = new HashMap<>();
+        pendings.forEach(p -> {
+            resultPendings.put(p.getUsername(),(LinkedList<String>) p.getPendingMessagesFor(target.getUsername()));
+        });
+        return resultPendings;
     }
 
     public int getUserState(User user) {

@@ -44,12 +44,12 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
       case a:SystemMessage=>
         if (a.getReason=="mode"){
           logger.error("got to REASON:MODE")
-          val userRepository = new UserRepositoryImpl(new Neo4jSessionFactory)
           logger.debug(new String(a.getBody))
           logger.debug(a.getBody(0))
           val user=userRepository.findById(authorId.toLong)
+          logger.debug(user)
           user.setState(a.getBody(0).toInt)
-          userRepository.save(user)
+          userRepository.update(user)
         } else{
           val destination = a.getDestination
           val messageReason=a.getReason

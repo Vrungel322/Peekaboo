@@ -70,7 +70,6 @@ project/plugins/project/
 .Trash-*
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
@@ -89,3 +88,7 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+.idea/
+libs/
+null/
+tmp/

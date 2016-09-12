@@ -85,10 +85,10 @@ public class ConfirmAction extends Thread {
             "                </tr>\n" +
             "                <tr>\n" +
             "                    <td align=\"center\" style=\"padding: 30px 0 25px 0px\">\n" +
-            "                        <a href=\"http://www.w3schools.com\"><img src=\"https://www.peekaboochat.com/icons/facebook.png\" alt=\"Facebook\" width=\"50\" height=\"50\" style=\"display:inline-block; padding: 0 15px 0 15px\"/></a>\n" +
-            "                        <a href=\"http://www.w3schools.com\"><img src=\"https://www.peekaboochat.com/icons/twitter.png\" alt=\"Twitter\" width=\"50\" height=\"50\" style=\"display:inline-block; padding: 0 15px 0 15px\"/></a>\n" +
-            "                        <a href=\"http://www.w3schools.com\"><img src=\"https://www.peekaboochat.com/icons/in.png\" alt=\"LinkedIn\" width=\"50\" height=\"50\" style=\"display:inline-block; padding: 0 15px 0 15px\"/></a>\n" +
-            "                        <a href=\"http://www.w3schools.com\"><img src=\"https://www.peekaboochat.com/icons/insta.png\" alt=\"Instagram\" width=\"50\" height=\"50\" style=\"display:inline-block;padding: 0 15px 0 15px\"/></a>\n" +
+            "                        <img src=\"https://www.peekaboochat.com/icons/facebook.png\" alt=\"Facebook\" width=\"50\" height=\"50\" style=\"display:inline-block; padding: 0 15px 0 15px\"/>\n" +
+            "                        <img src=\"https://www.peekaboochat.com/icons/twitter.png\" alt=\"Twitter\" width=\"50\" height=\"50\" style=\"display:inline-block; padding: 0 15px 0 15px\"/>\n" +
+            "                        <img src=\"https://www.peekaboochat.com/icons/in.png\" alt=\"LinkedIn\" width=\"50\" height=\"50\" style=\"display:inline-block; padding: 0 15px 0 15px\"/>\n" +
+            "                        <img src=\"https://www.peekaboochat.com/icons/insta.png\" alt=\"Instagram\" width=\"50\" height=\"50\" style=\"display:inline-block;padding: 0 15px 0 15px\"/>\n" +
             "                    </td>\n" +
             "                </tr>\n" +
             "                <tr>\n" +

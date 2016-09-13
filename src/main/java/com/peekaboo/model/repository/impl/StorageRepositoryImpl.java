@@ -5,6 +5,7 @@ import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.repository.StorageRepository;
+import org.neo4j.ogm.cypher.Filter;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -48,6 +49,12 @@ public class StorageRepositoryImpl implements StorageRepository {
     @Override
     public List<Storage> findByUser(User user) {
         return user.getOwnStorages();
+    }
+
+    @Override
+    public Storage findByFileName(String fileName) {
+        return sessionFactory.getSession().loadAll(Storage.class, new Filter("fileName", fileName))
+                .stream().findFirst().get();
     }
 
     @Override

@@ -13,5 +13,6 @@ public interface StorageRepository {
     void addUser(Storage storage, User user);
     Storage findById(Long id);
     List<Storage> findByUser(User user);
+    Storage findByFileName(String fileName);
 
 }

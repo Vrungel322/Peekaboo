@@ -2,7 +2,7 @@ package com.peekaboo.model.service;
 
 import com.peekaboo.model.entity.User;
 
-import java.util.ArrayList;
+import java.util.List;
 
 public interface UserService extends EntityService<User, String> {
 
@@ -15,14 +15,14 @@ public interface UserService extends EntityService<User, String> {
     boolean loginExists(String login);
     User findByEmail(String email);
     User findByTelephone(String telephone);
-    ArrayList<User> getAll();
+    List<User> getAll();
     void clearDataBase();
-    ArrayList<User> getFriends(User user);
+    List<User> getFriends(User user);
     void addNewFriend(User target, User whom);
     void deleteFriend(User from, User to);
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);
-    ArrayList<User> getBlackListFriends(User user);
+    List<User> getBlackListFriends(User user);
 
 
 

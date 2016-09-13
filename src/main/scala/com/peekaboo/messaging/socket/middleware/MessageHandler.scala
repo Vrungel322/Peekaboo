@@ -1,6 +1,9 @@
 package com.peekaboo.messaging.socket.middleware
 
+import java.util
+
 import akka.actor.Props
+import com.google.gson.Gson
 import com.peekaboo.messaging.socket.worker._
 import com.peekaboo.model.Neo4jSessionFactory
 import com.peekaboo.model.repository.impl.UserRepositoryImpl
@@ -9,6 +12,7 @@ import org.springframework.web.socket._
 import org.springframework.web.socket.handler.BinaryWebSocketHandler
 
 import scala.collection.mutable
+import scala.collection.JavaConversions._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
@@ -87,25 +91,24 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
         logger.debug("Created actor " + actRef.get.toString())
         session.sendMessage(new PongMessage())
         val actSel = actRef.get
-        val map=new mutable.HashMap[String,String]
-        try{val user=userRepository.findById(id.toLong)
-        logger.error("found user")
+        val map = new mutable.HashMap[String,String]
+        try{
+            val user = userRepository.findById(id.toLong)
+            logger.error("found user")
 
-        val tmp=userRepository.getPendingMessagesFor(user)
-        logger.error(tmp.toString)
-        val z=tmp.keySet().iterator()
-        while(!z.hasNext){
-          z.next()
-         logger.error(tmp.get(z))
-          while(!tmp.get(z).isEmpty){
-            logger.error(tmp.get(z).pop())
-          }
-          }}
-        catch{case a:Exception=>logger.error(a.getStackTrace)}
+            val messages = userRepository.getPendingMessagesFor(user)
+            logger.error(messages.toString)
+
+            val list: util.ArrayList[Message] = new util.ArrayList[Message]()
+            messages.get(id).toStream.foreach{msg => list.add(new Gson().fromJson[Message](msg, Message.getClass))}
+
+            list.foreach{ msg => actSel ! msg}
+
+        }catch{case a:Exception=>logger.error(a.getStackTrace)}
 
 
 //        map.+=(ParameterName.From,)
-//        val message a=new Message()
+//        val message a=new Message()s
 //        actSel ! ()
       })
 

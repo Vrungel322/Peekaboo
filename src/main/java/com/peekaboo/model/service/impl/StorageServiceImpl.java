@@ -17,6 +17,11 @@ public class StorageServiceImpl implements StorageService {
     private StorageRepositoryImpl storageRepository;
 
     @Override
+    public Storage get(String id) {
+        return storageRepository.findById(Long.valueOf(id));
+    }
+
+    @Override
     public void save(Storage entity) {
         storageRepository.save(entity);
     }
@@ -27,8 +32,19 @@ public class StorageServiceImpl implements StorageService {
     }
 
     @Override
+    public Storage create(Storage entity) {
+        storageRepository.save(entity);
+        return entity;
+    }
+
+    @Override
     public List<Storage> findByUser(User user) {
         return user.getOwnStorages();
+    }
+
+    @Override
+    public Storage findByFileName(String fileName) {
+        return storageRepository.findByFileName(fileName);
     }
 
     @Override

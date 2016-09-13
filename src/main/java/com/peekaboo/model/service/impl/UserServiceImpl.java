@@ -51,10 +51,7 @@ public class UserServiceImpl implements UserService {
     public boolean loginExists(String login) {
 
         User user = findByEmail(login);
-        if (user == null)
-            return false;
-        else
-            return true;
+        return user!=null;
     }
 
     @Override
@@ -83,7 +80,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ArrayList<User> getAll() {
+    public List<User> getAll() {
         return userRepository.getAll();
     }
 
@@ -93,7 +90,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ArrayList<User> getFriends(User user) {
+    public List<User> getFriends(User user) {
         return userRepository.getFriends(user);
     }
 
@@ -118,7 +115,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public ArrayList<User> getBlackListFriends(User user) {
+    public List<User> getBlackListFriends(User user) {
         return userRepository.getBlackListFriends(user);
     }
 }

@@ -74,9 +74,9 @@ public class SignController {
                 .setEnabled(true);
         String token = jwtUtil.generateToken(response);
         logger.error(token);
+        return new ResponseEntity(new SigninResponse(user.getId().toString(), token), HttpStatus.OK);
 //        return new ResponseEntity(new SigninResponse(user.getId().toString(),
 //                user.getUsername().toString(),user.getAvatar().toString(), token), HttpStatus.OK);
-        return new ResponseEntity(new SigninResponse(user.getId().toString(),token), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
@@ -175,6 +175,7 @@ public class SignController {
 //        private String username;
 //        private String avatar;
 
+//        public SigninResponse(String id, String username, String avatar, String token) {
         public SigninResponse(String id, String token) {
             this.token = token;
             this.id = id;
@@ -193,10 +194,11 @@ public class SignController {
 
     private class SignupResponse {
         private String id;
-        private String username;
-        private String avatar;
+//        private String username;
+//        private String avatar;
 
         public SignupResponse(String id) {
+//        public SignupResponse(String id, String username, String avatar) {
             this.id = id;
 //            this.avatar = avatar;
 //            this.username = username;

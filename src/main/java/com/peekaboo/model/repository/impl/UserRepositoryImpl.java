@@ -36,14 +36,10 @@ public class UserRepositoryImpl implements UserRepository {
 //            session.query("create constraint on (user:User) assert user.telephone is unique",Collections.EMPTY_MAP);
                 session.query("create constraint on (user:User) assert user.email is unique", Collections.EMPTY_MAP);
             }
-        } catch (NullPointerException e) {
-        }
-        try {
             session.save(user);
         } catch (Exception e) {
             return null;
         }
-
         return user;
     }
 
@@ -69,22 +65,28 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByUsername(String username) {
         Session session = sessionFactory.getSession();
-        return session.loadAll(User.class, new Filter("username", username))
+        try{
+            return session.loadAll(User.class, new Filter("username", username))
                 .stream().findFirst().get();
+        }catch (Exception ex){ return null;}
     }
 
     @Override
     public User findByEmail(String email) {
         Session session = sessionFactory.getSession();
-        return session.loadAll(User.class, new Filter("email", email))
-                .stream().findFirst().get();
+        try{
+            return session.loadAll(User.class, new Filter("email", email))
+                    .stream().findFirst().get();
+        }catch (Exception ex){ return null;}
     }
 
     @Override
     public User findByTelephone(String telephone) {
         Session session = sessionFactory.getSession();
-        return session.loadAll(User.class, new Filter("telephone", telephone))
-                .stream().findFirst().get();
+        try{
+            return session.loadAll(User.class, new Filter("telephone", telephone))
+                    .stream().findFirst().get();
+        }catch (Exception ex){ return null;}
     }
 
     @Override

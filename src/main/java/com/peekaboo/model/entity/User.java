@@ -24,13 +24,14 @@ public class User implements UserDetails {
     private String name;
     private String password;
     private int roles;
-    private String avatar = null;
+
 
     private int state;
     //TODO: male = 0 , female = 1
     private int gender;
     private boolean enabled;
-
+    @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
+    private Storage avatar;
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
     private Set<Friendship> friends = new HashSet<>();
     @Relationship(type = "PENDING_MESSAGES", direction = Relationship.DIRECTION)
@@ -307,11 +308,11 @@ public class User implements UserDetails {
                 filter(m -> (m.getUserto().getUsername().equals(username))).findFirst().get().getMessages();
     }
 
-    public String getAvatar() {
+    public Storage getAvatar() {
         return avatar;
     }
 
-    public void setAvatar(String avatar) {
+    public void setAvatar(Storage avatar) {
         this.avatar = avatar;
     }
 }

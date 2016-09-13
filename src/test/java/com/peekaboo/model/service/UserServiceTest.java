@@ -59,9 +59,9 @@ public class UserServiceTest {
         userService.clearDataBase();
         userService.save(new User("maks", "maksim", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
         userService.save(new User("alex1", "sashka1", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex2", "sashka2", "sss", "asdad", "alex2@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex3", "sashka3", "sss", "asdad", "alex3@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex4", "sashka4", "sss", "asdad", "alex4@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex2", "sashka2", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex3", "sashka3", "sss", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex4", "sashka4", "sss", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
         User user = userService.findByUsername("maks");
         User user1 = userService.findByUsername("alex1");
         User user2 = userService.findByUsername("alex2");

@@ -58,7 +58,7 @@ public class UserServiceTest {
     public void managingWithFriends() {
         userService.clearDataBase();
         userService.save(new User("maks", "maksim", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
-        userService.save(new User("alex1", "sashka1", "sss", "asdad", "alex1@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex1", "sashka1", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
         userService.save(new User("alex2", "sashka2", "sss", "asdad", "alex2@gmail.com", 0, 0, false, 0));
         userService.save(new User("alex3", "sashka3", "sss", "asdad", "alex3@gmail.com", 0, 0, false, 0));
         userService.save(new User("alex4", "sashka4", "sss", "asdad", "alex4@gmail.com", 0, 0, false, 0));
@@ -67,6 +67,8 @@ public class UserServiceTest {
         User user2 = userService.findByUsername("alex2");
         User user3 = userService.findByUsername("alex3");
         User user4 = userService.findByUsername("alex4");
+        System.out.println(user.toString());
+        System.out.println(user1.toString());
         userService.addNewFriend(user, user1);
         userService.addNewFriend(user, user2);
         userService.addNewFriend(user, user3);
@@ -114,24 +116,28 @@ public class UserServiceTest {
         userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks2", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
         userService.addPendingMessage(user2, user1, "type",new Gson().toJson(new User("maks3", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
         userService.addPendingMessage(user2, user1, "type",new Gson().toJson(new User("maks4", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-//        userService.addPendingMessage(user2, user1,"type", new String("привет"));
-//        userService.addPendingMessage(user2, user1,"type", new String("я - Лола"));
-//        userService.addPendingMessage(user2, user1,"type", new String("хочу познакомиться"));
-//        userService.addPendingMessage(user, user1,"type", new String("как дела?"));
-//        userService.addPendingMessage(user, user1,"type", new String("что делаешь?"));
-//        userService.addPendingMessage(user, user1,"type", new String("смотри какие мемы мне чепурной скинул)))"));
-//        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem1.png"));
-//        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem2.png"));
-//        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem3.png"));
-//        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/sticker.png"));
-//        userService.addPendingMessage(user, user1,"type", new String("я просто угораю, это лютый треш!!!"));
+        userService.addPendingMessage(user2, user1,"type", new String("привет"));
+        userService.addPendingMessage(user2, user1,"type", new String("я - Лола"));
+        userService.addPendingMessage(user2, user1,"type", new String("хочу познакомиться"));
+        userService.addPendingMessage(user, user1,"type", new String("как дела?"));
+        userService.addPendingMessage(user, user1,"type", new String("что делаешь?"));
+        userService.addPendingMessage(user, user1,"type", new String("смотри какие мемы мне чепурной скинул)))"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem1.png"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem2.png"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem3.png"));
+        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/sticker.png"));
+        userService.addPendingMessage(user, user1,"type", new String("я просто угораю, это лютый треш!!!"));
         userService.getPendingMessagesFor(userService.findByUsername(user1.getUsername()))
                 .forEach((k,v) -> {
                     System.out.println();
                     System.out.println();
                     System.out.println("unread messages from " + k);
                     v.forEach(m -> {
-                        System.out.println(new Gson().fromJson(m, JsonObject.class).get("email").toString());
+                        try {
+                            System.out.println(new Gson().fromJson(m, JsonObject.class).get("email").toString());
+                        } catch (Exception e) {
+                            System.out.println(m.toString());
+                        }
                     });
                     System.out.println();
                     System.out.println();

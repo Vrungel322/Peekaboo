@@ -74,8 +74,9 @@ public class SignController {
                 .setEnabled(true);
         String token = jwtUtil.generateToken(response);
         logger.error(token);
-        return new ResponseEntity(new SigninResponse(user.getId().toString(),
-                user.getUsername().toString(),user.getAvatar().toString(), token), HttpStatus.OK);
+        return new ResponseEntity(new SigninResponse(user.getId().toString(), token), HttpStatus.OK);
+//        return new ResponseEntity(new SigninResponse(user.getId().toString(),
+//                user.getUsername().toString(),user.getAvatar().toString(), token), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
@@ -142,7 +143,8 @@ public class SignController {
         verToken.setUser(user);
         verToken = verificationService.create(verToken);
         registrationConfirmService.confirm(user, verToken);
-        SignupResponse response = new SignupResponse(user.getId().toString(), user.getUsername().toString(), user.getAvatar().toString());
+        SignupResponse response = new SignupResponse(user.getId().toString());
+//        SignupResponse response = new SignupResponse(user.getId().toString(), user.getUsername().toString(), user.getAvatar().toString());
         logger.debug("User were successfully created");
         return new ResponseEntity(response, HttpStatus.OK);
     }
@@ -170,14 +172,15 @@ public class SignController {
     private class SigninResponse {
         private String id;
         private String token;
-        private String username;
-        private String avatar;
+//        private String username;
+//        private String avatar;
 
-        public SigninResponse(String id, String username, String avatar, String token) {
+//        public SigninResponse(String id, String username, String avatar, String token) {
+        public SigninResponse(String id, String token) {
             this.token = token;
             this.id = id;
-            this.username = username;
-            this.avatar = avatar;
+//            this.username = username;
+//            this.avatar = avatar;
         }
         public String getId() {
             return id;
@@ -185,26 +188,27 @@ public class SignController {
         public String getToken() {
             return token;
         }
-        public String getAvatar() { return avatar; }
-        public String getUsername() { return username; }
+//        public String getAvatar() { return avatar; }
+//        public String getUsername() { return username; }
     }
 
     private class SignupResponse {
         private String id;
-        private String username;
-        private String avatar;
+//        private String username;
+//        private String avatar;
 
-        public SignupResponse(String id, String username, String avatar) {
+        public SignupResponse(String id) {
+//        public SignupResponse(String id, String username, String avatar) {
             this.id = id;
-            this.avatar = avatar;
-            this.username = username;
+//            this.avatar = avatar;
+//            this.username = username;
         }
 
         public String getId() {
             return id;
         }
-        public String getUsername() { return username;}
-        public String getAvatar() {return avatar;}
+//        public String getUsername() { return username;}
+//        public String getAvatar() {return avatar;}
     }
 
     private final Logger logger = LogManager.getLogger(this);

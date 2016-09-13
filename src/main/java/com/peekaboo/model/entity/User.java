@@ -24,7 +24,7 @@ public class User implements UserDetails {
     private String name;
     private String password;
     private int roles;
-    private String avatar = null;
+    private Storage avatar;
 
     private int state;
     //TODO: male = 0 , female = 1
@@ -307,12 +307,11 @@ public class User implements UserDetails {
                 filter(m -> (m.getUserto().getUsername().equals(username))).findFirst().get().getMessages();
     }
 
-    public String getAvatar() {
-        return avatar;
+    public Storage getAvatar() {
+        return getOwnStorages().stream().filter(ava -> ava.getFileName()
+                .equals(getUsername())).findFirst().get();
     }
 
-    public void setAvatar(String avatar) {
-        this.avatar = avatar;
-    }
+
 }
 

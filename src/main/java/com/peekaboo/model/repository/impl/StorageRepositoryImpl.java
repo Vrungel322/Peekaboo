@@ -53,8 +53,10 @@ public class StorageRepositoryImpl implements StorageRepository {
 
     @Override
     public Storage findByFileName(String fileName) {
-        return sessionFactory.getSession().loadAll(Storage.class, new Filter("fileName", fileName))
-                .stream().findFirst().get();
+        try {
+            return sessionFactory.getSession().loadAll(Storage.class, new Filter("fileName", fileName))
+                    .stream().findFirst().get();
+        }catch (Exception ex){ return null;}
     }
 
     @Override

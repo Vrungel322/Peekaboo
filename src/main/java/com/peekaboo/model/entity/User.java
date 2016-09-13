@@ -24,13 +24,14 @@ public class User implements UserDetails {
     private String name;
     private String password;
     private int roles;
-    private Storage avatar;
+
 
     private int state;
     //TODO: male = 0 , female = 1
     private int gender;
     private boolean enabled;
-
+    @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
+    private Storage avatar;
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
     private Set<Friendship> friends = new HashSet<>();
     @Relationship(type = "PENDING_MESSAGES", direction = Relationship.DIRECTION)
@@ -308,10 +309,11 @@ public class User implements UserDetails {
     }
 
     public Storage getAvatar() {
-        return getOwnStorages().stream().filter(ava -> ava.getFileName()
-                .equals(getUsername())).findFirst().get();
+        return avatar;
     }
 
-
+    public void setAvatar(Storage avatar) {
+        this.avatar = avatar;
+    }
 }
 

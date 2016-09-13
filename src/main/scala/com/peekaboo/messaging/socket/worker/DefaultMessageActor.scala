@@ -19,6 +19,6 @@ class DefaultMessageActor(private val id: String) extends Actor {
       logger.debug(s"The message was ${new String(a.getBody)}")
       val userFrom: User = userService.findById(receiver.toLong)
       val userTo: User = userService.findById(destination.toLong)
-      userService.addPendingMessage(userFrom, userTo,a.getType, new Gson().toJson(a.getBody));
+      userService.addPendingMessage(userFrom, userTo,a.getType, new Gson().toJson(a));
   }
 }

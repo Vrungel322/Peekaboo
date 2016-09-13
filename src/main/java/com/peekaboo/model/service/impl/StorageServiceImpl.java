@@ -17,6 +17,11 @@ public class StorageServiceImpl implements StorageService {
     private StorageRepositoryImpl storageRepository;
 
     @Override
+    public Storage get(String id) {
+        return storageRepository.findById(Long.valueOf(id));
+    }
+
+    @Override
     public void save(Storage entity) {
         storageRepository.save(entity);
     }
@@ -24,6 +29,12 @@ public class StorageServiceImpl implements StorageService {
     @Override
     public void delete(Storage entity) {
         storageRepository.delete(entity);
+    }
+
+    @Override
+    public Storage create(Storage entity) {
+        storageRepository.save(entity);
+        return entity;
     }
 
     @Override

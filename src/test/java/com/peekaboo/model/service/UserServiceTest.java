@@ -93,25 +93,17 @@ public class UserServiceTest {
 
     @Test
     public void avatarOperations(){
-
         userService.clearDataBase();
         User user = new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0);
         userService.save(user);
-        Storage storage = new Storage("dsfg", "sdfg");
-        storageRepository.save(storage);
-        user.setProfilePhoto(storage);
-        userService.update(user);
-//        userService.clearDataBase();
-//        User user = new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0);
-//        userService.save(user);
-//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
-//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar2.jpg","path.to.avatar"));
-//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar3.jpg","path.to.avatar"));
-//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar4.jpg","path.to.avatar"));
-//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar5.jpg","path.to.avatar"));
-//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar6.jpg","path.to.avatar"));
-//        userService.deleteProfilePhoto(user);
-//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar2.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar3.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar4.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar5.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar6.jpg","path.to.avatar"));
+        userService.deleteProfilePhoto(user);
+        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
     }
 
     @Test
@@ -124,7 +116,6 @@ public class UserServiceTest {
         User user1 = userService.findByUsername("Vasyan");
         User user2 = userService.findByUsername("Lola");
         userService.addNewFriend(user,user1);
-        userService.addNewFriend(user2  ,user1);
         userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
         userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks1", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
         userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks2", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
@@ -157,5 +148,8 @@ public class UserServiceTest {
                     System.out.println();
                     System.out.println();
                 });
+
+        userService.deletePendingMessages(userService.findByUsername("Vasyan"));
+        System.out.println("end");
     }
 }

@@ -181,7 +181,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Map<String, List<String>> getPendingMessagesFor(User target) {
-        List<User> pendings = getFriends(target).stream()
+        List<User> pendings = getAll().stream()
                 .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
         Map<String, List<String>> resultPendings = new HashMap<>();
         pendings.forEach(p -> {
@@ -211,5 +211,13 @@ public class UserRepositoryImpl implements UserRepository {
 
     public int getUserState(User user) {
         return findByUsername(user.getUsername()).getState();
+    }
+
+    @Override
+    public void deletePendingMessages(User target) {
+        Session session = sessionFactory.getSession();
+        List<User> pendings = getAll().stream()
+                .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
+        pendings.forEach(p -> p.getPendingMessages().forEach(v-> session.delete(v)));
     }
 }

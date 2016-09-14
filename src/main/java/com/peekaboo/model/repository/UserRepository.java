@@ -25,6 +25,7 @@ public interface UserRepository {
     List<User> getBlackListFriends(User user);
     void addPendingMessage(User from, User target, String type, String object);
     Map<String, List<String>> getPendingMessagesFor(User target);
+    void deletePendingMessages(User user);
     void changeProfilePhoto(User user, Storage avatar);
     void deleteProfilePhoto(User user);
 }

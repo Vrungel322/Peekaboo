@@ -1,5 +1,6 @@
 package com.peekaboo.model.repository;
 
+import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 
 import java.util.List;
@@ -24,4 +25,6 @@ public interface UserRepository {
     List<User> getBlackListFriends(User user);
     void addPendingMessage(User from, User target, String type, String object);
     Map<String, List<String>> getPendingMessagesFor(User target);
+    void changeProfilePhoto(User user, Storage avatar);
+    void deleteProfilePhoto(User user);
 }

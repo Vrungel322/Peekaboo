@@ -24,21 +24,19 @@ public class User implements UserDetails {
     private String name;
     private String password;
     private int roles;
-
-
     private int state;
     //TODO: male = 0 , female = 1
     private int gender;
     private boolean enabled;
-    @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
-    private Storage avatar;
+    @Relationship(type = "PROFILE_PHOTO", direction = Relationship.DIRECTION)
+    private Storage profilePhoto = null;
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
     private Set<Friendship> friends = new HashSet<>();
     @Relationship(type = "PENDING_MESSAGES", direction = Relationship.DIRECTION)
     private Set<PendingMessages> pendingMessages = new HashSet<>();
     @Relationship(type = "OWNS", direction = Relationship.DIRECTION)
     private List<Storage> ownStorages = new ArrayList<>();
-    @Relationship(type = "USE", direction = Relationship.DIRECTION)
+    @Relationship(type = "USES", direction = Relationship.DIRECTION)
     private List<Storage> usesStorages = new ArrayList<>();
     @Relationship(type = "PENDINGFRIENDSHIP", direction = Relationship.UNDIRECTED)
     private List<User> pendingFriends = new ArrayList<>();
@@ -290,7 +288,7 @@ public class User implements UserDetails {
         sb.append(", roles=").append(roles);
         sb.append(", gender=").append(gender);
         sb.append(", enabled=").append(enabled);
-        sb.append(", avatar=").append(avatar);
+        sb.append(", avatar=").append(profilePhoto);
         sb.append('}');
         return sb.toString();
     }
@@ -308,12 +306,20 @@ public class User implements UserDetails {
                 filter(m -> (m.getUserto().getUsername().equals(username))).findFirst().get().getMessages();
     }
 
-    public Storage getAvatar() {
-        return avatar;
+    public Storage getProfilePhoto() {
+        return profilePhoto;
     }
 
-    public void setAvatar(Storage avatar) {
-        this.avatar = avatar;
+    public void setProfilePhoto(Storage profilePhoto) {
+        this.profilePhoto = profilePhoto;
+    }
+
+    public void setOwnStorages(List<Storage> ownStorages) {
+        this.ownStorages = ownStorages;
+    }
+
+    public void setUsesStorages(List<Storage> usesStorages) {
+        this.usesStorages = usesStorages;
     }
 }
 

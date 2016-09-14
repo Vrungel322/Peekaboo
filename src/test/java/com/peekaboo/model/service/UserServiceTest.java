@@ -12,6 +12,8 @@ import com.peekaboo.model.repository.impl.UserRepositoryImpl;
 import com.peekaboo.model.repository.impl.VerificationRepositoryImpl;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import javafx.scene.image.Image;
+import org.apache.http.HttpRequest;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -22,6 +24,7 @@ import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import sun.net.www.http.HttpClient;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -90,14 +93,25 @@ public class UserServiceTest {
 
     @Test
     public void avatarOperations(){
+
         userService.clearDataBase();
         User user = new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0);
         userService.save(user);
-        Storage avatar = new Storage("sdfgh", "dfgfg");
-        Storage storage = new Storage("dsfvb", "sdfgf");
-        user.setAvatar(avatar);
-        user.getOwnStorages().add(storage);
+        Storage storage = new Storage("dsfg", "sdfg");
+        storageRepository.save(storage);
+        user.setProfilePhoto(storage);
         userService.update(user);
+//        userService.clearDataBase();
+//        User user = new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0);
+//        userService.save(user);
+//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
+//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar2.jpg","path.to.avatar"));
+//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar3.jpg","path.to.avatar"));
+//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar4.jpg","path.to.avatar"));
+//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar5.jpg","path.to.avatar"));
+//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar6.jpg","path.to.avatar"));
+//        userService.deleteProfilePhoto(user);
+//        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
     }
 
     @Test

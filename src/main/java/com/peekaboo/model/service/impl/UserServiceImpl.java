@@ -1,6 +1,7 @@
 package com.peekaboo.model.service.impl;
 
 import com.peekaboo.model.Neo4jSessionFactory;
+import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.repository.impl.UserRepositoryImpl;
 import com.peekaboo.model.service.UserService;
@@ -117,6 +118,16 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<User> getBlackListFriends(User user) {
         return userRepository.getBlackListFriends(user);
+    }
+
+    @Override
+    public void changeProfilePhoto(User user, Storage avatar) {
+        userRepository.changeProfilePhoto(user, avatar);
+    }
+
+    @Override
+    public void deleteProfilePhoto(User user) {
+        userRepository.deleteProfilePhoto(user);
     }
 }
 

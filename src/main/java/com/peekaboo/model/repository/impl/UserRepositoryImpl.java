@@ -1,6 +1,7 @@
 package com.peekaboo.model.repository.impl;
 
 import com.peekaboo.model.Neo4jSessionFactory;
+import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.relations.Friendship;
 import com.peekaboo.model.entity.relations.PendingMessages;
@@ -187,6 +188,25 @@ public class UserRepositoryImpl implements UserRepository {
             resultPendings.put(p.getUsername(),(List<String>) p.getPendingMessagesFor(target.getUsername()));
         });
         return resultPendings;
+    }
+
+    @Override
+    public void deleteProfilePhoto(User user) {
+        Session session = sessionFactory.getSession();
+        User curUser = findByUsername(user.getUsername());
+        session.delete(curUser.getProfilePhoto());
+        curUser.setProfilePhoto(null);
+        update(curUser);
+    }
+
+    @Override
+    public void changeProfilePhoto(User user, Storage avatar) {
+        User curUser = findByUsername(user.getUsername());
+        if (curUser.getProfilePhoto() != null) {
+            deleteProfilePhoto(curUser);
+        }
+        curUser.setProfilePhoto(avatar);
+        update(curUser);
     }
 
     public int getUserState(User user) {

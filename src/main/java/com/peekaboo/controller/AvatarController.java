@@ -25,6 +25,10 @@ public class AvatarController {
 
     private static final Logger logger = LogManager.getLogger(AvatarController.class);
     private File rootDir;
+    @Autowired
+    private UserServiceImpl userService;
+    @Autowired
+    private StorageServiceImpl storageService;
 
     public AvatarController(){
         String rootPath = System.getProperty("user.dir");
@@ -32,23 +36,14 @@ public class AvatarController {
         if (!rootDir.exists())
             rootDir.mkdirs();
     }
-    
-    @Autowired
-    private UserServiceImpl userService;
-    @Autowired
-    private StorageServiceImpl storageService;
-
     @RequestMapping(path = "/avatar/", method = RequestMethod.POST)
     public String avatar( @RequestParam("image") MultipartFile image){
         if (!image.isEmpty()) {
             try {
                 byte[] bytes = image.getBytes();
-
                 User tmp = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 User user = userService.findById(tmp.getId());
-
                 String imageName = user.getUsername();
-                
                 File parent = new File(rootDir.getAbsolutePath() + File.separator + user.getId().toString());
                 if (!parent.exists()) parent.mkdir();
                 File uploadedImage = new File(parent.getAbsolutePath() + File.separator + imageName);
@@ -56,13 +51,9 @@ public class AvatarController {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedImage));
                 stream.write(bytes);
                 stream.close();
-
-                Storage storage = new Storage(imageName, uploadedImage.getAbsolutePath());
-                storageService.save(storage);
-
-                user.getOwnStorages().add(storage);
-                userService.update(user);
-
+                Storage profilePhoto = new Storage(imageName, uploadedImage.getAbsolutePath());
+                storageService.save(profilePhoto);
+                userService.changeProfilePhoto(user, profilePhoto);
                 logger.debug("Server Avatar location=" + uploadedImage.getAbsolutePath());
                 //for now just return upload status
                 return "{\"result\": \"Ok\", \"name\": \"" + imageName + "\"}";
@@ -77,11 +68,8 @@ public class AvatarController {
     @RequestMapping(path = "/avatar/{userId}", method = RequestMethod.GET)
     public void avatar(HttpServletResponse response, @PathVariable String userId){
         User user = userService.get(userId);
-        Storage avatar = user.getOwnStorages().stream().filter(str -> str.getFileName()
-                .equals(user.getUsername())).findFirst().get();
-
+        Storage avatar = user.getProfilePhoto();
         Path image = Paths.get(avatar.getFilePath());
-
         if (Files.exists(image)) {
             //TODO: Set correct content type
             response.setContentType("image/png");
@@ -98,6 +86,5 @@ public class AvatarController {
                 }
             }
         }
-
     }
 }

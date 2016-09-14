@@ -1,5 +1,6 @@
 package com.peekaboo.model.service;
 
+import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 
 import java.util.List;
@@ -23,7 +24,8 @@ public interface UserService extends EntityService<User, String> {
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);
     List<User> getBlackListFriends(User user);
-
+    void changeProfilePhoto(User user, Storage avatar);
+    void deleteProfilePhoto(User user);
 
 
 }

@@ -4,6 +4,7 @@ import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.relations.Friendship;
+import com.peekaboo.model.entity.relations.PendingFriendship;
 import com.peekaboo.model.entity.relations.PendingMessages;
 import com.peekaboo.model.repository.UserRepository;
 import org.neo4j.ogm.cypher.Filter;
@@ -105,6 +106,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void addNewFriend(User target, User whom) {
         Session session = sessionFactory.getSession();
+        deleteFriendshipRequest(target,whom);
         target.getFriends().add(new Friendship(target, whom));
         session.save(target);
         whom.getFriends().add(new Friendship(whom, target));
@@ -197,6 +199,31 @@ public class UserRepositoryImpl implements UserRepository {
         session.delete(curUser.getProfilePhoto());
         curUser.setProfilePhoto(null);
         update(curUser);
+    }
+
+    @Override
+    public void sendFriendshipRequest(User user, User target) {
+        Session session = sessionFactory.getSession();
+        user.getRequestFriends().add(new PendingFriendship(user, target));
+        session.save(user);
+    }
+
+    @Override
+    public void deleteFriendshipRequest(User user, User target) {
+        Session session = sessionFactory.getSession();
+        try {
+            PendingFriendship pendingFriendship = session.loadAll(PendingFriendship.class, new Filter("fromto", user.getId().toString() + target.getId().toString())).iterator().next();
+            user.getRequestFriends().remove(pendingFriendship);
+            update(user);
+        } catch (Exception e) {}
+
+        try {
+            PendingFriendship pendingFriendship = session.loadAll(PendingFriendship.class, new Filter("fromto", target.getId().toString() + user.getId().toString())).iterator().next();
+            target.getRequestFriends().remove(pendingFriendship);
+            update(target);
+        } catch (Exception e) {}
+
+
     }
 
     @Override

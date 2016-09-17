@@ -54,8 +54,6 @@ public class UserServiceTest {
         System.out.println(u.toString());
         Assert.assertEquals(u.getUsername(), "jack");
         userService.delete(userService.findByUsername("jack"));
-
-
     }
     @Test
     public void managingWithFriends() {
@@ -70,14 +68,29 @@ public class UserServiceTest {
         User user2 = userService.findByUsername("alex2");
         User user3 = userService.findByUsername("alex3");
         User user4 = userService.findByUsername("alex4");
-        System.out.println(user.toString());
-        System.out.println(user1.toString());
         userService.addNewFriend(user, user1);
         userService.addNewFriend(user, user2);
         userService.addNewFriend(user, user3);
         userService.addNewFriend(user, user4);
     }
 
+    @Test
+    public void pendingFriendshipRequest() {
+        userService.clearDataBase();
+        userService.save(new User("maks", "maksim", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
+        userService.save(new User("alex1", "sashka1", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex2", "sashka2", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex3", "sashka3", "sss", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex4", "sashka4", "sss", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
+        User user = userService.findByUsername("maks");
+        User user1 = userService.findByUsername("alex1");
+        User user2 = userService.findByUsername("alex2");
+        User user3 = userService.findByUsername("alex3");
+        User user4 = userService.findByUsername("alex4");
+        userService.sendFriendshipRequest(user1, user2);
+        userService.sendFriendshipRequest(user1,user4);
+        userService.deleteFriendshipRequest(user1,user4 );
+    }
     @Test
     public void constraintFiledsTest() {
         userService.clearDataBase();
@@ -90,7 +103,6 @@ public class UserServiceTest {
         userService.save(new User("username1", "maksim", "sss", "telephone1", "email1", 0, 0, true, 0));
         Assert.assertEquals(2,userService.getAll().size());
     }
-
     @Test
     public void avatarOperations(){
         userService.clearDataBase();
@@ -148,7 +160,6 @@ public class UserServiceTest {
                     System.out.println();
                     System.out.println();
                 });
-
         userService.deletePendingMessages(userService.findByUsername("Vasyan"));
         System.out.println("end");
     }

@@ -18,8 +18,7 @@ public class Neo4jSessionFactory {
     private SessionFactory sessionFactory = new SessionFactory(PACKAGE);
     private Session session = sessionFactory.openSession(NEO4J_URL, USERNAME, PASSWORD);
 
-    public Neo4jSessionFactory() {
-    }
+    public Neo4jSessionFactory() {}
 
     public Session getSession() {
         return session;

@@ -2,6 +2,7 @@ package com.peekaboo.model.entity;
 
 import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.entity.relations.Friendship;
+import com.peekaboo.model.entity.relations.PendingFriendship;
 import com.peekaboo.model.entity.relations.PendingMessages;
 import org.neo4j.ogm.annotation.GraphId;
 import org.neo4j.ogm.annotation.Index;
@@ -38,10 +39,8 @@ public class User implements UserDetails {
     private List<Storage> ownStorages = new ArrayList<>();
     @Relationship(type = "USES", direction = Relationship.DIRECTION)
     private List<Storage> usesStorages = new ArrayList<>();
-    @Relationship(type = "PENDINGFRIENDSHIP", direction = Relationship.UNDIRECTED)
-    private List<User> pendingFriends = new ArrayList<>();
-    @Relationship(type = "REQUESTFRIENDSHIP", direction = Relationship.UNDIRECTED)
-    private List<User> requestFriends = new ArrayList<>();
+    @Relationship(type = "REQUEST_FRIENDSHIP", direction = Relationship.UNDIRECTED)
+    private Set<PendingFriendship> requestFriends = new HashSet<>();
 
     public User() {}
 
@@ -168,23 +167,6 @@ public class User implements UserDetails {
         this.friends = friends;
     }
 
-    public List<User> getPendingFriends() {
-        return pendingFriends;
-    }
-
-    public List<User> getRequestFriends() {
-        return requestFriends;
-    }
-
-    public void setPendingFriends(List<User> pendingFriends) {
-        this.pendingFriends = pendingFriends;
-    }
-
-    public void setRequestFriends(List<User> requestFriends) {
-        this.pendingFriends = requestFriends;
-    }
-
-
     public void setLogin(String login) {
         if (login.contains("@")) {
             this.email = login;
@@ -256,6 +238,14 @@ public class User implements UserDetails {
 
     public void setPendingMessages(Set<PendingMessages> pendingMessages) {
         this.pendingMessages = pendingMessages;
+    }
+
+    public Set<PendingFriendship> getRequestFriends() {
+        return requestFriends;
+    }
+
+    public void setRequestFriends(Set<PendingFriendship> requestFriends) {
+        this.requestFriends = requestFriends;
     }
 
     @Override

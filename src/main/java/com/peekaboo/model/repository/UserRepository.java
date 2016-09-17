@@ -28,4 +28,6 @@ public interface UserRepository {
     void deletePendingMessages(User user);
     void changeProfilePhoto(User user, Storage avatar);
     void deleteProfilePhoto(User user);
+    void sendFriendshipRequest(User user, User target);
+    void deleteFriendshipRequest(User user, User target);
 }

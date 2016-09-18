@@ -1,5 +1,6 @@
 package com.peekaboo.controller.filemanage;
 
+import com.peekaboo.miscellaneous.PropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.impl.UserServiceImpl;
@@ -33,7 +34,7 @@ public class FileDownload {
     UserServiceImpl userService;
 
     public FileDownload() {
-        String rootPath = System.getProperty("catalina.home");
+        String rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"));
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
             rootDir.mkdirs();
@@ -47,13 +48,15 @@ public class FileDownload {
 //        Storage storage = receiver.getUsesStorages().stream()
 //                .filter(x -> x.getFileName().equals(fileName))
 //                .findFirst().get();
-        String rootPath = System.getProperty("catalina.home");
+        String rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"));
         //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
        File rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + userId);
         if (!rootDir.exists()) rootDir.mkdirs();
         File uploadedFile = new File(rootDir.getAbsolutePath() + File.separator+fileName );
         logger.error(uploadedFile.getAbsolutePath());
         Path file = Paths.get(uploadedFile.getAbsolutePath());
+        logger.error("done");
+        logger.error(Files.exists(file));
         if (Files.exists(file)) {
             response.setContentType("audio/wav");
             logger.error("file found");

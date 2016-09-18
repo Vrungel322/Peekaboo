@@ -16,6 +16,7 @@ class StandardSocketRequestDispatcher extends RequestDispatcher {
   val userRepository = new UserRepositoryImpl(new Neo4jSessionFactory);
   val system = ActorSystems.messageSystem
 
+
   def process(action: Action, authorId: String) = {
     logger.debug("Got to process")
     action match {

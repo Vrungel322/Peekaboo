@@ -212,10 +212,33 @@ http://maven.apache.org/POM/4.0.0 ">
         <!--=============Watson Engine================-->
 
 
-    </dependencies>
+
+
+        <dependency>
+            <groupId>com.lihaoyi</groupId>
+            <artifactId>upickle_2.11</artifactId>
+            <version>0.4.2</version>
+        </dependency>
+
+
+
+
+
+        </dependencies>
+
+
+
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.tomcat.maven</groupId>
+                <artifactId>tomcat7-maven-plugin</artifactId>
+                <version>2.2</version>
+                <configuration>
+                    <port>8081</port>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.scala-tools</groupId>
                 <artifactId>maven-scala-plugin</artifactId>
@@ -223,6 +246,7 @@ http://maven.apache.org/POM/4.0.0 ">
                 <executions>
                     <execution>
                         <id>compile</id>
+
                         <goals>
                             <goal>compile</goal>
                         </goals>

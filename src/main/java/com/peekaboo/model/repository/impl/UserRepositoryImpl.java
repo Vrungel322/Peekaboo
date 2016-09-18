@@ -69,7 +69,7 @@ public class UserRepositoryImpl implements UserRepository {
         Session session = sessionFactory.getSession();
         try{
             return session.loadAll(User.class, new Filter("username", username))
-                .stream().findFirst().get();
+                    .stream().findFirst().get();
         }catch (Exception ex){ return null;}
     }
 
@@ -172,10 +172,11 @@ public class UserRepositoryImpl implements UserRepository {
             LinkedList<String> messages = (LinkedList<String>) pendings.getMessages();
             messages.add(object);
             pendings.setMessages(messages);
+            //To do: understand why we have type
             pendings.setType(type);
             from.getPendingMessages().add(pendings);
         } catch (Exception e) {
-            from.getPendingMessages().add(new PendingMessages(from, target,type, object));
+            from.getPendingMessages().add(new PendingMessages(from, target, object));
         }
         session.save(from);
         session.save(target);

@@ -9,6 +9,7 @@ import java.io.InputStream
 
 import akka.actor.Actor
 import com.peekaboo.messaging.socket.middleware.BinaryMessageInterceptor
+import com.peekaboo.miscellaneous.PropertiesParser
 import com.peekaboo.model.Neo4jSessionFactory
 import com.peekaboo.model.entity.{Storage, User}
 import com.peekaboo.model.entity.enums.UserState
@@ -20,6 +21,7 @@ import org.apache.logging.log4j.LogManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.socket.{BinaryMessage, WebSocketSession}
 
+import scala.collection.mutable
 import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 class MessageActor(private val socket: WebSocketSession) extends Actor {
@@ -114,10 +116,11 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           sendMessage(action)
         }
         if ((messageType==UserState.AUDIO.getName)&&(state==UserState.TEXT.getId)){
-
+          logger.debug("processing audio to text")
           val converter: AudioToTextInterface = new AudioToTextWatson//here is our converter
           //next routine is searching the path of file which were stored using http "upload"
-          val rootPath: String = System.getProperty("catalina.home")
+          //todo:rewrite catalina home to build paths in one place
+          val rootPath: String = System.getProperty(PropertiesParser.getValue("FilesDestination"))
           val rootDir = new File(rootPath + File.separator + "tmp")
           //        logger.error(new String(msg.getBody, "UTF-8"))
           val filename = new String(msg.getBody, "UTF-8")
@@ -125,6 +128,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           logger.debug("Target file:"+file)
 
           val messageText=converter.RunServiceWithDefaults(file.toFile)//converting audio to txt using watson
+          logger.debug("converted")
           val parameters=msg.parameters
           parameters+("type"->"text")
           val message=new SendText(messageText,parameters)
@@ -135,14 +139,15 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
         //
 
         if ((messageType==UserState.TEXT.getName)&&(state==UserState.AUDIO.getId)){
+          try{
           logger.error("processing text2audio")
           val messageText=new String(msg.getBody, "UTF-8")
-          val rootPath = System.getProperty("user.dir")
+          val rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"))
           //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
           val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
           if (!rootDir.exists) rootDir.mkdirs()
           val fileName: String = UUID.randomUUID.toString
-          val uploadedFile = new File(rootDir.getAbsolutePath + File.separator+fileName+".temp" )
+          val uploadedFile = new File(rootDir.getAbsolutePath + File.separator+fileName +".tmp")
           logger.error(uploadedFile.getPath)
           uploadedFile.createNewFile
           val o=new FileOutputStream(uploadedFile)
@@ -155,9 +160,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           in.close()
 
 
-
-
-          //Test Mp3 To Ogg Convertion
+          //Test wav To mp3 Convertion
           val target: File = new File(rootDir.getAbsolutePath + File.separator + fileName)
           logger.error(target)
           logger.error(uploadedFile)
@@ -174,8 +177,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
              }
            })
           hello.start()
-//          Thread.sleep(10000)
-          hello.stop()
+
             val storage: Storage = new Storage(fileName, target.getAbsolutePath)
             val storageService=new StorageRepositoryImpl(new Neo4jSessionFactory)
 
@@ -184,11 +186,17 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           userRepository.save(user)
           var parameters:scala.Predef.Map[String,String]=Map()
           parameters+=("type"->"audio")
+
           val message=new Message(fileName.getBytes,parameters)
           val action=message.toMessage(sender)
           sendMessage(action)
+        }        catch{case a:Error =>logger.error(a.toString)}
         }
-        logger.error("state is:"+state)
+        if(messageType==UserState.AUDIO.getName && state==UserState.AUDIO.getId){
+          logger.error("Send audio to audio")
+          val action = msg.toMessage(sender)
+          sendMessage(action)
+        }
         //Here is all other routines not connected with text or audio
         if(state!=UserState.AUDIO.getId && state!=UserState.TEXT.getId){
           logger.error("processing default routine for sending")
@@ -221,8 +229,6 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
     case a =>
       logger.debug("Message received but it cannot be resolved")
       logger.debug(a)
-
-
   }
 
 

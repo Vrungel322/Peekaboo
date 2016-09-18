@@ -85,7 +85,7 @@ public class TextToAudioWatson implements TextToAudioInterface {
     }
     public InputStream RunServiceWithDefaults(String text) throws IOException{
         InputStream out;
-        InputStream stream = service.synthesize(text, Voice.EN_MICHAEL, AudioFormat.WAV).execute();
+        InputStream stream = service.synthesize(text, Voice.EN_LISA, AudioFormat.WAV).execute();
         out = WaveUtils.reWriteWaveHeader(stream);
         return out;
     }

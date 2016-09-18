@@ -1,5 +1,6 @@
 package com.peekaboo.controller;
 
+import com.peekaboo.miscellaneous.PropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.impl.StorageServiceImpl;
@@ -31,7 +32,7 @@ public class AvatarController {
     private StorageServiceImpl storageService;
 
     public AvatarController(){
-        String rootPath = System.getProperty("user.dir");
+        String rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"));
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
             rootDir.mkdirs();
@@ -70,7 +71,9 @@ public class AvatarController {
         User user = userService.get(userId);
         Storage avatar = user.getProfilePhoto();
         Path image = Paths.get(avatar.getFilePath());
-        if (Files.exists(image)) {
+        if (!Files.exists(image)) {
+            logger.error("Avatar doesnot exists - returning default avatar");
+        }
             //TODO: Set correct content type
             response.setContentType("image/png");
             logger.error("image found");
@@ -85,6 +88,6 @@ public class AvatarController {
                     e1.printStackTrace();
                 }
             }
-        }
+
     }
 }

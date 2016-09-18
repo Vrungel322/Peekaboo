@@ -23,7 +23,7 @@ public interface UserRepository {
     void addToBlackList(User from, User to);
     void removeFromBlackList(User from, User to);
     List<User> getBlackListFriends(User user);
-    void addPendingMessage(User from, User target, String type, String object);
+    void addPendingMessage(User from, User target,  String type,String object);
     Map<String, List<String>> getPendingMessagesFor(User target);
     void deletePendingMessages(User user);
     void changeProfilePhoto(User user, Storage avatar);

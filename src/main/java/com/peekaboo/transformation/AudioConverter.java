@@ -13,9 +13,9 @@ import java.io.File;
  */
 public  class AudioConverter {
 
-    private static final Integer bitrate = 8;//Minimal bitrate only
+    private static final Integer bitrate = 16;//Minimal bitrate only
     private static final Integer channels = 1; //2 for stereo, 1 for mono
-    private static final Integer samplingRate = 8000;//For good quality.
+    private static final Integer samplingRate = 16000;//For good quality.
 
     /* Data structures for the audio
      *  and Encoding attributes
@@ -37,6 +37,7 @@ public  class AudioConverter {
      */
     private String oggCodec = "vorbis";
     private String wavCodec = "adpcm_ima_wav";
+    private String mp3Codec = "libmp3lame";
 
 
 
@@ -59,10 +60,14 @@ public  class AudioConverter {
 
     private void wavToOgg(File source, File target){
         //ADD CODE FOR CHANGING THE EXTENSION OF THE FILE
-        encoAttrs.setFormat(wavFormat);
-        audioAttr.setCodec(wavCodec);
+        encoAttrs.setFormat(mp3Format);
+        audioAttr.setCodec(mp3Codec);
         encoAttrs.setAudioAttributes(audioAttr);
+
         try{
+//            for (int i=1;i<50;i++) {
+//                System.out.println(encoder.getAudioEncoders()[i]);
+//            }
             encoder.encode(source, target, encoAttrs);
         }catch(Exception e){
             System.out.println("Encoding Failed"+e.toString());
@@ -81,15 +86,15 @@ public  class AudioConverter {
 //        }
 //    }
 //
-//    public static void main(String[] args){
-//        AudioConverter aed = new AudioConverter();
-//        File source = new  File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.ogg");
-//        File target = new File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.wav");
-//
-//        //Test Mp3 To Ogg Convertion
-//        String mimeType = "audio/mp3";
-//        aed.encodeAudio(source, target, mimeType);
-//
-//        //Test Ogg To Mp3 Convertion
-//    }
+    public static void main(String[] args){
+        AudioConverter aed = new AudioConverter();
+        File source = new  File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.ogg");
+        File target = new File("D:\\JAVA\\PEEKABOO\\Peekaboolasttest\\Peekaboo\\src\\test.wav");
+
+        //Test Mp3 To Ogg Convertion
+        String mimeType = "audio/mp3";
+        aed.encodeAudio(source, target, mimeType);
+
+        //Test Ogg To Mp3 Convertion
+    }
 }

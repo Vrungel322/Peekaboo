@@ -29,12 +29,12 @@ public class PendingMessages {
 
     public PendingMessages() {}
 
-    public PendingMessages(User from, User to,String type,String message) {
+    public PendingMessages(User from, User to,String message) {
         this.userfrom = from;
         this.userto = to;
         this.fromto = from.getId().toString()+to.getId().toString();
         this.messages.add(message);
-        this.typeMessage=type;
+
 
     }
 

@@ -2,14 +2,20 @@ package com.peekaboo.controller;
 
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.UserService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 @RestController
 public class FriendController {
@@ -31,11 +37,18 @@ public class FriendController {
     @RequestMapping(value = "/allusers/find", method = RequestMethod.GET)
     public ResponseEntity<UsersListResponse> getAllUsersList() {
         ArrayList users = (ArrayList) userService.getAll();
+        logger.error("trying to get all Users");
+        logger.error(users.size());
         if (users.size() == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
+            Gson gson=new Gson();
+            String s=gson.toJson(users);
+            Map<String,String> m=new HashMap<String,String>();
+            logger.error("Attention");
             UsersListResponse response = new UsersListResponse(users);
-            return new ResponseEntity<>(response, HttpStatus.OK);
+            logger.error("Success");
+            return new ResponseEntity<>(response,HttpStatus.OK);
         }
     }
 
@@ -78,8 +91,11 @@ public class FriendController {
 
         private ArrayList<User> usersList;
 
-        public UsersListResponse(ArrayList users) {
-            this.usersList = users;
+        public UsersListResponse(ArrayList<User> users) {
+            this.usersList = new ArrayList<>();
+
+                this.usersList.addAll(users);
+
         }
 
         public ArrayList<User> getUsersList() {
@@ -113,5 +129,5 @@ public class FriendController {
             return id;
         }
     }
-
+    private final Logger logger = LogManager.getLogger(this);
 }

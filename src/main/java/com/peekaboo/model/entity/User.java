@@ -180,9 +180,6 @@ public class User implements UserDetails {
         this.telephone = null;
     }
 
-    public String getname() {
-        return name;
-    }
 
     public void setname(String name) {
         this.name = name;

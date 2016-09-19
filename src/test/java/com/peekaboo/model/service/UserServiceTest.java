@@ -2,15 +2,25 @@ package com.peekaboo.model.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.peekaboo.confirmation.RegistrationConfirmService;
+import com.peekaboo.controller.confirmation.ConfirmationResponse;
+import com.peekaboo.controller.sign.ErrorResponse;
+import com.peekaboo.controller.sign.ErrorType;
+import com.peekaboo.controller.sign.SignController;
+import com.peekaboo.controller.sign.SignResponse;
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.VerificationToken;
+import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.entity.relations.PendingMessages;
 import com.peekaboo.model.repository.UserRepository;
+import com.peekaboo.model.repository.VerificationTokenRepository;
 import com.peekaboo.model.repository.impl.StorageRepositoryImpl;
 import com.peekaboo.model.repository.impl.UserRepositoryImpl;
 import com.peekaboo.model.repository.impl.VerificationRepositoryImpl;
 import com.peekaboo.model.service.impl.UserServiceImpl;
+import com.peekaboo.security.jwt.JwtUtil;
 import javafx.scene.image.Image;
 import org.apache.http.HttpRequest;
 import org.apache.http.client.methods.HttpGet;
@@ -19,9 +29,13 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.neo4j.cypher.internal.compiler.v2_0.functions.Str;
 import org.neo4j.ogm.cypher.Filter;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import sun.net.www.http.HttpClient;
@@ -35,11 +49,26 @@ import java.util.LinkedList;
 @ContextConfiguration(locations = {"/config/rootTest.xml"})
 public class UserServiceTest {
 
+    static String userID = "";
+    static String tokenID = "";
+    final String username = "rtwnk";
+    final String pwrd = "rtwnk1234";
+    final String login = "rtwnk@gmail.com";
+
     Neo4jSessionFactory neo4jSessionFactory = new Neo4jSessionFactory();
     @Autowired
     UserRepository userService;
-    VerificationRepositoryImpl verificationRepository = new VerificationRepositoryImpl(neo4jSessionFactory);
-    StorageRepositoryImpl storageRepository = new StorageRepositoryImpl(neo4jSessionFactory);
+    @Autowired
+    VerificationTokenRepository verificationService;
+
+    @Autowired
+    RegistrationConfirmService registrationConfirmService;
+    @Autowired
+    JwtUtil jwtUtil;
+    @Autowired
+    BCryptPasswordEncoder encoder;
+
+    private final Logger logger = LogManager.getLogger(this);
 
     @Test
     public void createUpdateAndDeleteUser() {
@@ -89,7 +118,8 @@ public class UserServiceTest {
         User user4 = userService.findByUsername("alex4");
         userService.sendFriendshipRequest(user1, user2);
         userService.sendFriendshipRequest(user1,user4);
-        userService.deleteFriendshipRequest(user1,user4 );
+        userService.sendFriendshipRequest(user4,user1);
+//        userService.deleteFriendshipRequest(user1,user4 );
     }
     @Test
     public void constraintFiledsTest() {
@@ -163,4 +193,95 @@ public class UserServiceTest {
         userService.deletePendingMessages(userService.findByUsername("Vasyan"));
         System.out.println("end");
     }
+
+
+    @Test
+    public void signupTest() {
+        userService.clearDataBase();
+        logger.debug("Got SIGN UP request");
+        logger.debug("Attempting to register new user");
+        User user = userService.findByUsername(username);
+        String password = encoder.encode(pwrd);
+        if (user != null) {
+            logger.debug("User has registered before");
+            logger.debug("Checking maybe he hasn't been verified yet");
+            if (user.isEnabled()) {
+                logger.error("User has already been registered. Send him error");
+                logger.error("username is taken");
+            }
+            if (user.hasLogin(login) ||
+                    !userService.loginExists(login)) {
+                logger.debug("User has entered unique login or login belongs to him. Updating user info");
+                user.emptyLogin();
+                user.setLogin(login);
+                user.setPassword(password);
+                userService.update(user);
+                logger.debug("Removing old verification key");
+                verificationService.deleteByValue(verificationService.findByUser(user).getValue());
+            } else {logger.error("Login is taken");}
+        } else {
+            if (userService.loginExists(login)) {
+                logger.error("Login is taken");
+            } else {
+                user = new User();
+                user.setUsername(username);
+                user.setname(user.getUsername());
+                user.setLogin(login);
+                user.setPassword(password);
+                user.setEnabled(true);
+                user.addRole(UserRole.USER);
+                user = userService.save(user);
+            }
+        }
+        VerificationToken verToken = registrationConfirmService.generateVerificationToken();
+        verToken.setUser(user);
+        verToken = verificationService.create(verToken);
+        registrationConfirmService.confirm(user, verToken);
+        logger.debug("User were successfully created");
+        userID = userService.findByUsername(username).getId().toString();
+        tokenID = verToken.getValue().toString();
+        signConfirmation();
+    }
+
+    @Test
+    public void signConfirmation() {
+        logger.debug("Got CONFIRMATION request");
+        VerificationToken key = verificationService.findByValue(tokenID);
+        if (key == null || !key.getUser().getId().toString().equals(userID)) {
+            logger.debug("User entered invalid verification token");
+        } else {
+            User user = userService.findById(Long.valueOf(userID));
+            user.setEnabled(true);
+            verificationService.deleteByValue(tokenID);
+            userService.update(user);
+            SignResponse response = new SignResponse();
+            response.setId(user.getId().toString())
+                    .setUsername(user.getUsername())
+                    .setRole(user.getRoles())
+                    .setEnabled(user.isEnabled());
+        }
+    }
+
+    @Test
+    public void signinTest() {
+        logger.debug("Got SIGN IN request");
+        User user;
+        user = userService.findByUsername(username);
+        String password = pwrd;
+
+        if (user == null || !encoder.matches(password, user.getPassword())) {
+            logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
+            logger.error("User entered wrong login or password");
+        }
+        logger.debug("User were successfully authorized");
+        SignResponse response = new SignResponse();
+        response.setId(user.getId().toString())
+                .setUsername(user.getUsername())
+                .setRole(user.getRoles())
+                .setEnabled(true);
+        String token = jwtUtil.generateToken(response);
+        logger.error(token);
+    }
+
+
 }

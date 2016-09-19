@@ -205,6 +205,9 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void sendFriendshipRequest(User user, User target) {
         Session session = sessionFactory.getSession();
+        //if self-back friendship request exist, we do not have to make another request
+        for (PendingFriendship friendship: target.getRequestFriends()) {
+            if (user.getUsername().equals(friendship.getUserto().getUsername())) {return;} }
         user.getRequestFriends().add(new PendingFriendship(user, target));
         session.save(user);
     }
@@ -213,18 +216,18 @@ public class UserRepositoryImpl implements UserRepository {
     public void deleteFriendshipRequest(User user, User target) {
         Session session = sessionFactory.getSession();
         try {
-            PendingFriendship pendingFriendship = session.loadAll(PendingFriendship.class, new Filter("fromto", user.getId().toString() + target.getId().toString())).iterator().next();
+            PendingFriendship pendingFriendship = session.loadAll(PendingFriendship.class,
+                    new Filter("fromto", user.getId().toString() + target.getId().toString())).iterator().next();
             user.getRequestFriends().remove(pendingFriendship);
             update(user);
         } catch (Exception e) {}
-
+        //для перестраховки проверяю на возможную обратную связь (баги бд) и также удаляю её
         try {
-            PendingFriendship pendingFriendship = session.loadAll(PendingFriendship.class, new Filter("fromto", target.getId().toString() + user.getId().toString())).iterator().next();
+            PendingFriendship pendingFriendship = session.loadAll(PendingFriendship.class, new Filter("fromto",
+                    target.getId().toString() + user.getId().toString())).iterator().next();
             target.getRequestFriends().remove(pendingFriendship);
             update(target);
         } catch (Exception e) {}
-
-
     }
 
     @Override
@@ -247,5 +250,11 @@ public class UserRepositoryImpl implements UserRepository {
         List<User> pendings = getAll().stream()
                 .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
         pendings.forEach(p -> p.getPendingMessages().forEach(v-> session.delete(v)));
+    }
+
+    @Override
+    public boolean loginExists(String login) {
+        User user = findByEmail(login);
+        return user!=null;
     }
 }

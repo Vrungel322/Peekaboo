@@ -4,6 +4,7 @@ import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService extends EntityService<User, String> {
 
@@ -26,6 +27,10 @@ public interface UserService extends EntityService<User, String> {
     List<User> getBlackListFriends(User user);
     void changeProfilePhoto(User user, Storage avatar);
     void deleteProfilePhoto(User user);
-
+    void addPendingMessage(User from, User target,  String type,String object);
+    Map<String, List<String>> getPendingMessagesFor(User target);
+    void deletePendingMessages(User user);
+    void sendFriendshipRequest(User user, User target);
+    void deleteFriendshipRequest(User user, User target);
 
 }

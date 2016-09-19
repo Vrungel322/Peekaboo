@@ -45,4 +45,14 @@ public class PendingFriendship {
     public void setFromto(String fromto) {
         this.fromto = fromto;
     }
+
+    @Override
+    public String toString() {
+        return "PendingFriendship{" +
+                "relationshipId=" + relationshipId +
+                ", fromto='" + fromto + '\'' +
+                ", userfrom=" + userfrom.toString() +
+                ", userto=" + userto.toString() +
+                '}';
+    }
 }

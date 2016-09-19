@@ -49,13 +49,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean loginExists(String login) {
-
-        User user = findByEmail(login);
-        return user!=null;
-    }
-
-    @Override
     public User findByLogin(String login) {
         return userRepository.findByUsername(login);
     }
@@ -119,15 +112,37 @@ public class UserServiceImpl implements UserService {
     public List<User> getBlackListFriends(User user) {
         return userRepository.getBlackListFriends(user);
     }
-
     @Override
     public void changeProfilePhoto(User user, Storage avatar) {
         userRepository.changeProfilePhoto(user, avatar);
     }
-
     @Override
     public void deleteProfilePhoto(User user) {
         userRepository.deleteProfilePhoto(user);
+    }
+    @Override
+    public boolean loginExists(String login) {
+        return userRepository.loginExists(login);
+    }
+    @Override
+    public void addPendingMessage(User from, User target, String type, String object) {
+        userRepository.addPendingMessage(from,target,type,object);
+    }
+    @Override
+    public Map<String, List<String>> getPendingMessagesFor(User target) {
+        return userRepository.getPendingMessagesFor(target);
+    }
+    @Override
+    public void deletePendingMessages(User user) {
+        userRepository.deletePendingMessages(user);
+    }
+    @Override
+    public void sendFriendshipRequest(User user, User target) {
+        userRepository.sendFriendshipRequest(user,target);
+    }
+    @Override
+    public void deleteFriendshipRequest(User user, User target) {
+        userRepository.deleteFriendshipRequest(user,target);
     }
 }
 

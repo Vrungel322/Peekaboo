@@ -34,10 +34,10 @@ public class FileDownload {
     UserServiceImpl userService;
 
     public FileDownload() {
-        String rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"));
+        String rootPath = System.getProperty("catalina.home");
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
-            rootDir.mkdirs();
+            rootDir.mkdir();
     }
 
     @RequestMapping(path = "/audio/{fileName}", method = RequestMethod.GET)

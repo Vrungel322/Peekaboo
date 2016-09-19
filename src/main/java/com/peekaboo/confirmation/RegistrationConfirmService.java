@@ -40,6 +40,7 @@ public class RegistrationConfirmService {
             token.append(random.nextInt(10));
         }
         verificationToken.setValue(token.toString());
+        System.out.println(token.toString());
         return verificationToken;
     }
 }

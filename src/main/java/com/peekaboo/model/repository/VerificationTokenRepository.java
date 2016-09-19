@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 public interface VerificationTokenRepository  {
 
     void save(VerificationToken entity);
+    VerificationToken create(VerificationToken token);
     void delete(VerificationToken entity);
     void update(VerificationToken verificationToken);
     VerificationToken findById(Long id);

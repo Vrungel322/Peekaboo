@@ -40,6 +40,7 @@ public class SignController {
     JwtUtil jwtUtil;
     @Autowired
     BCryptPasswordEncoder encoder;
+    private final Logger logger = LogManager.getLogger(this);
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
     public ResponseEntity signin( @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
@@ -211,5 +212,5 @@ public class SignController {
 //        public String getAvatar() {return avatar;}
     }
 
-    private final Logger logger = LogManager.getLogger(this);
+
 }

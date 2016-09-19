@@ -35,6 +35,12 @@ public class VerificationRepositoryImpl implements VerificationTokenRepository {
     }
 
     @Override
+    public VerificationToken create(VerificationToken token) {
+        save(token);
+        return token;
+    }
+
+    @Override
     public void delete(VerificationToken entity) {
         Session session = sessionFactory.getSession();
         session.delete(entity);

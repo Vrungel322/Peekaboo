@@ -32,10 +32,7 @@ public class AvatarController {
     private StorageServiceImpl storageService;
 
     public AvatarController(){
-        String rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"));
-        rootDir = new File(rootPath + File.separator + "tmp");
-        if (!rootDir.exists())
-            rootDir.mkdirs();
+
     }
     @RequestMapping(path = "/avatar/", method = RequestMethod.POST)
     public String avatar( @RequestParam("image") MultipartFile image){

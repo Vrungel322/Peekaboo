@@ -2,6 +2,7 @@ package com.peekaboo.model.service;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
@@ -26,7 +27,7 @@ public class TestNeo4jConnection {
     static StorageRepositoryImpl storageRepository = new StorageRepositoryImpl(neo4jSessionFactory);
 
     public static void main(String[] args) {
-
+        System.out.println(JavaPropertiesParser.PARSER.getValue("WatsonToneAnalyzerVersionDate"));
 
     }
 }

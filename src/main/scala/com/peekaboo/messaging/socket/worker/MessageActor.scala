@@ -9,7 +9,7 @@ import java.io.InputStream
 
 import akka.actor.Actor
 import com.peekaboo.messaging.socket.middleware.BinaryMessageInterceptor
-import com.peekaboo.miscellaneous.PropertiesParser
+import com.peekaboo.miscellaneous.JavaPropertiesParser
 import com.peekaboo.model.Neo4jSessionFactory
 import com.peekaboo.model.entity.{Storage, User}
 import com.peekaboo.model.entity.enums.UserState
@@ -120,7 +120,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           val converter: AudioToTextInterface = new AudioToTextWatson//here is our converter
           //next routine is searching the path of file which were stored using http "upload"
           //todo:rewrite catalina home to build paths in one place
-          val rootPath: String = System.getProperty(PropertiesParser.getValue("FilesDestination"))
+          val rootPath: String = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
           val rootDir = new File(rootPath + File.separator + "tmp")
           //        logger.error(new String(msg.getBody, "UTF-8"))
           val filename = new String(msg.getBody, "UTF-8")
@@ -142,8 +142,8 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           try{
           logger.error("processing text2audio")
           val messageText=new String(msg.getBody, "UTF-8")
-          val rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"))
-          //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
+          val rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
+          //todo:we save converted audio to destination folder, but is it right?  Also Timofei have to add creation of file
           val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
           if (!rootDir.exists) rootDir.mkdirs()
           val fileName: String = UUID.randomUUID.toString

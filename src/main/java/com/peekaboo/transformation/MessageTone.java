@@ -3,7 +3,7 @@ package com.peekaboo.transformation;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.ToneAnalyzer;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneAnalysis;
 import com.ibm.watson.developer_cloud.tone_analyzer.v3.model.ToneScore;
-import com.peekaboo.miscellaneous.PropertiesParser;
+import com.peekaboo.miscellaneous.JavaPropertiesParser;
 
 import java.util.List;
 
@@ -14,9 +14,9 @@ public class MessageTone extends ToneAnalyzer {
     private List<ToneScore> tonesList;
     private String UnknownEmotion="unknown";
     public MessageTone() {
-        super(PropertiesParser.getValue("WatsonToneAnalyzerVersionDate"));
-        this.setEndPoint(PropertiesParser.getValue("WatsonToneAnalyzerEndPoint"));
-        this.setUsernameAndPassword(PropertiesParser.getValue("WatsonToneAnalyzerLogin"),PropertiesParser.getValue("WatsonToneAnalyzerPassword"));
+        super(JavaPropertiesParser.PARSER.getValue("WatsonToneAnalyzerVersionDate"));
+        this.setEndPoint(JavaPropertiesParser.PARSER.getValue("WatsonToneAnalyzerEndPoint"));
+        this.setUsernameAndPassword(JavaPropertiesParser.PARSER.getValue("WatsonToneAnalyzerLogin"), JavaPropertiesParser.PARSER.getValue("WatsonToneAnalyzerPassword"));
     }
 
     public MessageTone SetMessage(String messageText) {

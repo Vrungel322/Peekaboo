@@ -4,6 +4,7 @@ import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,10 +13,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import org.codehaus.jackson.annotate.JsonAutoDetect;
+import org.codehaus.jackson.annotate.JsonProperty;
+
+import java.util.*;
 
 @RestController
 public class FriendController {
@@ -35,20 +36,24 @@ public class FriendController {
     }
 
     @RequestMapping(value = "/allusers/find", method = RequestMethod.GET)
-    public ResponseEntity<UsersListResponse> getAllUsersList() {
+    public ResponseEntity<UsersListResponse> getAllUsersList()  {
         ArrayList users = (ArrayList) userService.getAll();
         logger.error("trying to get all Users");
         logger.error(users.size());
         if (users.size() == 0) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         } else {
-            Gson gson=new Gson();
-            String s=gson.toJson(users);
-            Map<String,String> m=new HashMap<String,String>();
+
+
+
+            //todo:whether to show email?
             logger.error("Attention");
+
             UsersListResponse response = new UsersListResponse(users);
             logger.error("Success");
+
             return new ResponseEntity<>(response,HttpStatus.OK);
+
         }
     }
 
@@ -74,7 +79,15 @@ public class FriendController {
             this.username = username;
         }
     }
-
+    public static class StringResponse {
+        private String str;
+        public StringResponse(String s){
+            this.str=s;
+        }
+        public String getString(){
+            return this.str;
+        }
+    }
     public static class FriendResponse {
         private String id;
 
@@ -89,21 +102,24 @@ public class FriendController {
 
     public static class UsersListResponse {
 
-        private ArrayList<User> usersList;
+        private List<FriendEntity>  listFriends;
 
-        public UsersListResponse(ArrayList<User> users) {
-            this.usersList = new ArrayList<>();
+        public UsersListResponse(ArrayList<User> users)  {
 
-                this.usersList.addAll(users);
+            listFriends= new ArrayList();
+
+            users.forEach(a->
+                listFriends.add(new FriendEntity(a.getUsername(),a.getId())));
+//            Gson gson=new Gson();
+//            this.usersJsonArray=gson.toJson(listFriends);
 
         }
 
-        public ArrayList<User> getUsersList() {
-            return usersList;
+
+        public List<FriendEntity> getUsersList() {
+            return listFriends;
         }
-        public void setUsersList(ArrayList<User> usersList) {
-            this.usersList = usersList;
-        }
+
     }
 
     public static class UserRequest {

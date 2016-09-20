@@ -1,7 +1,6 @@
 package com.peekaboo.controller.filemanage;
 
-import com.peekaboo.miscellaneous.PropertiesParser;
-import com.peekaboo.model.entity.Storage;
+import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -13,16 +12,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/download")
@@ -34,10 +29,10 @@ public class FileDownload {
     UserServiceImpl userService;
 
     public FileDownload() {
-        String rootPath = System.getProperty("catalina.home");
+        String rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"));
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
-            rootDir.mkdir();
+            rootDir.mkdirs();
     }
 
     @RequestMapping(path = "/audio/{fileName}", method = RequestMethod.GET)
@@ -48,7 +43,7 @@ public class FileDownload {
 //        Storage storage = receiver.getUsesStorages().stream()
 //                .filter(x -> x.getFileName().equals(fileName))
 //                .findFirst().get();
-        String rootPath = System.getProperty(PropertiesParser.getValue("FilesDestination"));
+        String rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"));
         //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
        File rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + userId);
         if (!rootDir.exists()) rootDir.mkdirs();

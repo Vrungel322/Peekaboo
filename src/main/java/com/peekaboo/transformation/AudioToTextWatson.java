@@ -5,7 +5,7 @@ import com.ibm.watson.developer_cloud.speech_to_text.v1.model.RecognizeOptions;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechModel;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechResults;
 import com.ibm.watson.developer_cloud.speech_to_text.v1.model.SpeechWordConfidence;
-import com.peekaboo.miscellaneous.PropertiesParser;
+import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import org.apache.commons.lang3.text.WordUtils;
 
 import java.io.File;
@@ -20,7 +20,7 @@ public class AudioToTextWatson extends SpeechToText implements AudioToTextInterf
     private double confidenceValue;
 
     public AudioToTextWatson() {
-        this.setUsernameAndPassword(PropertiesParser.getValue("WatsonAudioToTextLogin"), PropertiesParser.getValue("WatsonAudioToTextPassword"));
+        this.setUsernameAndPassword(JavaPropertiesParser.PARSER.getValue("WatsonAudioToTextLogin"), JavaPropertiesParser.PARSER.getValue("WatsonAudioToTextPassword"));
     }
 
     @Override
@@ -80,10 +80,10 @@ public class AudioToTextWatson extends SpeechToText implements AudioToTextInterf
     @Override
     public String RunServiceWithDefaults(File file) {
         SpeechRecognitionOptions options = new SpeechRecognitionOptions();
-        options.setAudioType(PropertiesParser.getValue("WatsonAudioToTextDefaultAudioType"));
-        options.setLanguageOption(PropertiesParser.getValue("WatsonAudioToTextDefaultWatsonlanguageOption"));
-        options.setModelOption(PropertiesParser.getValue("WatsonAudioToTextDefaultModelOption"));
-        options.setThresholdOption(Double.parseDouble(PropertiesParser.getValue("WatsonAudioToTextDefaultThresholdOption")));
+        options.setAudioType(JavaPropertiesParser.PARSER.getValue("WatsonAudioToTextDefaultAudioType"));
+        options.setLanguageOption(JavaPropertiesParser.PARSER.getValue("WatsonAudioToTextDefaultWatsonlanguageOption"));
+        options.setModelOption(JavaPropertiesParser.PARSER.getValue("WatsonAudioToTextDefaultModelOption"));
+        options.setThresholdOption(Double.parseDouble(JavaPropertiesParser.PARSER.getValue("WatsonAudioToTextDefaultThresholdOption")));
         return this.RunService(file, options);
     }
 

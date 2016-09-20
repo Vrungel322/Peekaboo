@@ -1,5 +1,6 @@
 package com.peekaboo.controller.filemanage;
 
+import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.impl.StorageServiceImpl;
@@ -28,7 +29,7 @@ public class FileUpload {
     UserServiceImpl userService;
 
     public FileUpload() {
-        String rootPath = System.getProperty("user.dir");
+        String rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"));
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
             rootDir.mkdirs();
@@ -36,6 +37,7 @@ public class FileUpload {
 
     @RequestMapping(path = "/audio/{userId}", method = RequestMethod.POST)
     public String audio(@PathVariable String userId, @RequestParam("file") MultipartFile file) {
+       logger.error("got to upload");
         if (!file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();

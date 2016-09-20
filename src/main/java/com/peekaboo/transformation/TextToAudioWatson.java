@@ -4,14 +4,12 @@ import com.ibm.watson.developer_cloud.text_to_speech.v1.TextToSpeech;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.model.AudioFormat;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.model.Voice;
 import com.ibm.watson.developer_cloud.text_to_speech.v1.util.WaveUtils;
-import com.peekaboo.miscellaneous.PropertiesParser;
+import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,8 +21,8 @@ public class TextToAudioWatson implements TextToAudioInterface {
     TextToSpeech service = new TextToSpeech();
     public TextToAudioWatson(){
         this.service = new TextToSpeech();
-        this.service.setUsernameAndPassword(PropertiesParser.getValue("WatsonTextToAudioLogin" ), PropertiesParser.getValue("WatsonTextToAudioPassword"));
-        this.service.setEndPoint(PropertiesParser.getValue("WatsonTextToAudioEndPoint"));
+        this.service.setUsernameAndPassword(JavaPropertiesParser.PARSER.getValue("WatsonTextToAudioLogin" ), JavaPropertiesParser.PARSER.getValue("WatsonTextToAudioPassword"));
+        this.service.setEndPoint(JavaPropertiesParser.PARSER.getValue("WatsonTextToAudioEndPoint"));
     }
     public InputStream RunService(String text, SpeechRecognitionOptions options) throws IOException {
         InputStream out;

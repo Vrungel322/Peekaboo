@@ -1,6 +1,6 @@
 package com.peekaboo.controller;
 
-import com.peekaboo.miscellaneous.PropertiesParser;
+import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.impl.StorageServiceImpl;

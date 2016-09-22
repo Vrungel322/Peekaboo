@@ -54,13 +54,12 @@ public class UserServiceTest {
     final String username = "rtwnk";
     final String pwrd = "rtwnk1234";
     final String login = "rtwnk@gmail.com";
+    private final Logger logger = LogManager.getLogger(this);
 
-    Neo4jSessionFactory neo4jSessionFactory = new Neo4jSessionFactory();
     @Autowired
     UserRepository userService;
     @Autowired
     VerificationTokenRepository verificationService;
-
     @Autowired
     RegistrationConfirmService registrationConfirmService;
     @Autowired
@@ -68,11 +67,8 @@ public class UserServiceTest {
     @Autowired
     BCryptPasswordEncoder encoder;
 
-    private final Logger logger = LogManager.getLogger(this);
-
     @Test
     public void createUpdateAndDeleteUser() {
-        userService.clearDataBase();
         User user = new User("maks", "maksim", "sss", "asdad", "maksratosh@g" +
                 "mail.com", 0, 0, true, 0);
         userService.save(user);
@@ -84,9 +80,9 @@ public class UserServiceTest {
         Assert.assertEquals(u.getUsername(), "jack");
         userService.delete(userService.findByUsername("jack"));
     }
+
     @Test
     public void managingWithFriends() {
-        userService.clearDataBase();
         userService.save(new User("maks", "maksim", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
         userService.save(new User("alex1", "sashka1", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
         userService.save(new User("alex2", "sashka2", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
@@ -101,11 +97,15 @@ public class UserServiceTest {
         userService.addNewFriend(user, user2);
         userService.addNewFriend(user, user3);
         userService.addNewFriend(user, user4);
+        userService.delete(user);
+        userService.delete(user1);
+        userService.delete(user2);
+        userService.delete(user3);
+        userService.delete(user4);
     }
 
     @Test
     public void pendingFriendshipRequest() {
-        userService.clearDataBase();
         userService.save(new User("maks", "maksim", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
         userService.save(new User("alex1", "sashka1", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
         userService.save(new User("alex2", "sashka2", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
@@ -119,23 +119,30 @@ public class UserServiceTest {
         userService.sendFriendshipRequest(user1, user2);
         userService.sendFriendshipRequest(user1,user4);
         userService.sendFriendshipRequest(user4,user1);
-//        userService.deleteFriendshipRequest(user1,user4 );
+        userService.delete(user);
+        userService.delete(user1);
+        userService.delete(user2);
+        userService.delete(user3);
+        userService.delete(user4);
     }
+
     @Test
     public void constraintFiledsTest() {
-        userService.clearDataBase();
-        userService.save(new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0));
+        User user = userService.save(new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0));
         //check for email - failed
-        userService.save(new User("username1", "maksim", "sss", "telephone1", "emamil", 0, 0, true, 0));
+        User user1 = userService.save(new User("username1", "maksim", "sss", "telephone1", "emamil", 0, 0, true, 0));
         //check for username - failed
-        userService.save(new User("username", "maksim", "sss", "telephone", "email1", 0, 0, true, 0));
+        User user2 = userService.save(new User("username", "maksim", "sss", "telephone", "email1", 0, 0, true, 0));
         //result - success
-        userService.save(new User("username1", "maksim", "sss", "telephone1", "email1", 0, 0, true, 0));
+        User user3 = userService.save(new User("username1", "maksim", "sss", "telephone1", "email1", 0, 0, true, 0));
         Assert.assertEquals(2,userService.getAll().size());
+        userService.delete(user);
+        userService.delete(user3);
+
     }
+
     @Test
     public void avatarOperations(){
-        userService.clearDataBase();
         User user = new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0);
         userService.save(user);
         userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
@@ -146,11 +153,11 @@ public class UserServiceTest {
         userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar6.jpg","path.to.avatar"));
         userService.deleteProfilePhoto(user);
         userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
+        userService.delete(user);
     }
 
     @Test
     public void pendingMessagesQueryForOfflineUser() {
-        userService.clearDataBase();
         userService.save(new User("maks", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
         userService.save(new User("Vasyan", "Vasyan", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
         userService.save(new User("Lola", "Lola Shkoora", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
@@ -191,13 +198,14 @@ public class UserServiceTest {
                     System.out.println();
                 });
         userService.deletePendingMessages(userService.findByUsername("Vasyan"));
-        System.out.println("end");
+        userService.delete(user);
+        userService.delete(user1);
+        userService.delete(user2);
     }
 
 
     @Test
     public void signupTest() {
-        userService.clearDataBase();
         logger.debug("Got SIGN UP request");
         logger.debug("Attempting to register new user");
         User user = userService.findByUsername(username);
@@ -259,6 +267,7 @@ public class UserServiceTest {
                     .setUsername(user.getUsername())
                     .setRole(user.getRoles())
                     .setEnabled(user.isEnabled());
+            userService.delete(user);
         }
     }
 
@@ -268,7 +277,6 @@ public class UserServiceTest {
         User user;
         user = userService.findByUsername(username);
         String password = pwrd;
-
         if (user == null || !encoder.matches(password, user.getPassword())) {
             logger.debug("User has entered wrong login or password. Sending NOT_FOUND response");
             logger.error("User entered wrong login or password");
@@ -282,6 +290,4 @@ public class UserServiceTest {
         String token = jwtUtil.generateToken(response);
         logger.error(token);
     }
-
-
 }

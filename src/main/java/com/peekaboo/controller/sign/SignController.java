@@ -72,10 +72,11 @@ public class SignController {
         response.setId(user.getId().toString())
                 .setUsername(user.getUsername())
                 .setRole(user.getRoles())
-                .setEnabled(true);
+                .setEnabled(true)
+                .setState(user.getState());
         String token = jwtUtil.generateToken(response);
         logger.error(token);
-        return new ResponseEntity(new SigninResponse(user.getId().toString(), token), HttpStatus.OK);
+        return new ResponseEntity(new SigninResponse(user.getId().toString(), token, user.getState()), HttpStatus.OK);
 //        return new ResponseEntity(new SigninResponse(user.getId().toString(),
 //                user.getUsername().toString(),user.getAvatar().toString(), token), HttpStatus.OK);
     }
@@ -173,13 +174,16 @@ public class SignController {
     private class SigninResponse {
         private String id;
         private String token;
+        private int state;
 //        private String username;
 //        private String avatar;
 
 //        public SigninResponse(String id, String username, String avatar, String token) {
-        public SigninResponse(String id, String token) {
+        public SigninResponse(String id, String token, int state) {
             this.token = token;
             this.id = id;
+            this.state = state;
+
 //            this.username = username;
 //            this.avatar = avatar;
         }
@@ -189,6 +193,7 @@ public class SignController {
         public String getToken() {
             return token;
         }
+        public int getState() { return state;}
 //        public String getAvatar() { return avatar; }
 //        public String getUsername() { return username; }
     }

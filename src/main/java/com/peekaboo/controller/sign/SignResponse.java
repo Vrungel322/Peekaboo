@@ -7,6 +7,7 @@ public class SignResponse {
     private String id;
     private String username;
     private int role;
+    private int state;
     private boolean enabled;
 
     public String getId() {
@@ -43,5 +44,17 @@ public class SignResponse {
     public SignResponse setRole(int role) {
         this.role = role;
         return this;
+    }
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 }

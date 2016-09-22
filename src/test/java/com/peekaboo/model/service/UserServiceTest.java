@@ -3,47 +3,26 @@ package com.peekaboo.model.service;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.peekaboo.confirmation.RegistrationConfirmService;
-import com.peekaboo.controller.confirmation.ConfirmationResponse;
-import com.peekaboo.controller.sign.ErrorResponse;
-import com.peekaboo.controller.sign.ErrorType;
-import com.peekaboo.controller.sign.SignController;
 import com.peekaboo.controller.sign.SignResponse;
-import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
 import com.peekaboo.model.entity.enums.UserRole;
-import com.peekaboo.model.entity.relations.PendingMessages;
+import com.peekaboo.model.repository.StorageRepository;
 import com.peekaboo.model.repository.UserRepository;
 import com.peekaboo.model.repository.VerificationTokenRepository;
-import com.peekaboo.model.repository.impl.StorageRepositoryImpl;
-import com.peekaboo.model.repository.impl.UserRepositoryImpl;
-import com.peekaboo.model.repository.impl.VerificationRepositoryImpl;
-import com.peekaboo.model.service.impl.UserServiceImpl;
 import com.peekaboo.security.jwt.JwtUtil;
-import javafx.scene.image.Image;
-import org.apache.http.HttpRequest;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.neo4j.cypher.internal.compiler.v2_0.functions.Str;
-import org.neo4j.ogm.cypher.Filter;
-import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import sun.net.www.http.HttpClient;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/config/rootTest.xml"})
@@ -66,6 +45,8 @@ public class UserServiceTest {
     JwtUtil jwtUtil;
     @Autowired
     BCryptPasswordEncoder encoder;
+    @Autowired
+    StorageRepository storageService;
 
     @Test
     public void createUpdateAndDeleteUser() {
@@ -117,8 +98,8 @@ public class UserServiceTest {
         User user3 = userService.findByUsername("alex3");
         User user4 = userService.findByUsername("alex4");
         userService.sendFriendshipRequest(user1, user2);
-        userService.sendFriendshipRequest(user1,user4);
-        userService.sendFriendshipRequest(user4,user1);
+        userService.sendFriendshipRequest(user1, user4);
+        userService.sendFriendshipRequest(user4, user1);
         userService.delete(user);
         userService.delete(user1);
         userService.delete(user2);
@@ -135,24 +116,24 @@ public class UserServiceTest {
         User user2 = userService.save(new User("username", "maksim", "sss", "telephone", "email1", 0, 0, true, 0));
         //result - success
         User user3 = userService.save(new User("username1", "maksim", "sss", "telephone1", "email1", 0, 0, true, 0));
-        Assert.assertEquals(2,userService.getAll().size());
+        Assert.assertEquals(2, userService.getAll().size());
         userService.delete(user);
         userService.delete(user3);
 
     }
 
     @Test
-    public void avatarOperations(){
+    public void avatarOperations() {
         User user = new User("username", "maksim", "sss", "telephone", "email", 0, 0, true, 0);
         userService.save(user);
-        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar2.jpg","path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar3.jpg","path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar4.jpg","path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar5.jpg","path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar6.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar1.jpg", "path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar2.jpg", "path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar3.jpg", "path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar4.jpg", "path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar5.jpg", "path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar6.jpg", "path.to.avatar"));
         userService.deleteProfilePhoto(user);
-        userService.changeProfilePhoto(userService.findByUsername("username"),new Storage("avatar1.jpg","path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar1.jpg", "path.to.avatar"));
         userService.delete(user);
     }
 
@@ -164,25 +145,25 @@ public class UserServiceTest {
         User user = userService.findByUsername("maks");
         User user1 = userService.findByUsername("Vasyan");
         User user2 = userService.findByUsername("Lola");
-        userService.addNewFriend(user,user1);
-        userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks1", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user, user1, "type",new Gson().toJson(new User("maks2", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user2, user1, "type",new Gson().toJson(new User("maks3", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user2, user1, "type",new Gson().toJson(new User("maks4", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user2, user1,"type", new String("привет"));
-        userService.addPendingMessage(user2, user1,"type", new String("я - Лола"));
-        userService.addPendingMessage(user2, user1,"type", new String("хочу познакомиться"));
-        userService.addPendingMessage(user, user1,"type", new String("как дела?"));
-        userService.addPendingMessage(user, user1,"type", new String("что делаешь?"));
-        userService.addPendingMessage(user, user1,"type", new String("смотри какие мемы мне чепурной скинул)))"));
-        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem1.png"));
-        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem2.png"));
-        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/mem3.png"));
-        userService.addPendingMessage(user, user1,"type", new String("/User/Desktop/sticker.png"));
-        userService.addPendingMessage(user, user1,"type", new String("я просто угораю, это лютый треш!!!"));
+        userService.addNewFriend(user, user1);
+        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks1", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks2", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user2, user1, "type", new Gson().toJson(new User("maks3", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user2, user1, "type", new Gson().toJson(new User("maks4", "Maks Boss Backend", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user2, user1, "type", new String("привет"));
+        userService.addPendingMessage(user2, user1, "type", new String("я - Лола"));
+        userService.addPendingMessage(user2, user1, "type", new String("хочу познакомиться"));
+        userService.addPendingMessage(user, user1, "type", new String("как дела?"));
+        userService.addPendingMessage(user, user1, "type", new String("что делаешь?"));
+        userService.addPendingMessage(user, user1, "type", new String("смотри какие мемы мне чепурной скинул)))"));
+        userService.addPendingMessage(user, user1, "type", new String("/User/Desktop/mem1.png"));
+        userService.addPendingMessage(user, user1, "type", new String("/User/Desktop/mem2.png"));
+        userService.addPendingMessage(user, user1, "type", new String("/User/Desktop/mem3.png"));
+        userService.addPendingMessage(user, user1, "type", new String("/User/Desktop/sticker.png"));
+        userService.addPendingMessage(user, user1, "type", new String("я просто угораю, это лютый треш!!!"));
         userService.getPendingMessagesFor(userService.findByUsername(user1.getUsername()))
-                .forEach((k,v) -> {
+                .forEach((k, v) -> {
                     System.out.println();
                     System.out.println();
                     System.out.println("unread messages from " + k);
@@ -226,7 +207,9 @@ public class UserServiceTest {
                 userService.update(user);
                 logger.debug("Removing old verification key");
                 verificationService.deleteByValue(verificationService.findByUser(user).getValue());
-            } else {logger.error("Login is taken");}
+            } else {
+                logger.error("Login is taken");
+            }
         } else {
             if (userService.loginExists(login)) {
                 logger.error("Login is taken");
@@ -289,5 +272,23 @@ public class UserServiceTest {
                 .setEnabled(true);
         String token = jwtUtil.generateToken(response);
         logger.error(token);
+    }
+
+    @Test
+    public void photoTest() {
+        userService.clearDataBase();
+        //TODO: You must have existed photo file
+        String filePath = System.getProperty("user.dir") + File.separator + "tmp" + File.separator + "default_profile_photo.jpeg";
+        if (storageService.findByFileName("default_profile_photo") == null) {
+            //TODO: Add correct file path
+            Storage storage = new Storage("default_profile_photo", filePath);
+            storageService.save(storage);
+        }
+        User user = new User("dsfgcbnh", "sdxvcbn", "sss", "asdad2", "dbvn@gmail.com", 0, 0, false, 0);
+        userService.save(user);
+        System.out.println(storageService.findByFileName("default_profile_photo").toString());
+        System.out.println(userService.findByEmail(user.getEmail()).getProfilePhoto().getFileName());
+        Assert.assertEquals(userService.findByEmail(user.getEmail()).getProfilePhoto().getFilePath(),
+                storageService.findByFileName("default_profile_photo").getFilePath());
     }
 }

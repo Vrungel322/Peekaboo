@@ -5,7 +5,6 @@ import com.peekaboo.model.entity.relations.Friendship;
 import com.peekaboo.model.entity.relations.PendingFriendship;
 import com.peekaboo.model.entity.relations.PendingMessages;
 import org.neo4j.ogm.annotation.GraphId;
-import org.neo4j.ogm.annotation.Index;
 import org.neo4j.ogm.annotation.NodeEntity;
 import org.neo4j.ogm.annotation.Relationship;
 import org.springframework.security.core.GrantedAuthority;
@@ -30,7 +29,7 @@ public class User implements UserDetails {
     private int gender;
     private boolean enabled;
     @Relationship(type = "PROFILE_PHOTO", direction = Relationship.DIRECTION)
-    private Storage profilePhoto = null;
+    private Storage profilePhoto;
     @Relationship(type = "FRIENDS", direction = Relationship.DIRECTION)
     private Set<Friendship> friends = new HashSet<>();
     @Relationship(type = "PENDING_MESSAGES", direction = Relationship.DIRECTION)
@@ -42,7 +41,8 @@ public class User implements UserDetails {
     @Relationship(type = "REQUEST_FRIENDSHIP", direction = Relationship.UNDIRECTED)
     private Set<PendingFriendship> requestFriends = new HashSet<>();
 
-    public User() {}
+    public User() {
+    }
 
     public User(String username, String name, String password, String telephone,
                 String email, int roles, int gender, boolean enabled, int state
@@ -58,6 +58,7 @@ public class User implements UserDetails {
         this.friends = new HashSet<>();
         this.state = state;
     }
+
     public String getName() {
         return name;
     }
@@ -81,9 +82,17 @@ public class User implements UserDetails {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     @Override
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     @Override
@@ -106,6 +115,10 @@ public class User implements UserDetails {
         return enabled;
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     //todo: make private?
     public boolean hasRole(UserRole userRole) {
         return (this.roles & userRole.getId()) != 0; //apply bit map to check existence of role
@@ -121,14 +134,6 @@ public class User implements UserDetails {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getTelephone() {
@@ -155,10 +160,6 @@ public class User implements UserDetails {
         this.gender = gender;
     }
 
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
-
     public Set<Friendship> getFriends() {
         return friends;
     }
@@ -167,19 +168,10 @@ public class User implements UserDetails {
         this.friends = friends;
     }
 
-    public void setLogin(String login) {
-        if (login.contains("@")) {
-            this.email = login;
-        } else {
-            this.telephone = login;
-        }
-    }
-
     public void emptyLogin() {
         this.email = null;
         this.telephone = null;
     }
-
 
     public void setname(String name) {
         this.name = name;
@@ -195,6 +187,14 @@ public class User implements UserDetails {
 
     public String getLogin() {
         return email == null ? telephone : email;
+    }
+
+    public void setLogin(String login) {
+        if (login.contains("@")) {
+            this.email = login;
+        } else {
+            this.telephone = login;
+        }
     }
 
     public String getEmail() {
@@ -217,8 +217,16 @@ public class User implements UserDetails {
         return ownStorages;
     }
 
+    public void setOwnStorages(List<Storage> ownStorages) {
+        this.ownStorages = ownStorages;
+    }
+
     public List<Storage> getUsesStorages() {
         return usesStorages;
+    }
+
+    public void setUsesStorages(List<Storage> usesStorages) {
+        this.usesStorages = usesStorages;
     }
 
     public void addOwnStorages(List<Storage> ownStorages) {
@@ -282,8 +290,10 @@ public class User implements UserDetails {
 
     public boolean wantsToSendMessages(String username) {
         HashSet<PendingMessages> pendings = (HashSet<PendingMessages>) this.getPendingMessages();
-        for (PendingMessages pending: pendings) {
-            if (pending.pendingTo(username)) {return true;}
+        for (PendingMessages pending : pendings) {
+            if (pending.pendingTo(username)) {
+                return true;
+            }
         }
         return false;
     }
@@ -299,14 +309,6 @@ public class User implements UserDetails {
 
     public void setProfilePhoto(Storage profilePhoto) {
         this.profilePhoto = profilePhoto;
-    }
-
-    public void setOwnStorages(List<Storage> ownStorages) {
-        this.ownStorages = ownStorages;
-    }
-
-    public void setUsesStorages(List<Storage> usesStorages) {
-        this.usesStorages = usesStorages;
     }
 }
 

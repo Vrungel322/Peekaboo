@@ -8,7 +8,6 @@ import com.peekaboo.model.entity.relations.PendingFriendship;
 import com.peekaboo.model.entity.relations.PendingMessages;
 import com.peekaboo.model.repository.UserRepository;
 import org.neo4j.ogm.cypher.Filter;
-import org.neo4j.ogm.cypher.Filters;
 import org.neo4j.ogm.session.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,6 +37,8 @@ public class UserRepositoryImpl implements UserRepository {
 //            session.query("create constraint on (user:User) assert user.telephone is unique",Collections.EMPTY_MAP);
                 session.query("create constraint on (user:User) assert user.email is unique", Collections.EMPTY_MAP);
             }
+            user.setProfilePhoto(session.loadAll(Storage.class, new Filter("fileName", "default_profile_photo"))
+                    .stream().findFirst().get());
             session.save(user);
         } catch (Exception e) {
             return null;
@@ -67,28 +68,34 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findByUsername(String username) {
         Session session = sessionFactory.getSession();
-        try{
+        try {
             return session.loadAll(User.class, new Filter("username", username))
                     .stream().findFirst().get();
-        }catch (Exception ex){ return null;}
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
     public User findByEmail(String email) {
         Session session = sessionFactory.getSession();
-        try{
+        try {
             return session.loadAll(User.class, new Filter("email", email))
                     .stream().findFirst().get();
-        }catch (Exception ex){ return null;}
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
     public User findByTelephone(String telephone) {
         Session session = sessionFactory.getSession();
-        try{
+        try {
             return session.loadAll(User.class, new Filter("telephone", telephone))
                     .stream().findFirst().get();
-        }catch (Exception ex){ return null;}
+        } catch (Exception ex) {
+            return null;
+        }
     }
 
     @Override
@@ -106,7 +113,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void addNewFriend(User target, User whom) {
         Session session = sessionFactory.getSession();
-        deleteFriendshipRequest(target,whom);
+        deleteFriendshipRequest(target, whom);
         target.getFriends().add(new Friendship(target, whom));
         session.save(target);
         whom.getFriends().add(new Friendship(whom, target));
@@ -163,7 +170,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public void addPendingMessage(User from, User target,String type, String object) {
+    public void addPendingMessage(User from, User target, String type, String object) {
         Session session = sessionFactory.getSession();
         try {
             PendingMessages pendings = from.getPendingMessages().stream()
@@ -188,7 +195,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
         Map<String, List<String>> resultPendings = new HashMap<>();
         pendings.forEach(p -> {
-            resultPendings.put(p.getUsername(),(List<String>) p.getPendingMessagesFor(target.getUsername()));
+            resultPendings.put(p.getUsername(), (List<String>) p.getPendingMessagesFor(target.getUsername()));
         });
         return resultPendings;
     }
@@ -206,8 +213,11 @@ public class UserRepositoryImpl implements UserRepository {
     public void sendFriendshipRequest(User user, User target) {
         Session session = sessionFactory.getSession();
         //if self-back friendship request exist, we do not have to make another request
-        for (PendingFriendship friendship: target.getRequestFriends()) {
-            if (user.getUsername().equals(friendship.getUserto().getUsername())) {return;} }
+        for (PendingFriendship friendship : target.getRequestFriends()) {
+            if (user.getUsername().equals(friendship.getUserto().getUsername())) {
+                return;
+            }
+        }
         user.getRequestFriends().add(new PendingFriendship(user, target));
         session.save(user);
     }
@@ -220,14 +230,16 @@ public class UserRepositoryImpl implements UserRepository {
                     new Filter("fromto", user.getId().toString() + target.getId().toString())).iterator().next();
             user.getRequestFriends().remove(pendingFriendship);
             update(user);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         //для перестраховки проверяю на возможную обратную связь (баги бд) и также удаляю её
         try {
             PendingFriendship pendingFriendship = session.loadAll(PendingFriendship.class, new Filter("fromto",
                     target.getId().toString() + user.getId().toString())).iterator().next();
             target.getRequestFriends().remove(pendingFriendship);
             update(target);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
     }
 
     @Override
@@ -249,12 +261,12 @@ public class UserRepositoryImpl implements UserRepository {
         Session session = sessionFactory.getSession();
         List<User> pendings = getAll().stream()
                 .filter(f -> f.wantsToSendMessages(target.getUsername()) == true).collect(Collectors.toList());
-        pendings.forEach(p -> p.getPendingMessages().forEach(v-> session.delete(v)));
+        pendings.forEach(p -> p.getPendingMessages().forEach(v -> session.delete(v)));
     }
 
     @Override
     public boolean loginExists(String login) {
         User user = findByEmail(login);
-        return user!=null;
+        return user != null;
     }
 }

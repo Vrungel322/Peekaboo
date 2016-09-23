@@ -1,6 +1,7 @@
 package com.peekaboo.controller;
 
 import java.io.Serializable;
+
 import org.codehaus.jackson.annotate.JsonAutoDetect;
 import org.codehaus.jackson.annotate.JsonProperty;
 
@@ -10,13 +11,58 @@ import org.codehaus.jackson.annotate.JsonProperty;
 @JsonAutoDetect
 public class FriendEntity implements Serializable {
 
-    private String name;
     private Long id;
+    private String name;
+    private String surname;
+    private String nickname;
+    private int state;
+    private String imgUri;
 
-    public FriendEntity(String name, Long id){
-        this.name=name;
-        this.id=id;
+    public FriendEntity(Long id, String name, String surname, String nickname, int state, String imgUri) {
+        this.id = id;
+        this.name = name;
+        this.surname = surname;
+        this.nickname = nickname;
+        this.state = state;
+        this.imgUri = imgUri;
     }
+
+    @JsonProperty
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    @JsonProperty
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    @JsonProperty
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    @JsonProperty
+    public String getImgUri() {
+        return imgUri;
+    }
+
+    public void setImgUri(String imgUri) {
+        this.imgUri = imgUri;
+    }
+
     @JsonProperty
     public String getName() {
         return name;
@@ -25,6 +71,7 @@ public class FriendEntity implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
     @JsonProperty
     public Long getId() {
         return id;

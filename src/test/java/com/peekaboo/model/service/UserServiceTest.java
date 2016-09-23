@@ -254,7 +254,7 @@ public class UserServiceTest {
         }
     }
 
-    @Test
+
     public void signinTest() {
         logger.debug("Got SIGN IN request");
         User user;

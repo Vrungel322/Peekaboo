@@ -198,7 +198,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           sendMessage(action)
         }
         //Here is all other routines not connected with text or audio
-        if(state!=UserState.AUDIO.getId && state!=UserState.TEXT.getId){
+        if(state==UserState.ALL){
           logger.error("processing default routine for sending")
           val action = msg.toMessage(sender)
           sendMessage(action)

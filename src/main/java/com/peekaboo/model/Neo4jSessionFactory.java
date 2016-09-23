@@ -11,7 +11,7 @@ import java.util.Collections;
 @Component(value = "sessionFactory")
 public class Neo4jSessionFactory {
 
-    public static final String NEO4J_URL = "http://localhost:7474";
+    public static final String NEO4J_URL = "http://peekaboo:7474";
     public static final String USERNAME = "neo4j";
     public static final String PASSWORD = "root";
     public static final String PACKAGE = "com.peekaboo.model";

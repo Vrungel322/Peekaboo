@@ -120,7 +120,7 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
                 actSel ! (msg,id,id,msg.getType)
               }
             }
-
+          userRepository.deletePendingMessages(user)
 
         }catch{case a:Exception=>logger.error(a.toString)}
 

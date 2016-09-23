@@ -109,7 +109,7 @@ public class FriendController {
             listFriends= new ArrayList();
 
             users.forEach(a->
-                listFriends.add(new FriendEntity(a.getUsername(),a.getId())));
+                listFriends.add(new FriendEntity(a.getId(), "name", "Surname", "Vrungel", 1, "someUri")));
 //            Gson gson=new Gson();
 //            this.usersJsonArray=gson.toJson(listFriends);
 

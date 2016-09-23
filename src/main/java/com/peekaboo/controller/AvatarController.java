@@ -13,13 +13,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
+import static io.jsonwebtoken.lang.Classes.getResourceAsStream;
 
 @RestController
 public class AvatarController {
@@ -64,19 +63,39 @@ public class AvatarController {
     }
 
     @RequestMapping(path = "/avatar/{userId}", method = RequestMethod.GET)
-    public void avatar(HttpServletResponse response, @PathVariable String userId){
+    public void avatar(HttpServletResponse response, @PathVariable String userId) {
         User user = userService.get(userId);
         logger.error(user.toString());
+        response.setContentType("image/jpeg");
         Storage avatar = user.getProfilePhoto();
-        logger.error(avatar.toString());
-        Path image = Paths.get(avatar.getFilePath());
-        if (!Files.exists(image)) {
-            logger.error("Avatar does not exists - returning default avatar");
-        }
+
+
+
+        if (avatar == null) {
+            try {
+
+                logger.error("got to null");
+                byte[] buffer = new byte[1024];
+                int bytesread;
+
+
+                InputStream input = AvatarController.class.getResourceAsStream("/defaultfiles/default_profile_photo.jpg");
+                OutputStream output = response.getOutputStream();
+                while ((bytesread = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, bytesread);
+                }
+                response.getOutputStream().flush();
+            } catch (Exception e) {
+               logger.error(e.toString());
+            }
+        } else {
+            String avatarpath = avatar.getFilePath();
+            Path image = Paths.get(avatarpath);
+
             //TODO: Set correct content type
-            response.setContentType("image/png");
             logger.error("image found");
             try {
+
                 Files.copy(image, response.getOutputStream());
                 logger.error("image copied to output stream");
                 response.getOutputStream().flush();
@@ -87,6 +106,8 @@ public class AvatarController {
                     e1.printStackTrace();
                 }
             }
-
+        }
     }
+
+
 }

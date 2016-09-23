@@ -274,7 +274,6 @@ public class UserServiceTest {
         logger.error(token);
     }
 
-    @Test
     public void photoTest() {
         userService.clearDataBase();
         //TODO: You must have existed photo file

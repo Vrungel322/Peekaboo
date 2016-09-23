@@ -2,7 +2,7 @@ package com.peekaboo.messaging.socket.middleware
 
 import java.util
 
-import akka.actor.Props
+import akka.actor.{ActorRef, Props}
 
 import scala.collection.JavaConverters._
 import com.google.gson.Gson
@@ -22,6 +22,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration.FiniteDuration
 import upickle.default._
+
+import scala.util.Try
 //Implementation of Spring BinaryWebSocketHandler
 //I'm not sure, but the container(tomcat) creates new thread for each request to this endpoint
 //So it would be a good idea to replace Spring websockets with something offered by one of the scala's frameworks
@@ -45,7 +47,57 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
       val ownerId = getId(session)
       logger.debug("want to process action")
       //finally, we dispatch the message
-      requestDispatcher.process(action, ownerId)
+      logger.debug("Got to process")
+      action match {
+        case a: Message =>
+          val destination = a.getDestination
+          val messageType=a.getType
+          logger.error("HERE IS SOMETHING")
+          logger.error("messageType:"+messageType)
+
+          logger.debug(s"SEND action from ${ownerId} to ${destination}")
+
+
+
+          //todo: if not found actor use default
+          system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
+            val actSel = getFromTry(aTry, destination)
+
+            actSel ! (a, ownerId,destination,messageType)
+          }
+          )
+
+
+        //      case a:Switchmode=>
+        //
+        //        user.setState(a.getBody(0).toInt)
+        case a:SystemMessage=>
+          if (a.getReason=="mode"){
+            logger.error("got to REASON:MODE")
+            logger.debug(new String(a.getBody))
+            logger.debug(a.getBody(0))
+            val user=userRepository.findById(ownerId.toLong)
+            logger.debug(user)
+            user.setState(a.getBody(0).toInt)
+            userRepository.update(user)
+          } else{
+            val destination = a.getDestination
+            val messageReason=a.getReason
+            logger.error("System message is processed")
+            logger.error("messageReason"+messageReason)
+            logger.debug(s"System action from ${ownerId} to ${destination}")
+
+
+
+            //todo: if not found actor use default
+            system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
+              val actSel = getFromTry(aTry, destination)
+              logger.error("Trying to get to actor")
+              actSel ! (a, ownerId,destination,messageReason)
+            })}
+
+        case a=> logger.error("unknown command")
+      }
 
     }
     catch {
@@ -158,6 +210,18 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
   private def getId(session: WebSocketSession): String =
     session.getHandshakeHeaders get "id" get 0
 
+  private def getFromTry(aTry: Try[ActorRef], defaultHandler: String): ActorRef = {
+    if (aTry.isSuccess) {
+      logger.error("Atry is success")
+      aTry.get
+    }
+    else {
+      logger.error("default handler")
+      system.actorOf(Props(new DefaultMessageActor(defaultHandler)), defaultHandler)
+    }
+  }
+
+  val system = ActorSystems.messageSystem
   private val logger = LogManager.getLogger(MessageHandler.this)
 
 }

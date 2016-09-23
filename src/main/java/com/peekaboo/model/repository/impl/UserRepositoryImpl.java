@@ -37,8 +37,8 @@ public class UserRepositoryImpl implements UserRepository {
 //            session.query("create constraint on (user:User) assert user.telephone is unique",Collections.EMPTY_MAP);
                 session.query("create constraint on (user:User) assert user.email is unique", Collections.EMPTY_MAP);
             }
-            user.setProfilePhoto(session.loadAll(Storage.class, new Filter("fileName", "default_profile_photo"))
-                    .stream().findFirst().get());
+//            user.setProfilePhoto(session.loadAll(Storage.class, new Filter("fileName", "default_profile_photo"))
+//                    .stream().findFirst().get());
             session.save(user);
         } catch (Exception e) {
             return null;

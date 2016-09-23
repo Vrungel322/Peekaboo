@@ -143,7 +143,7 @@ public class SignController {
         verToken.setUser(user);
         verToken = verificationService.create(verToken);
         registrationConfirmService.confirm(user, verToken);
-        SignupResponse response = new SignupResponse(user.getId().toString());
+        SignupResponse response = new SignupResponse(user.getId().toString(), user.getUsername());
 //        SignupResponse response = new SignupResponse(user.getId().toString(), user.getUsername().toString(), user.getAvatar().toString());
         logger.debug("User were successfully created");
         return new ResponseEntity(response, HttpStatus.OK);
@@ -211,21 +211,30 @@ public class SignController {
     }
 
     private class SignupResponse {
+        private String username;
         private String id;
-//        private String username;
+
 //        private String avatar;
 
-        public SignupResponse(String id) {
+        public SignupResponse(String id, String username) {
 //        public SignupResponse(String id, String username, String avatar) {
             this.id = id;
 //            this.avatar = avatar;
-//            this.username = username;
+            this.username = username;
         }
 
         public String getId() {
             return id;
         }
-//        public String getUsername() { return username;}
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
+        //        public String getUsername() { return username;}
 //        public String getAvatar() {return avatar;}
     }
 

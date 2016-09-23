@@ -2,10 +2,8 @@ package com.peekaboo.controller.sign;
 
 import com.peekaboo.confirmation.RegistrationConfirmService;
 import com.peekaboo.model.entity.User;
-import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.entity.VerificationToken;
-import com.peekaboo.model.service.UserService;
-import com.peekaboo.model.service.VerificationTokenService;
+import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import com.peekaboo.model.service.impl.VerificationTokenServiceImpl;
 import com.peekaboo.security.jwt.JwtUtil;
@@ -30,6 +28,7 @@ import java.util.List;
 @RequestMapping("/")
 public class SignController {
 
+    private final Logger logger = LogManager.getLogger(this);
     @Autowired
     UserServiceImpl userService;
     @Autowired
@@ -40,10 +39,9 @@ public class SignController {
     JwtUtil jwtUtil;
     @Autowired
     BCryptPasswordEncoder encoder;
-    private final Logger logger = LogManager.getLogger(this);
 
     @RequestMapping(value = "/signin", method = RequestMethod.POST)
-    public ResponseEntity signin( @RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
+    public ResponseEntity signin(@RequestBody SigninRequestEntity requestEntity, Errors errors) throws Exception {
         logger.debug("Got SIGN IN request");
         if (errors.hasErrors()) {
             logErrors(errors);
@@ -76,13 +74,13 @@ public class SignController {
                 .setState(user.getState());
         String token = jwtUtil.generateToken(response);
         logger.error(token);
-        return new ResponseEntity(new SigninResponse(user.getId().toString(), token, user.getState()), HttpStatus.OK);
+        return new ResponseEntity(new SigninResponse(user.getId().toString(), token, user.getUsername() ,user.getState()), HttpStatus.OK);
 //        return new ResponseEntity(new SigninResponse(user.getId().toString(),
 //                user.getUsername().toString(),user.getAvatar().toString(), token), HttpStatus.OK);
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
-    public ResponseEntity signup( @RequestBody SignupRequestEntity requestEntity, Errors errors) {
+    public ResponseEntity signup(@RequestBody SignupRequestEntity requestEntity, Errors errors) {
         logger.debug("Got SIGN UP request");
         logger.debug("Attempting to register new user");
         if (errors.hasErrors()) {
@@ -172,30 +170,44 @@ public class SignController {
     }
 
     private class SigninResponse {
+        private String username;
         private String id;
         private String token;
         private int state;
 //        private String username;
 //        private String avatar;
 
-//        public SigninResponse(String id, String username, String avatar, String token) {
-        public SigninResponse(String id, String token, int state) {
+        //        public SigninResponse(String id, String username, String avatar, String token) {
+        public SigninResponse(String id, String token, String username, int state) {
             this.token = token;
             this.id = id;
             this.state = state;
 
-//            this.username = username;
+            this.username = username;
 //            this.avatar = avatar;
         }
+
         public String getId() {
             return id;
         }
+
         public String getToken() {
             return token;
         }
-        public int getState() { return state;}
+
+        public int getState() {
+            return state;
+        }
 //        public String getAvatar() { return avatar; }
 //        public String getUsername() { return username; }
+
+        public String getUsername() {
+            return username;
+        }
+
+        public void setUsername(String username) {
+            this.username = username;
+        }
     }
 
     private class SignupResponse {

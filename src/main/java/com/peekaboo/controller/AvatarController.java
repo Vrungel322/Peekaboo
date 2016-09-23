@@ -34,7 +34,7 @@ public class AvatarController {
     public AvatarController(){
 
     }
-    @RequestMapping(path = "/avatar/", method = RequestMethod.POST)
+    @RequestMapping(path = "/avatar", method = RequestMethod.POST)
     public String avatar( @RequestParam("image") MultipartFile image){
         if (!image.isEmpty()) {
             try {
@@ -66,10 +66,12 @@ public class AvatarController {
     @RequestMapping(path = "/avatar/{userId}", method = RequestMethod.GET)
     public void avatar(HttpServletResponse response, @PathVariable String userId){
         User user = userService.get(userId);
+        logger.error(user.toString());
         Storage avatar = user.getProfilePhoto();
+        logger.error(avatar.toString());
         Path image = Paths.get(avatar.getFilePath());
         if (!Files.exists(image)) {
-            logger.error("Avatar doesnot exists - returning default avatar");
+            logger.error("Avatar does not exists - returning default avatar");
         }
             //TODO: Set correct content type
             response.setContentType("image/png");

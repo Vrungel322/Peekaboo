@@ -278,7 +278,8 @@ public class UserServiceTest {
     public void photoTest() {
         userService.clearDataBase();
         //TODO: You must have existed photo file
-        String filePath = System.getProperty("user.dir") + File.separator + "tmp" + File.separator + "default_profile_photo.jpeg";
+        String filePath = System.getProperty("user.dir") + File.separator + "tmp" + File.separator + "default_profile_photo.jpg";
+
         if (storageService.findByFileName("default_profile_photo") == null) {
             //TODO: Add correct file path
             Storage storage = new Storage("default_profile_photo", filePath);
@@ -286,6 +287,8 @@ public class UserServiceTest {
         }
         User user = new User("dsfgcbnh", "sdxvcbn", "sss", "asdad2", "dbvn@gmail.com", 0, 0, false, 0);
         userService.save(user);
+
+
         System.out.println(storageService.findByFileName("default_profile_photo").toString());
         System.out.println(userService.findByEmail(user.getEmail()).getProfilePhoto().getFileName());
         Assert.assertEquals(userService.findByEmail(user.getEmail()).getProfilePhoto().getFilePath(),

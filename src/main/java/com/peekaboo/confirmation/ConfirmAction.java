@@ -16,7 +16,11 @@ public class ConfirmAction extends Thread {
 
     @Override
     public void run() {
-        confirmSender.send(user.getLogin(), body0+verificationToken.getValue()+body1);
+        if (user.getLogin().contains("@")) {
+            confirmSender.send(user.getLogin(), body0 + verificationToken.getValue() + body1);
+        } else {
+            confirmSender.send(user.getLogin(), sms + verificationToken.getValue());
+        }
     }
 
     public User getUser() {
@@ -26,6 +30,8 @@ public class ConfirmAction extends Thread {
     public VerificationToken getVerificationToken() {
         return verificationToken;
     }
+
+    public String sms = "Verification token is: ";
 
     public String body0 = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n" +
             "<html xmlns=\"http://www.w3.org/1999/xhtml\">\n" +

@@ -1,5 +1,6 @@
 package com.peekaboo.confirmation.phone;
 
+import com.peekaboo.confirmation.ConfirmSender;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
@@ -16,10 +17,12 @@ import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
-public class PhoneService {
+@Service
+public class PhoneService implements ConfirmSender {
     private static final Logger logger = LogManager.getLogger(PhoneService.class);
 
     public static final String BASE_URL = "https://rest.nexmo.com/sms/json";
@@ -29,6 +32,7 @@ public class PhoneService {
 
     private HttpClient httpClient = null;
 
+    @Override
     public void send(String to, String body) {
         Map<String, String> requestParams = new LinkedHashMap<String, String>();
         requestParams.put("from", DEFAULT_FROM);

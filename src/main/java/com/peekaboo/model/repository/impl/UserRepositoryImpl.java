@@ -265,8 +265,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public boolean loginExists(String login) {
-        User user = findByEmail(login);
+    public boolean emailExist(String email) {
+        User user = findByEmail(email);
+        return user != null;
+    }
+
+    @Override
+    public boolean phoneExist(String phone) {
+        User user = findByTelephone(phone);
         return user != null;
     }
 }

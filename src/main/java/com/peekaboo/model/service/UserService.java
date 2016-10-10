@@ -14,7 +14,8 @@ public interface UserService extends EntityService<User, String> {
     void delete(User user);
     User findById(Long id);
     User findByUsername(String username);
-    boolean loginExists(String login);
+    boolean emailExist(String email);
+    boolean phoneExist(String phone);
     User findByEmail(String email);
     User findByTelephone(String telephone);
     List<User> getAll();

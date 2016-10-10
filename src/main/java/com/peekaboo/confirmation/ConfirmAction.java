@@ -16,11 +16,15 @@ public class ConfirmAction extends Thread {
 
     @Override
     public void run() {
-        if (user.getLogin().contains("@")) {
-            confirmSender.send(user.getLogin(), body0 + verificationToken.getValue() + body1);
-        } else {
-            confirmSender.send(user.getLogin(), sms + verificationToken.getValue());
-        }
+
+        // TODO: Set correct confrm operation 
+//        if (user.getLogin().contains("@")) {
+//            confirmSender.send(user.getLogin(), body0 + verificationToken.getValue() + body1);
+//        } else {
+//            confirmSender.send(user.getLogin(), sms + verificationToken.getValue());
+//        }
+
+        confirmSender.send(user.getLogin(), sms + verificationToken.getValue());
     }
 
     public User getUser() {

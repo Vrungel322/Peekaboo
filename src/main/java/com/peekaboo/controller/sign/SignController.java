@@ -74,7 +74,7 @@ public class SignController {
                 .setState(user.getState());
         String token = jwtUtil.generateToken(response);
         logger.error(token);
-        return new ResponseEntity(new SigninResponse(user.getId().toString(), token, user.getUsername() ,user.getState()), HttpStatus.OK);
+        return new ResponseEntity(new SigninResponse(user.getId().toString(), token, user.getUsername(), user.getState()), HttpStatus.OK);
 //        return new ResponseEntity(new SigninResponse(user.getId().toString(),
 //                user.getUsername().toString(),user.getAvatar().toString(), token), HttpStatus.OK);
     }
@@ -90,6 +90,7 @@ public class SignController {
                     HttpStatus.BAD_REQUEST
             );
         }
+
         User user = userService.findByUsername(requestEntity.getUsername());
         String password = encoder.encode(requestEntity.getPassword());
         if (user != null) {
@@ -101,18 +102,6 @@ public class SignController {
                         new ErrorResponse(ErrorType.USER_EXIST, "Username is taken"),
                         HttpStatus.CONFLICT
                 );
-            }
-            if (user.hasLogin(requestEntity.getLogin()) ||
-                    !userService.loginExists(requestEntity.getLogin())) {
-
-                logger.debug("User has entered unique login or login belongs to him. Updating user info");
-                user.emptyLogin();
-                user.setLogin(requestEntity.getLogin());
-                user.setPassword(password);
-                userService.update(user);
-                logger.debug("Removing old verification key");
-                verificationService.deleteByValue(verificationService.findByUser(user).getValue());
-
             } else {
                 logger.debug("Login is taken");
                 return new ResponseEntity(
@@ -122,17 +111,29 @@ public class SignController {
             }
 
         } else {
-            if (userService.loginExists(requestEntity.getLogin())) {
-                logger.debug("Login is taken");
-                return new ResponseEntity(
-                        new ErrorResponse(ErrorType.USER_EXIST, "Login is taken"),
-                        HttpStatus.CONFLICT
-                );
+
+            boolean flag1 = userService.emailExist(requestEntity.getEmail());
+            boolean flag2 = userService.phoneExist(requestEntity.getPhone());
+
+            if (flag1 || flag2) {
+
+                if (flag1 == true) {
+                    return new ResponseEntity(
+                            new ErrorResponse(ErrorType.USER_EXIST, "Email is taken"),
+                            HttpStatus.CONFLICT
+                    );
+                } else if (flag2 == true) {
+                    return new ResponseEntity(
+                            new ErrorResponse(ErrorType.USER_EXIST, "Phone number is taken"),
+                            HttpStatus.CONFLICT
+                    );
+                }
             } else {
                 user = new User();
                 user.setUsername(requestEntity.getUsername());
                 user.setname(user.getUsername());
-                user.setLogin(requestEntity.getLogin());
+                user.setEmail(requestEntity.getEmail());
+                user.setTelephone(requestEntity.getPhone());
                 user.setPassword(password);
                 user.setEnabled(true);
                 user.addRole(UserRole.USER);

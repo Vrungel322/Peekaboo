@@ -1,9 +1,14 @@
 package com.peekaboo.controller.sign;
 
 
-public class SignupRequestEntity extends SigninRequestEntity {
-
+public class SignupRequestEntity {
     private String username;
+
+    private String phone;
+
+    private String email;
+
+    private String password;
 
     public String getUsername() {
         return username;
@@ -12,4 +17,32 @@ public class SignupRequestEntity extends SigninRequestEntity {
     public void setUsername(String username) {
         this.username = username;
     }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+
+//        return !login.chars().anyMatch(Character::isAlphabetic);
 }
+

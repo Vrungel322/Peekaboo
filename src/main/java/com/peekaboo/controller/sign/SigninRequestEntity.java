@@ -1,6 +1,5 @@
 package com.peekaboo.controller.sign;
 
-;
 
 public class SigninRequestEntity {
 

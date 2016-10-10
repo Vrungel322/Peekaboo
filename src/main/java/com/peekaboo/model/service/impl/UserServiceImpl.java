@@ -1,16 +1,14 @@
 package com.peekaboo.model.service.impl;
 
-import com.peekaboo.model.Neo4jSessionFactory;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.repository.impl.UserRepositoryImpl;
 import com.peekaboo.model.service.UserService;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @Service(value = "userService")
 public class UserServiceImpl implements UserService {
@@ -112,37 +110,50 @@ public class UserServiceImpl implements UserService {
     public List<User> getBlackListFriends(User user) {
         return userRepository.getBlackListFriends(user);
     }
+
     @Override
     public void changeProfilePhoto(User user, Storage avatar) {
         userRepository.changeProfilePhoto(user, avatar);
     }
+
     @Override
     public void deleteProfilePhoto(User user) {
         userRepository.deleteProfilePhoto(user);
     }
+
     @Override
-    public boolean loginExists(String login) {
-        return userRepository.loginExists(login);
+    public boolean emailExist(String email) {
+        return userRepository.emailExist(email);
     }
+
+    @Override
+    public boolean phoneExist(String phone) {
+        return userRepository.phoneExist(phone);
+    }
+
     @Override
     public void addPendingMessage(User from, User target, String type, String object) {
-        userRepository.addPendingMessage(from,target,type,object);
+        userRepository.addPendingMessage(from, target, type, object);
     }
+
     @Override
     public Map<String, List<String>> getPendingMessagesFor(User target) {
         return userRepository.getPendingMessagesFor(target);
     }
+
     @Override
     public void deletePendingMessages(User user) {
         userRepository.deletePendingMessages(user);
     }
+
     @Override
     public void sendFriendshipRequest(User user, User target) {
-        userRepository.sendFriendshipRequest(user,target);
+        userRepository.sendFriendshipRequest(user, target);
     }
+
     @Override
     public void deleteFriendshipRequest(User user, User target) {
-        userRepository.deleteFriendshipRequest(user,target);
+        userRepository.deleteFriendshipRequest(user, target);
     }
 }
 

@@ -7,7 +7,6 @@ import com.peekaboo.controller.sign.SignResponse;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
-import com.peekaboo.model.entity.enums.UserRole;
 import com.peekaboo.model.repository.StorageRepository;
 import com.peekaboo.model.repository.UserRepository;
 import com.peekaboo.model.repository.VerificationTokenRepository;
@@ -21,8 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.io.File;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/config/rootTest.xml"})
@@ -50,7 +47,7 @@ public class UserServiceTest {
 
     @Test
     public void createUpdateAndDeleteUser() {
-        User user = new User("maks", "maksim", "sss","Ratoshnuk", "asdad", "maksratosh@g" +
+        User user = new User("maks", "maksim", "sss", "Ratoshnuk", "asdad", "maksratosh@g" +
                 "mail.com", 0, 0, true, 0);
         userService.save(user);
         user = userService.findByUsername(user.getUsername());
@@ -64,11 +61,11 @@ public class UserServiceTest {
 
     @Test
     public void managingWithFriends() {
-        userService.save(new User("maks", "maksim", "sss","Ratoshnuk", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
-        userService.save(new User("alex1", "sashka1", "sss","Ratoshnuk", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex2", "sashka2", "sss","Ratoshnuk", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex3", "sashka3", "sss","Ratoshnuk", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex4", "sashka4", "sss","Ratoshnuk", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
+        userService.save(new User("maks", "maksim", "sss", "Ratoshnuk", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
+        userService.save(new User("alex1", "sashka1", "sss", "Ratoshnuk", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex2", "sashka2", "sss", "Ratoshnuk", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex3", "sashka3", "sss", "Ratoshnuk", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex4", "sashka4", "sss", "Ratoshnuk", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
         User user = userService.findByUsername("maks");
         User user1 = userService.findByUsername("alex1");
         User user2 = userService.findByUsername("alex2");
@@ -87,11 +84,11 @@ public class UserServiceTest {
 
     @Test
     public void pendingFriendshipRequest() {
-        userService.save(new User("maks", "maksim","Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
-        userService.save(new User("alex1", "sashka1","Ratoshnuk", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex2", "sashka2","Ratoshnuk", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex3", "sashka3","Ratoshnuk", "sss", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex4", "sashka4","Ratoshnuk", "sss", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
+        userService.save(new User("maks", "maksim", "Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
+        userService.save(new User("alex1", "sashka1", "Ratoshnuk", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex2", "sashka2", "Ratoshnuk", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex3", "sashka3", "Ratoshnuk", "sss", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
+        userService.save(new User("alex4", "sashka4", "Ratoshnuk", "sss", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
         User user = userService.findByUsername("maks");
         User user1 = userService.findByUsername("alex1");
         User user2 = userService.findByUsername("alex2");
@@ -124,7 +121,7 @@ public class UserServiceTest {
 
     @Test
     public void avatarOperations() {
-        User user = new User("username", "maksim", "Ratoshnuk","sss", "telephone", "email", 0, 0, true, 0);
+        User user = new User("username", "maksim", "Ratoshnuk", "sss", "telephone", "email", 0, 0, true, 0);
         userService.save(user);
         userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar1.jpg", "path.to.avatar"));
         userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar2.jpg", "path.to.avatar"));
@@ -139,18 +136,18 @@ public class UserServiceTest {
 
     @Test
     public void pendingMessagesQueryForOfflineUser() {
-        userService.save(new User("maks", "Maks Boss Backend","Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
-        userService.save(new User("Vasyan", "Vasyan","Beshenniy", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
-        userService.save(new User("Lola", "Lola Shkoora","Gubina","sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
+        userService.save(new User("maks", "Maks Boss Backend", "Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
+        userService.save(new User("Vasyan", "Vasyan", "Beshenniy", "sss", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
+        userService.save(new User("Lola", "Lola Shkoora", "Gubina", "sss", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
         User user = userService.findByUsername("maks");
         User user1 = userService.findByUsername("Vasyan");
         User user2 = userService.findByUsername("Lola");
         userService.addNewFriend(user, user1);
-        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks", "Maks Boss Backend","Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks1", "Maks Boss Backend","Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks2", "Maks Boss Backend","Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user2, user1, "type", new Gson().toJson(new User("maks3", "Maks Boss Backend","Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
-        userService.addPendingMessage(user2, user1, "type", new Gson().toJson(new User("maks4", "Maks Boss Backend","Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks", "Maks Boss Backend", "Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks1", "Maks Boss Backend", "Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user, user1, "type", new Gson().toJson(new User("maks2", "Maks Boss Backend", "Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user2, user1, "type", new Gson().toJson(new User("maks3", "Maks Boss Backend", "Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
+        userService.addPendingMessage(user2, user1, "type", new Gson().toJson(new User("maks4", "Maks Boss Backend", "Ratoshnuk", "sss", "asdad", "maksratosh@gmail.com", 0, 0, true, 0)));
         userService.addPendingMessage(user2, user1, "type", new String("привет"));
         userService.addPendingMessage(user2, user1, "type", new String("я - Лола"));
         userService.addPendingMessage(user2, user1, "type", new String("хочу познакомиться"));
@@ -184,55 +181,6 @@ public class UserServiceTest {
         userService.delete(user2);
     }
 
-
-    @Test
-    public void signupTest() {
-        logger.debug("Got SIGN UP request");
-        logger.debug("Attempting to register new user");
-        User user = userService.findByUsername(username);
-        String password = encoder.encode(pwrd);
-        if (user != null) {
-            logger.debug("User has registered before");
-            logger.debug("Checking maybe he hasn't been verified yet");
-            if (user.isEnabled()) {
-                logger.error("User has already been registered. Send him error");
-                logger.error("username is taken");
-            }
-            if (user.hasLogin(login) ||
-                    !userService.loginExists(login)) {
-                logger.debug("User has entered unique login or login belongs to him. Updating user info");
-                user.emptyLogin();
-                user.setLogin(login);
-                user.setPassword(password);
-                userService.update(user);
-                logger.debug("Removing old verification key");
-                verificationService.deleteByValue(verificationService.findByUser(user).getValue());
-            } else {
-                logger.error("Login is taken");
-            }
-        } else {
-            if (userService.loginExists(login)) {
-                logger.error("Login is taken");
-            } else {
-                user = new User();
-                user.setUsername(username);
-                user.setname(user.getUsername());
-                user.setLogin(login);
-                user.setPassword(password);
-                user.setEnabled(true);
-                user.addRole(UserRole.USER);
-                user = userService.save(user);
-            }
-        }
-        VerificationToken verToken = registrationConfirmService.generateVerificationToken();
-        verToken.setUser(user);
-        verToken = verificationService.create(verToken);
-        registrationConfirmService.confirm(user, verToken);
-        logger.debug("User were successfully created");
-        userID = userService.findByUsername(username).getId().toString();
-        tokenID = verToken.getValue().toString();
-        signConfirmation();
-    }
 
     @Test
     public void signConfirmation() {

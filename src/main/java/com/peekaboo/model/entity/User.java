@@ -196,7 +196,7 @@ public class User implements UserDetails {
     }
 
     public String getLogin() {
-        return email == null ? telephone : email;
+        return telephone;
     }
 
     public void setLogin(String login) {

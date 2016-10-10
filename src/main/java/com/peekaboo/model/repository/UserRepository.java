@@ -17,7 +17,8 @@ public interface UserRepository {
     User findByTelephone(String telephone);
     List<User> getAll();
     void clearDataBase();
-    boolean loginExists(String login);
+    boolean emailExist(String email);
+    boolean phoneExist(String phone);
     List<User> getFriends(User user);
     void addNewFriend(User target, User whom);
     void deleteFriend(User from, User to);

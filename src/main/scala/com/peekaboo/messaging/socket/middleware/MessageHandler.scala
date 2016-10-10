@@ -37,6 +37,7 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
   val userRepository = new UserRepositoryImpl(new Neo4jSessionFactory)
   //each message goes through this method
   override def handleBinaryMessage(session: WebSocketSession, message: BinaryMessage): Unit = {
+
     try {
       logger.debug("Message size: " + message.getPayloadLength)
 
@@ -58,20 +59,35 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
           logger.debug(s"SEND action from ${ownerId} to ${destination}")
 
 
+          if (destination.toLong==294){
+            //MEGOFITCHA______________________________________________________________________
+            logger.error("CHAT MESSAGE")
+            try{
+              Future{chatsystem.actorSelection("/user/chat")}.onComplete(actorref=>{
+                val c=actorref.get
+                logger.error("got message actor:"+a.toString)
+                c!(a, ownerId, destination, messageType)
+              })
+            }
+            catch{case e =>logger.error("was previously created")}
+            //MEGOFITCHA_____________________________________________________________________
 
-          //todo: if not found actor use default
-          system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
-            val actSel = getFromTry(aTry, destination)
-
-            actSel ! (a, ownerId,destination,messageType)
           }
-          )
+          else {
+            //todo: if not found actor use default
+            system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
+              val actSel = getFromTry(aTry, destination)
 
+              actSel !(a, ownerId, destination, messageType)
+            }
+            )
+          }
 
         //      case a:Switchmode=>
         //
         //        user.setState(a.getBody(0).toInt)
         case a:SystemMessage=>
+
           if (a.getReason=="mode"){
             logger.error("got to REASON:MODE")
             logger.debug(new String(a.getBody))
@@ -80,22 +96,39 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
             logger.debug(user)
             user.setState(a.getBody(0).toInt)
             userRepository.update(user)
-          } else{
+          } else {
             val destination = a.getDestination
-            val messageReason=a.getReason
+            val messageReason = a.getReason
             logger.error("System message is processed")
-            logger.error("messageReason"+messageReason)
+            logger.error("messageReason" + messageReason)
             logger.debug(s"System action from ${ownerId} to ${destination}")
 
-
-
-            //todo: if not found actor use default
-            system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
-              val actSel = getFromTry(aTry, destination)
-              logger.error("Trying to get to actor")
-              actSel ! (a, ownerId,destination,messageReason)
-            })}
-
+            if (destination.toLong == 294) {
+              //MEGOFITCHA______________________________________________________________________
+              logger.error("CHAT MESSAGE")
+              try {
+                Future {
+                  chatsystem.actorSelection("/user/chat")
+                }.onComplete(actorref => {
+                  val c = actorref.get
+                  logger.error("got message actor:" + a.toString)
+                  c !(a, ownerId, destination, messageReason)
+                })
+              }
+              catch {
+                case e => logger.error("was previously created")
+              }
+              //MEGOFITCHA_____________________________________________________________________
+            }
+            else {
+              //todo: if not found actor use default
+              system.actorSelection("/user/" + destination).resolveOne(FiniteDuration(1, "s")).onComplete(aTry => {
+                val actSel = getFromTry(aTry, destination)
+                logger.error("Trying to get to actor")
+                actSel !(a, ownerId, destination, messageReason)
+              })
+            }
+          }
         case a=> logger.error("unknown command")
       }
 
@@ -113,6 +146,14 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
   //this method is invoked after successful handshake with client and the sever
   //also it would be great to send this user all messages he has received while he was offline
   override def afterConnectionEstablished(session: WebSocketSession): Unit = {
+   //MEGOFITCHA______________________________________________________________________
+    try{
+      Future{chatsystem.actorOf(Props[ChatManager],"chat")}.onComplete(a=>{
+        logger.error("created"+a.toString)
+      })}
+    catch{case e =>logger.error("was previously created")}
+    //MEGOFITCHA_____________________________________________________________________
+
 
 
     val id = getId(session)
@@ -120,42 +161,53 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
     //session.setBinaryMessageSizeLimit(session.getBinaryMessageSizeLimit * 4) //todo: check does it work
     logger.debug(s"Connection established. With user $id")
     //at first it looks if there was a connection with a client
-    try {
-      actorSystem.actorOf(Props(new DefaultMessageActor("0")), "0")
-    }
-    catch{case e:Exception=>}
-    actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
-      logger.debug("Future has been reached")
 
-      //if the connection existed stop actor handling it
-      if (a.isSuccess) {
-        logger.debug("Future is success")
-        logger.debug("Removing actor")
-        actorSystem.stop(a.get)
-      }
+      actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
+        logger.debug("Future has been reached")
 
-      //after one second create new actor with connection
-      //this was done to give enough time for system to stop the actor
-      Future {
-        //        actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
-        //          logger.debug("IF actor is alive, kill it")
-        //          //if found stopping it
-        //          if (a.isSuccess) {
-        //            logger.debug("Removing actor")
-        //            actorSystem.stop(a.get)
-        //          }
-        //        })
-        logger.debug("Creating new actor after 1 second")
-        Thread.sleep(1000)
-        logger.debug("1 second has been passed")
-        actorSystem.actorOf(Props(new MessageActor(session)), id)
-      }.onComplete(actRef => {
-        //here created actor sends pong message to check it's connection
-        logger.debug("Created actor " + actRef.get.toString())
-        session.sendMessage(new PongMessage())
-        val actSel = actRef.get
-        val map = new mutable.HashMap[String,String]
-        try{
+        //if the connection existed stop actor handling it
+        if (a.isSuccess) {
+          logger.debug("Future is success")
+          logger.debug("Removing actor")
+          actorSystem.stop(a.get)
+        }
+
+        //after one second create new actor with connection
+        //this was done to give enough time for system to stop the actor
+        Future {
+          //        actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
+          //          logger.debug("IF actor is alive, kill it")
+          //          //if found stopping it
+          //          if (a.isSuccess) {
+          //            logger.debug("Removing actor")
+          //            actorSystem.stop(a.get)
+          //          }
+          //        })
+          logger.debug("Creating new actor after 1 second")
+          Thread.sleep(1000)
+          logger.debug("1 second has been passed")
+          actorSystem.actorOf(Props(new MessageActor(session)), id)
+        }.onComplete(actRef => {
+          //here created actor sends pong message to check it's connection
+          logger.debug("Created actor " + actRef.get.toString())
+          session.sendMessage(new PongMessage())
+          val actSel = actRef.get
+
+
+          //MEGOFITCHA______________________________________________________________________
+          try{
+            Future{chatsystem.actorSelection("/user/chat")}.onComplete(a=>{
+              val c=a.get
+              logger.error("adding actor to chat")
+              c!(actSel,id,"add")
+              Thread.sleep(2000)
+            })
+          }
+          catch{case e =>logger.error("was previously created")}
+          //MEGOFITCHA_____________________________________________________________________
+
+          val map = new mutable.HashMap[String,String]
+          try{
             val user = userRepository.findById(id.toLong)
 
             logger.error("got to block try and user is"+user)
@@ -166,25 +218,27 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
             for((a,v)<-messages){
               for(z<-v){
                 logger.error(z)
-
                 val msg = read[Message](z)
                 logger.error(msg)
-                actSel ! (msg,id,id,msg.getType)
+                actSel ! (msg,msg.getSender,id,msg.getType)
               }
             }
-          userRepository.deletePendingMessages(user)
+            userRepository.deletePendingMessages(user)
 
-        }catch{case a:Exception=>logger.error(a.toString)}
+          }catch{case a:Exception=>logger.error(a.toString)}
 
 
-//        map.+=(ParameterName.From,)
-//        val message a=new Message()s
-//        actSel ! ()
+          //        map.+=(ParameterName.From,)
+          //        val message a=new Message()s
+          //        actSel ! ()
+        })
+
       })
 
-    })
+    }
 
-  }
+
+
 
   //this method will be invoked only if client manually invokes "close connection", or server do it
   //this method wont be invoked if client lose connection with internet
@@ -196,6 +250,18 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
     //looking for user's actor
     actorSystem.actorSelection(s"/user/${id}").resolveOne(FiniteDuration(1, "s")).onComplete(a => {
       logger.debug("The Future has been reached")
+
+      //MEGOFITCHA______________________________________________________________________
+      try{
+        Future{chatsystem.actorSelection("/user/chat")}.onComplete(ac=>{
+          val c=ac.get
+          c!(a.get,id,"delete")
+          Thread.sleep(2000)
+        })
+      }
+      catch{case e =>logger.error("was previously created")}
+      //MEGOFITCHA_____________________________________________________________________
+
       //if found stopping it
       if (a.isSuccess) {
         logger.debug("Future is success")
@@ -222,6 +288,7 @@ class MessageHandler(requestDispatcher: RequestDispatcher, messageInterceptor: M
   }
 
   val system = ActorSystems.messageSystem
+  val chatsystem=ActorSystems.chatSystem
   private val logger = LogManager.getLogger(MessageHandler.this)
 
 }

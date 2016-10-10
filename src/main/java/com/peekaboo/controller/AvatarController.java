@@ -95,7 +95,7 @@ public class AvatarController {
             String avatarpath = avatar.getFilePath();
             Path image = Paths.get(avatarpath);
 
-            //TODO: Set correct content type
+//            //TODO: Set correct content type
             logger.error("image found");
             try {
 

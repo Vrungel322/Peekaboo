@@ -24,8 +24,11 @@ class DefaultMessageActor(private val id: String) extends Actor {
       val userTo: User = userService.findById(destination.toLong)
       var parameters:scala.Predef.Map[String,String]=Map()
       parameters+=("type"->messageType)
+      parameters+=("from"->userFrom.getId.toString)
+      parameters+=("destination"->userTo.getId.toString)
 
-      userService.addPendingMessage(userFrom, userTo,"message", write(a).toString);
-      logger.error(a)
+  val newmsg=new Message(a.getBody,parameters)
+      logger.error(newmsg)
+      userService.addPendingMessage(userFrom, userTo,"message", write(newmsg).toString);
   }
 }

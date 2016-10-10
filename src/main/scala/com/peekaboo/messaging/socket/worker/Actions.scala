@@ -1,5 +1,7 @@
 package com.peekaboo.messaging.socket.worker
 
+import org.apache.logging.log4j.LogManager
+
 //represents different actions client can perform with the system and
 //system can perform with client
 abstract class Action(val parameters: Map[String, String]) {
@@ -35,7 +37,7 @@ case class SystemMessage(text: Array[Byte], override val parameters: Map[String,
 }
 
 case class Message(text: Array[Byte], override val parameters: Map[String, String]) extends Action(parameters) with Serializable {
-
+  private val logger = LogManager.getLogger
   override val name = "MESSAGE"
 
   override def getBody = text
@@ -46,9 +48,13 @@ case class Message(text: Array[Byte], override val parameters: Map[String, Strin
     * @param author author of the READNOTIFICATION command
     * @return READ_NOTIFICATION command
     */
-  def toMessage(author: String): Message = Message(text, parameters.filter { case (param, _) => param != ParameterName.Destination } + (ParameterName.From -> author))
+  def toMessage(author: String): Message = {
+    logger.error(getParameter(ParameterName.From).isEmpty)
+    Message(text, parameters.filter { case(a,b)=>true} +  (ParameterName.From -> author))
+  }/*case (param, _) => param != ParameterName.Destination+ (ParameterName.From -> author)*/
 
   def getDestination: String = getParameter(ParameterName.Destination).get
+  def getSender: String = getParameter(ParameterName.From).get
 
   def getType: String = getParameter(ParameterName.Type).get
 }

@@ -27,6 +27,7 @@ public class MailService implements ConfirmSender {
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
             helper.setTo(to);
+            helper.setFrom("peekaboochat@gmail.com");
             helper.setSubject(REGISTRATION_CONFIRMATION);
             helper.setText(body, true);
 
@@ -43,6 +44,7 @@ public class MailService implements ConfirmSender {
         int i = 0;
         while (i < numberOfSend && !toSend) {
             try {
+                logger.error(mailSender.getUsername());
                 mailSender.send(mailMessage);
                 toSend = true;
             } catch (MailSendException e) {

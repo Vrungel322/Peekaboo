@@ -1,0 +1,9 @@
+applications:
+- path: target/ROOT.war
+  memory: 512M
+  instances: 1
+  domain: mybluemix.net
+  name: testtomcatdfff
+  host: testtomcatdfff
+  disk_quota: 1024M
+  buildpack: java_buildpack

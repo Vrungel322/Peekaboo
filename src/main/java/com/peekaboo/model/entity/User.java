@@ -22,6 +22,7 @@ public class User implements UserDetails {
     private String telephone;
     private String email;
     private String name;
+    private String surname;
     private String password;
     private int roles;
     private int state;
@@ -44,11 +45,12 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String username, String name, String password, String telephone,
+    public User(String username, String name,String surname, String password, String telephone,
                 String email, int roles, int gender, boolean enabled, int state
                 /*LocalDate birthdate,*/) {
         this.username = username;
         this.name = name;
+        this.surname=surname;
         this.password = password;
         this.telephone = telephone;
         this.email = email;
@@ -57,6 +59,14 @@ public class User implements UserDetails {
         this.enabled = enabled;
         this.friends = new HashSet<>();
         this.state = state;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String name) {
+        this.surname = surname;
     }
 
     public String getName() {

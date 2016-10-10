@@ -7,6 +7,7 @@
     <bean id="messageHandler" class="com.peekaboo.messaging.socket.middleware.MessageHandler">
         <constructor-arg index="0" ref="requestDispatcher"/>
         <constructor-arg index="1" ref="messageInterceptor"/>
+
     </bean>
 
     <bean id="messageInterceptor" class="com.peekaboo.messaging.socket.middleware.BinaryMessageInterceptor"/>
@@ -18,11 +19,15 @@
 
     <websockets:handlers>
         <websockets:mapping path="/socket/send" handler="messageHandler"/>
+
         <websockets:handshake-interceptors>
             <ref bean="handshakeInterceptor"/>
+
         </websockets:handshake-interceptors>
     </websockets:handlers>
-
+    <bean class="org.springframework.web.socket.server.standard.ServletServerContainerFactoryBean">
+        <property name="maxSessionIdleTimeout" value="60000"/>
+    </bean>
     <bean id="handshakeInterceptor" class="com.peekaboo.messaging.socket.middleware.SecurityHandshakeInterceptor">
         <constructor-arg index="0" ref="authenticationInterceptor"/>
     </bean>

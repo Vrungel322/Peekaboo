@@ -18,13 +18,13 @@ public class FriendEntity implements Serializable {
     private int state;
     private String imgUri;
 
-    public FriendEntity(Long id, String name, String surname, String nickname, int state, String imgUri) {
+    public FriendEntity(Long id, String name, String surname, String nickname, int state) {
         this.id = id;
         this.name = name;
         this.surname = surname;
         this.nickname = nickname;
         this.state = state;
-        this.imgUri = imgUri;
+
     }
 
     @JsonProperty
@@ -54,14 +54,6 @@ public class FriendEntity implements Serializable {
         this.state = state;
     }
 
-    @JsonProperty
-    public String getImgUri() {
-        return imgUri;
-    }
-
-    public void setImgUri(String imgUri) {
-        this.imgUri = imgUri;
-    }
 
     @JsonProperty
     public String getName() {

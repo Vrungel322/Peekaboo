@@ -48,73 +48,26 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
 
       logger.error("Got to message Actor")
       try{
+        //here we are searching the state of destination user
         val userRepository = new UserRepositoryImpl(new Neo4jSessionFactory)
         val user=userRepository.findById(destination.toLong)
         val state=user.getState
         logger.error("state:"+state)
+        //here userstates are defined - they will be used a lot of times
         val typeText=UserState.TEXT.getName
         val stateText=UserState.TEXT.getId
         val typeAudio=UserState.AUDIO.getName
         val stateAudio=UserState.AUDIO.getId
-        //        (messageType,state) match {
-        //          case(typeText,stateText)=>
-        //            logger.error("processing text2text")
-        //            val action = msg.toMessage(sender)
-        //            sendMessage(action)
-        //
-        //
-        //          case (typeAudio,stateText)=>
-        //            val converter: AudioToTextInterface = new AudioToTextWatson//here is our converter
-        //            //next routine is searching the path of file which were stored using http "upload"
-        //            val rootPath: String = System.getProperty("catalina.home")
-        //            val rootDir = new File(rootPath + File.separator + "tmp")
-        //            //        logger.error(new String(msg.getBody, "UTF-8"))
-        //            val filename = new String(msg.getBody, "UTF-8")
-        //            val file: Path = java.nio.file.Paths.get(rootDir.getAbsolutePath,destination,filename)
-        //            logger.debug("Target file:"+file)
-        //            val messageText=converter.RunServiceWithDefaults(file.toFile)//converting audio to txt using watson
-        //            val parameters=msg.parameters
-        //            parameters+("type"->"text")
-        //            val message=new SendText(messageText,parameters)
-        //            logger.debug("Converted message text:"+messageText)
-        //            val action=message.toMessage(sender)
-        //            sendMessage(action)
-        //
-        //
-        //          case (typeText,stateAudio)=>
-        //            logger.error("processing text2audio")
-        //            val messageText=new String(msg.getBody, "UTF-8")
-        //            val rootPath = System.getProperty("catalina.home")
-        //            val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
-        //            if (!rootDir.exists) rootDir.mkdirs()
-        //            val fileName: String = UUID.randomUUID.toString
-        //            val uploadedFile = new File(rootDir.getAbsolutePath + File.separator+fileName )
-        //            uploadedFile.createNewFile
-        //            val o=new FileOutputStream(uploadedFile)
-        //            val buffer: Array[Byte] = new Array[Byte](1024)
-        //            val t=new TextToAudioWatson
-        //            val in:InputStream=t.RunServiceWithDefaults(messageText)
-        //            IOUtils.copy(in, o)
-        //            o.flush()
-        //            o.close()
-        //            in.close()
-        //            var parameters:scala.Predef.Map[String,String]=Map()
-        //            parameters+=("type"->"audio")
-        //            val message=new Message(fileName.getBytes,parameters)
-        //            val action=message.toMessage(sender)
-        //            sendMessage(action)
-        //
-        //
-        //          case(_,_)=>
-        //            logger.error("processing default routine for sending")
-        //            val action = msg.toMessage(sender)
-        //            sendMessage(action)
-        //        }
+        //then actions of actor are defined, depending on type of message and status of user
+
+
+        //***************************TEXT--------->>TEXT************************************
         if ((messageType==UserState.TEXT.getName)&&(state==UserState.TEXT.getId)){
           logger.error("processing text2text")
           val action = msg.toMessage(sender)
           sendMessage(action)
         }
+        //***************************AUDIO--------->>TEXT************************************
         if ((messageType==UserState.AUDIO.getName)&&(state==UserState.TEXT.getId)){
           logger.debug("processing audio to text")
           val converter: AudioToTextInterface = new AudioToTextWatson//here is our converter
@@ -136,7 +89,8 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           val action=message.toMessage(sender)
           sendMessage(action)
         }
-        //
+
+        //***************************TEXT--------->>AUDIO************************************
 
         if ((messageType==UserState.TEXT.getName)&&(state==UserState.AUDIO.getId)){
           try{
@@ -162,22 +116,23 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
 
           //Test wav To mp3 Convertion
           val target: File = new File(rootDir.getAbsolutePath + File.separator + fileName)
-          logger.error(target)
-          logger.error(uploadedFile)
-          logger.error("we are before future")
-           val hello=new Thread(new Runnable {
-             def run(): Unit = {
-
-               val audioAttr = new AudioAttributes
-               val mimeType: String = "audio/mp3"
-
-               val aed: AudioConverter = new AudioConverter()
-
-                aed.encodeAudio(uploadedFile, target, mimeType)
-             }
-           })
-          hello.start()
-
+//          logger.error(target)
+//          logger.error(uploadedFile)
+//          logger.error("we are before future")
+//           val hello=new Thread(new Runnable {
+//             def run(): Unit = {
+//
+//               val audioAttr = new AudioAttributes
+//               val mimeType: String = "audio/mp3"
+//
+//               val aed: AudioConverter = new AudioConverter()
+//
+//                aed.encodeAudio(uploadedFile, target, mimeType)
+//             }
+//           })
+//          hello.start()
+            val headerFixer=new WavHeaderFixer(uploadedFile,target)
+            headerFixer.fix()
             val storage: Storage = new Storage(fileName, target.getAbsolutePath)
             val storageService=new StorageRepositoryImpl(new Neo4jSessionFactory)
 
@@ -192,13 +147,16 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           sendMessage(action)
         }        catch{case a:Error =>logger.error(a.toString)}
         }
+
+        //***************************AUDIO--------->>AUDIO************************************
         if(messageType==UserState.AUDIO.getName && state==UserState.AUDIO.getId){
           logger.error("Send audio to audio")
           val action = msg.toMessage(sender)
           sendMessage(action)
         }
         //Here is all other routines not connected with text or audio
-        if(state==UserState.ALL){
+        logger.error("UserState:" + UserState.ALL)
+        if(state==UserState.ALL.getId){
           logger.error("processing default routine for sending")
           val action = msg.toMessage(sender)
           sendMessage(action)

@@ -22,11 +22,11 @@ import java.util.UUID;
 public class FileUpload {
 
     private static final Logger logger = LogManager.getLogger(FileUpload.class);
-    private File rootDir;
     @Autowired
     StorageServiceImpl storageService;
     @Autowired
     UserServiceImpl userService;
+    private File rootDir;
 
     public FileUpload() {
         String rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"));
@@ -35,14 +35,14 @@ public class FileUpload {
             rootDir.mkdirs();
     }
 
-    @RequestMapping(path = "/audio/{userId}", method = RequestMethod.POST)
-    public String audio(@PathVariable String userId, @RequestParam("file") MultipartFile file) {
-       logger.error("got to upload");
+    @RequestMapping(path = "/{fileType}/{userId}", method = RequestMethod.POST)
+    public String upload(@PathVariable String fileType, @PathVariable String userId, @RequestParam("file") MultipartFile file) {
+        logger.error("got to upload");
         if (!file.isEmpty()) {
             try {
                 byte[] bytes = file.getBytes();
                 String fileName = UUID.randomUUID().toString();
-                File parent = new File(rootDir.getAbsolutePath() + File.separator + userId);
+                File parent = new File(rootDir.getAbsolutePath() + File.separator + userId + File.separator + fileType);
                 if (!parent.exists()) parent.mkdir();
                 File uploadedFile = new File(parent.getAbsolutePath() + File.separator + fileName);
                 if (!uploadedFile.exists()) uploadedFile.createNewFile();

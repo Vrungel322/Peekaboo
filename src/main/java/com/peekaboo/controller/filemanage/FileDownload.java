@@ -1,6 +1,7 @@
 package com.peekaboo.controller.filemanage;
 
 import com.peekaboo.miscellaneous.JavaPropertiesParser;
+import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -23,10 +24,10 @@ import java.nio.file.Paths;
 @RequestMapping("/download")
 public class FileDownload {
 
-    private File rootDir;
-
     @Autowired
     UserServiceImpl userService;
+    private File rootDir;
+    private Logger logger = LogManager.getLogger(this);
 
     public FileDownload() {
         String rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"));
@@ -35,38 +36,58 @@ public class FileDownload {
             rootDir.mkdirs();
     }
 
-    @RequestMapping(path = "/audio/{fileName}", method = RequestMethod.GET)
-    public void audio(HttpServletResponse response, @PathVariable String fileName) {
+    @RequestMapping(path = "/{fileType}/{fileName}", method = RequestMethod.GET)
+    public void download(HttpServletResponse response, @PathVariable String fileType, @PathVariable String fileName) {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String userId = u.getId().toString();
-        User receiver = userService.get(userId);
-//        Storage storage = receiver.getUsesStorages().stream()
-//                .filter(x -> x.getFileName().equals(fileName))
-//                .findFirst().get();
-        String rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"));
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!FUCKING NOTRIGHT
-       File rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + userId);
-        if (!rootDir.exists()) rootDir.mkdirs();
-        File uploadedFile = new File(rootDir.getAbsolutePath() + File.separator+fileName );
-        logger.error(uploadedFile.getAbsolutePath());
-        Path file = Paths.get(uploadedFile.getAbsolutePath());
-        logger.error("done");
-        logger.error(Files.exists(file));
-        if (Files.exists(file)) {
-            response.setContentType("audio/wav");
-            logger.error("file found");
-            try {
-                Files.copy(file, response.getOutputStream());
-                logger.error("file copied");
-                response.getOutputStream().flush();
-            } catch (IOException e) {
+        User receiver = userService.get(u.getId().toString());
+
+        try {
+            Storage storage = receiver.getUsesStorages().stream()
+                    .filter(x -> x.getFileName().equals(fileName))
+                    .findFirst().get();
+
+
+            Path file = Paths.get(storage.getFilePath());
+            logger.error("done");
+            logger.error(Files.exists(file));
+
+            if (Files.exists(file)) {
+                switch (fileType) {
+                    case "audio":
+                        response.setContentType("audio/wav");
+                        break;
+                    case "image":
+                        response.setContentType("image/jpeg");
+                        break;
+                    case "video":
+                        // TODO: Set correct response type for video
+//                        response.setContentType("????");
+                        logger.error("Video not supported yet");
+                        break;
+                    case "document":
+                        // TODO: Set correct response type for document
+//                        response.setContentType("????");
+                        logger.error("Document not supported yet");
+                        break;
+                    default:
+                        logger.error("Enter not correct file type");
+                }
+
+                logger.error("file found");
                 try {
-                    response.getWriter().print("");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                    Files.copy(file, response.getOutputStream());
+                    logger.error("file copied");
+                    response.getOutputStream().flush();
+                } catch (IOException e) {
+                    try {
+                        response.getWriter().print("");
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
             }
+        } catch (Exception e) {
+            logger.error(e.toString());
         }
     }
-    private Logger logger = LogManager.getLogger(this);
 }

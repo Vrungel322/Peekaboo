@@ -35,7 +35,7 @@ public class FileUpload {
             rootDir.mkdirs();
     }
 
-    @RequestMapping(path = "/audio/{userId}", method = RequestMethod.POST)
+    @RequestMapping(path = "/{userId}", method = RequestMethod.POST)
     public String audio(@PathVariable String userId, @RequestParam("file") MultipartFile file) {
        logger.error("got to upload");
         if (!file.isEmpty()) {

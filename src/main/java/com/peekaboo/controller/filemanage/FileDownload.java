@@ -37,7 +37,7 @@ public class FileDownload {
     }
 
     @RequestMapping(path = "/{fileType}/{fileName}", method = RequestMethod.GET)
-    public void audio(HttpServletResponse response, @PathVariable String fileType, @PathVariable String fileName) {
+    public void download(HttpServletResponse response, @PathVariable String fileType, @PathVariable String fileName) {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User receiver = userService.get(u.getId().toString());
 
@@ -61,11 +61,13 @@ public class FileDownload {
                         break;
                     case "video":
                         // TODO: Set correct response type for video
-                        response.setContentType("????");
+//                        response.setContentType("????");
+                        logger.error("Video not supported yet");
                         break;
                     case "document":
                         // TODO: Set correct response type for document
-                        response.setContentType("????");
+//                        response.setContentType("????");
+                        logger.error("Document not supported yet");
                         break;
                     default:
                         logger.error("Enter not correct file type");

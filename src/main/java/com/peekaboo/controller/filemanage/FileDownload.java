@@ -3,6 +3,7 @@ package com.peekaboo.controller.filemanage;
 import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.enums.FileType;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -56,23 +57,25 @@ public class FileDownload {
                 storage = receiver.getOwnStorages().stream()
                         .filter(x -> x.getFileName().equals(fileName))
                         .findFirst().get();
-            } catch (NoSuchElementException ex){
+            } catch (NoSuchElementException ex) {
                 storage = null;
             }
 
-            if(storage == null) throw new Exception();
+            if (storage == null) throw new Exception();
 
             Path file = Paths.get(storage.getFilePath());
             logger.error("done");
             logger.error(Files.exists(file));
 
+            if (!fileType.equals(storage.getFileType())) logger.error("Wrong file type in the path");
+
             if (Files.exists(file)) {
-                switch (fileType) {
+                switch (storage.getFileType()) {
                     case "audio":
-                        response.setContentType("audio/wav");
+                        response.setContentType(FileType.AUDIO.name());
                         break;
                     case "image":
-                        response.setContentType("image/jpeg");
+                        response.setContentType(FileType.IMAGE.name());
                         break;
                     case "video":
                         // TODO: Set correct response type for video

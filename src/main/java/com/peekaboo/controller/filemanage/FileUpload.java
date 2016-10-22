@@ -3,6 +3,7 @@ package com.peekaboo.controller.filemanage;
 import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.enums.FileType;
 import com.peekaboo.model.service.impl.StorageServiceImpl;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -52,7 +53,7 @@ public class FileUpload {
                 stream.close();
                 StringBuilder fileBaseName = new StringBuilder("");
                 fileBaseName.append(userId).append(fileName);
-                Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath());
+                Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath(), fileType);
                 storageService.save(storage);
                 User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 User user = userService.get(u.getId().toString());

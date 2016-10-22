@@ -3,6 +3,7 @@ package com.peekaboo.controller;
 import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.enums.FileType;
 import com.peekaboo.model.service.impl.StorageServiceImpl;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +52,7 @@ public class AvatarController {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedImage));
                 stream.write(bytes);
                 stream.close();
-                Storage profilePhoto = new Storage(imageName, uploadedImage.getAbsolutePath());
+                Storage profilePhoto = new Storage(imageName, uploadedImage.getAbsolutePath(), FileType.IMAGE.name());
                 storageService.save(profilePhoto);
                 userService.changeProfilePhoto(user, profilePhoto);
                 logger.debug("Server Avatar location=" + uploadedImage.getAbsolutePath());

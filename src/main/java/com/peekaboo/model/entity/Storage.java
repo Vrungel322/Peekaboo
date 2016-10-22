@@ -14,11 +14,14 @@ public class Storage {
 
     private String filePath;
 
+    private String fileType;
+
     public Storage(){}
 
-    public Storage(String fileName, String filePath){
+    public Storage(String fileName, String filePath, String fileType) {
         this.fileName = fileName;
         this.filePath = filePath;
+        this.fileType = fileType;
     }
 
     public Long getId() {
@@ -27,6 +30,14 @@ public class Storage {
 
     private void setId(Long id) {
         this.id = id;
+    }
+
+    public String getFileType() {
+        return fileType;
+    }
+
+    public void setFileType(String fileType) {
+        this.fileType = fileType;
     }
 
     public void setFileName(String fileName) {

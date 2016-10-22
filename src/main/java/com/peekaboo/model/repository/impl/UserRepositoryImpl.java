@@ -32,7 +32,7 @@ public class UserRepositoryImpl implements UserRepository {
     public User save(User user) {
         Session session = sessionFactory.getSession();
         try {
-            if (getAll().size() == 1) {
+            if (session.countEntitiesOfType(User.class) == 1) {
                 session.query("create constraint on (user:User) assert user.username is unique", Collections.EMPTY_MAP);
 //            session.query("create constraint on (user:User) assert user.telephone is unique",Collections.EMPTY_MAP);
                 session.query("create constraint on (user:User) assert user.email is unique", Collections.EMPTY_MAP);

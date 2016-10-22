@@ -3,6 +3,7 @@ package com.peekaboo.controller.filemanage;
 import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
+import com.peekaboo.model.entity.enums.FileType;
 import com.peekaboo.model.service.impl.StorageServiceImpl;
 import com.peekaboo.model.service.impl.UserServiceImpl;
 import org.apache.logging.log4j.LogManager;
@@ -40,10 +41,11 @@ public class FileUpload {
         logger.error("got to upload");
         if (!file.isEmpty()) {
             try {
+                logger.error("file is not empty");
                 byte[] bytes = file.getBytes();
                 String fileName = UUID.randomUUID().toString();
                 File parent = new File(rootDir.getAbsolutePath() + File.separator + userId + File.separator + fileType);
-                if (!parent.exists()) parent.mkdir();
+                if (!parent.exists()) parent.mkdirs();
                 File uploadedFile = new File(parent.getAbsolutePath() + File.separator + fileName);
                 if (!uploadedFile.exists()) uploadedFile.createNewFile();
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedFile));
@@ -51,7 +53,7 @@ public class FileUpload {
                 stream.close();
                 StringBuilder fileBaseName = new StringBuilder("");
                 fileBaseName.append(userId).append(fileName);
-                Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath());
+                Storage storage = new Storage(fileName.toString(), uploadedFile.getAbsolutePath(), fileType);
                 storageService.save(storage);
                 User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
                 User user = userService.get(u.getId().toString());

@@ -12,7 +12,7 @@ import com.peekaboo.messaging.socket.middleware.BinaryMessageInterceptor
 import com.peekaboo.miscellaneous.JavaPropertiesParser
 import com.peekaboo.model.Neo4jSessionFactory
 import com.peekaboo.model.entity.{Storage, User}
-import com.peekaboo.model.entity.enums.UserState
+import com.peekaboo.model.entity.enums.{FileType, UserState}
 import com.peekaboo.model.repository.impl.{StorageRepositoryImpl, UserRepositoryImpl}
 import com.peekaboo.model.service.impl.UserServiceImpl
 import com.peekaboo.transformation._
@@ -133,7 +133,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
 //          hello.start()
             val headerFixer=new WavHeaderFixer(uploadedFile,target)
             headerFixer.fix()
-            val storage: Storage = new Storage(fileName, target.getAbsolutePath)
+            val storage: Storage = new Storage(fileName, target.getAbsolutePath, FileType.AUDIO.name())
             val storageService=new StorageRepositoryImpl(new Neo4jSessionFactory)
 
             storageService.save(storage)
@@ -172,6 +172,57 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
          val action=message.toMessage(sender)
          sendMessage(action)
        }
+
+
+
+        //******************************IMAGE->AUDIO***************************************
+        if (messageType=="image"&&state==UserState.AUDIO.getId){
+          logger.error("Send image to text")
+          val rootPath: String = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
+          val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
+          if (!rootDir.exists) rootDir.mkdirs()
+          val fileName: String = new String(msg.getBody,"UTF-8")
+          val file = new File(rootDir.getAbsolutePath + File.separator+"image"+File.separator+fileName)
+          logger.error(file.getPath)
+          val imageReader: ImageReader = new ImageReader(file)
+          val messageText=imageReader.detect
+
+          try{val rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
+          //todo:we save converted audio to destination folder, but is it right?  Also Timofei have to add creation of file
+          val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
+          if (!rootDir.exists) rootDir.mkdirs()
+          val fileName: String = UUID.randomUUID.toString
+          val uploadedFile = new File(rootDir.getAbsolutePath + File.separator+fileName +".tmp")
+          logger.error(uploadedFile.getPath)
+          uploadedFile.createNewFile
+          val o=new FileOutputStream(uploadedFile)
+          val buffer: Array[Byte] = new Array[Byte](1024)
+          val t=new TextToAudioWatson
+          val in:InputStream=t.RunServiceWithDefaults(messageText)
+          IOUtils.copy(in, o)
+          o.flush()
+          o.close()
+          in.close()
+
+
+          //Test wav To mp3 Convertion
+          val target: File = new File(rootDir.getAbsolutePath + File.separator + fileName)
+          val headerFixer=new WavHeaderFixer(uploadedFile,target)
+          headerFixer.fix()
+          val storage: Storage = new Storage(fileName, target.getAbsolutePath,FileType.AUDIO.name())
+          val storageService=new StorageRepositoryImpl(new Neo4jSessionFactory)
+
+          storageService.save(storage)
+          user.getOwnStorages.add(storage)
+          userRepository.save(user)
+          var parameters:scala.Predef.Map[String,String]=Map()
+          parameters+=("type"->"audio")
+
+          val message=new Message(fileName.getBytes,parameters)
+          val action=message.toMessage(sender)
+          sendMessage(action)
+          }        catch{case a:Error =>logger.error(a.toString)}
+        }
         //*******************************Here is all other routines not connected with text or audio
         logger.error("UserState:" + UserState.ALL)
         if(state==UserState.ALL.getId){

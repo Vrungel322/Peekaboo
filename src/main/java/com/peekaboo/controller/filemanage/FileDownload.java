@@ -72,10 +72,10 @@ public class FileDownload {
             if (Files.exists(file)) {
                 switch (storage.getFileType()) {
                     case "audio":
-                        response.setContentType(FileType.AUDIO.name());
+                        response.setContentType(FileType.AUDIO.type());
                         break;
                     case "image":
-                        response.setContentType(FileType.IMAGE.name());
+                        response.setContentType(FileType.IMAGE.type());
                         break;
                     case "video":
                         // TODO: Set correct response type for video

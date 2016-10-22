@@ -7,6 +7,7 @@ import com.peekaboo.controller.sign.SignResponse;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.VerificationToken;
+import com.peekaboo.model.entity.enums.FileType;
 import com.peekaboo.model.repository.StorageRepository;
 import com.peekaboo.model.repository.UserRepository;
 import com.peekaboo.model.repository.VerificationTokenRepository;
@@ -123,14 +124,14 @@ public class UserServiceTest {
     public void avatarOperations() {
         User user = new User("username", "maksim", "Ratoshnuk", "sss", "telephone", "email", 0, 0, true, 0);
         userService.save(user);
-        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar1.jpg", "path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar2.jpg", "path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar3.jpg", "path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar4.jpg", "path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar5.jpg", "path.to.avatar"));
-        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar6.jpg", "path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar1.jpg", "path.to.avatar", FileType.IMAGE.name()));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar2.jpg", "path.to.avatar", FileType.IMAGE.name()));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar3.jpg", "path.to.avatar", FileType.IMAGE.name()));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar4.jpg", "path.to.avatar", FileType.IMAGE.name()));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar5.jpg", "path.to.avatar", FileType.IMAGE.name()));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar6.jpg", "path.to.avatar", FileType.IMAGE.name()));
         userService.deleteProfilePhoto(user);
-        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar1.jpg", "path.to.avatar"));
+        userService.changeProfilePhoto(userService.findByUsername("username"), new Storage("avatar1.jpg", "path.to.avatar", FileType.IMAGE.name()));
         userService.delete(user);
     }
 
@@ -223,14 +224,19 @@ public class UserServiceTest {
     }
 
     @Test
+    public void test(){
+        System.out.println(FileType.AUDIO.toString());
+    }
+
+    @Test
     public void photoTest() {
 
-        String filePath = "/opt/apache-tomcat-9.0.0.M10/bin/tmp/166/AVATAR.jpg";
-        Storage storage = new Storage("pomaranch", filePath);
-        storageService.save(storage);
-        User user = userService.findById(166l);
-        user.setProfilePhoto(storage);
-        userService.update(user);
+//        String filePath = "/opt/apache-tomcat-9.0.0.M10/bin/tmp/166/AVATAR.jpg";
+//        Storage storage = new Storage("pomaranch", filePath);
+//        storageService.save(storage);
+//        User user = userService.findById(166l);
+//        user.setProfilePhoto(storage);
+//        userService.update(user);
 
 //        userService.clearDataBase();
 //        //TODO: You must have existed photo file

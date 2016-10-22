@@ -24,7 +24,6 @@ import java.util.*;
 @Service
 public class PhoneService implements ConfirmSender {
     private static final Logger logger = LogManager.getLogger(PhoneService.class);
-
     public static final String BASE_URL = "https://rest.nexmo.com/sms/json";
     public static final String API_KEY = "65ad2b77";
     public static final String API_SECRET = "71788e97d572ffb0";

@@ -154,7 +154,25 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           val action = msg.toMessage(sender)
           sendMessage(action)
         }
-        //Here is all other routines not connected with text or audio
+        //***************************IMAGE-------->>TEXT********************************
+       if (messageType=="image"&&state==UserState.TEXT.getId){
+         logger.error("Send image to text")
+         val rootPath: String = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
+         val rootDir = new File(rootPath + File.separator + "tmp"+ File.separator + destination)
+         if (!rootDir.exists) rootDir.mkdirs()
+         val fileName: String = new String(msg.getBody,"UTF-8")
+         val file = new File(rootDir.getAbsolutePath + File.separator+"image"+File.separator+fileName)
+         logger.error(file.getPath)
+         val imageReader: ImageReader = new ImageReader(file)
+         val messageText=imageReader.detect
+         val parameters=msg.parameters
+         parameters+("type"->"text")
+         val message=new SendText(messageText,parameters)
+         logger.debug("Converted message text:"+messageText)
+         val action=message.toMessage(sender)
+         sendMessage(action)
+       }
+        //*******************************Here is all other routines not connected with text or audio
         logger.error("UserState:" + UserState.ALL)
         if(state==UserState.ALL.getId){
           logger.error("processing default routine for sending")

@@ -40,10 +40,11 @@ public class FileUpload {
         logger.error("got to upload");
         if (!file.isEmpty()) {
             try {
+                logger.error("file is not empty");
                 byte[] bytes = file.getBytes();
                 String fileName = UUID.randomUUID().toString();
                 File parent = new File(rootDir.getAbsolutePath() + File.separator + userId + File.separator + fileType);
-                if (!parent.exists()) parent.mkdir();
+                if (!parent.exists()) parent.mkdirs();
                 File uploadedFile = new File(parent.getAbsolutePath() + File.separator + fileName);
                 if (!uploadedFile.exists()) uploadedFile.createNewFile();
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedFile));

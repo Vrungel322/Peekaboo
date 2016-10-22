@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/download")
@@ -42,10 +43,24 @@ public class FileDownload {
         User receiver = userService.get(u.getId().toString());
 
         try {
-            Storage storage = receiver.getUsesStorages().stream()
-                    .filter(x -> x.getFileName().equals(fileName))
-                    .findFirst().get();
+            Storage storage;
+            try {
+                storage = receiver.getUsesStorages().stream()
+                        .filter(x -> x.getFileName().equals(fileName))
+                        .findFirst().get();
+            } catch (NoSuchElementException ex) {
+                storage = null;
+            }
 
+            try {
+                storage = receiver.getOwnStorages().stream()
+                        .filter(x -> x.getFileName().equals(fileName))
+                        .findFirst().get();
+            } catch (NoSuchElementException ex){
+                storage = null;
+            }
+
+            if(storage == null) throw new Exception();
 
             Path file = Paths.get(storage.getFilePath());
             logger.error("done");

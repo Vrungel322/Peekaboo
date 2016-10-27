@@ -4,7 +4,8 @@ import com.peekaboo.miscellaneous.JavaPropertiesParser;
 import com.peekaboo.model.entity.Storage;
 import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.enums.FileType;
-import com.peekaboo.model.service.impl.UserServiceImpl;
+import com.peekaboo.model.service.StorageService;
+import com.peekaboo.model.service.UserService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/download")
 public class FileDownload {
 
     @Autowired
-    UserServiceImpl userService;
+    UserService userService;
+    @Autowired
+    StorageService storageService;
+
     private File rootDir;
     private Logger logger = LogManager.getLogger(this);
 
@@ -43,25 +46,11 @@ public class FileDownload {
         User u = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         User receiver = userService.get(u.getId().toString());
 
+        Storage storage = storageService.findByFileName(fileName);
         try {
-            Storage storage;
-            try {
-                storage = receiver.getUsesStorages().stream()
-                        .filter(x -> x.getFileName().equals(fileName))
-                        .findFirst().get();
-            } catch (NoSuchElementException ex) {
-                storage = null;
-            }
-
-            try {
-                storage = receiver.getOwnStorages().stream()
-                        .filter(x -> x.getFileName().equals(fileName))
-                        .findFirst().get();
-            } catch (NoSuchElementException ex) {
-                storage = null;
-            }
-
             if (storage == null) throw new Exception();
+            if (!receiver.getOwnStorages().contains(storage) &&
+                    !receiver.getUsesStorages().contains(storage)) throw new Exception();
 
             Path file = Paths.get(storage.getFilePath());
             logger.error("done");

@@ -73,12 +73,15 @@ public class FileDownload {
             logger.error("done");
             logger.error(Files.exists(file));
 
-            if (!fileType.equals(storage.getFileType())) logger.error("Wrong file type in the path");
+            if (!fileType.equals(storage.getFileType())) {
+                logger.error("Wrong file type in the path: " + fileType + " " + storage.getFileType());
+            }
 
             if (Files.exists(file)) {
                 switch (storage.getFileType()) {
                     case "audio":
                         response.setContentType(FileType.AUDIO.type());
+                        logger.error("I come here");
                         break;
                     case "image":
                         response.setContentType(FileType.IMAGE.type());

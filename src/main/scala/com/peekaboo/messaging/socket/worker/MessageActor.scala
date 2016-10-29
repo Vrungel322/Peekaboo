@@ -89,13 +89,14 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           try {
             logger.error("processing text2audio")
             val messageText = new String(msg.getBody, "UTF-8")
+            val audiofolder=JavaPropertiesParser.PARSER.getValue("Audio")
             val rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
             //todo:we save converted audio to destination folder, but is it right?  Also Timofei have to add creation of file
-            val rootDir = new File(rootPath + File.separator + "tmp" + File.separator + destination)
+            val rootDir = new File(rootPath + File.separator + "tmp" + File.separator + destination+ File.separator+audiofolder)
             if (!rootDir.exists) rootDir.mkdirs()
             val fileName: String = UUID.randomUUID.toString
-            val audiofolder=JavaPropertiesParser.PARSER.getValue("Audio")
-            val uploadedFile = new File(rootDir.getAbsolutePath + File.separator+audiofolder+ File.separator + fileName + ".tmp")
+
+            val uploadedFile = new File(rootDir.getAbsolutePath + File.separator + fileName + ".tmp")
             logger.error(uploadedFile.getPath)
             uploadedFile.createNewFile
             val o = new FileOutputStream(uploadedFile)
@@ -109,8 +110,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
 
 
             //Test wav To mp3 Convertion
-            val target: File = new File(rootDir.getAbsolutePath + File.separator+audiofolder++ File.separator + fileName)
-            if (!target.exists) target.mkdirs
+            val target: File = new File(rootDir.getAbsolutePath + File.separator + fileName)
             //          logger.error(target)
             //          logger.error(uploadedFile)
             //          logger.error("we are before future")

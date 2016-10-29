@@ -79,6 +79,7 @@ public class AudioToTextYandex implements AudioToTextInterface {
             while ((line = rd.readLine()) != null) {
                 result.append(line);
             }
+            System.out.println(result);
 
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 

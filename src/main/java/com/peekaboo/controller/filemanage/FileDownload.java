@@ -54,14 +54,20 @@ public class FileDownload {
             }
 
             try {
-                storage = receiver.getOwnStorages().stream()
+                storage = receiver.getUsesStorages().stream()
                         .filter(x -> x.getFileName().equals(fileName))
                         .findFirst().get();
             } catch (NoSuchElementException ex) {
-                storage = null;
-            }
+                try{
+                    storage = receiver.getOwnStorages().stream()
+                            .filter(x -> x.getFileName().equals(fileName))
+                            .findFirst().get();}
+                catch(NoSuchElementException ex1){   storage = null;}
+                }
 
-            if (storage == null) throw new Exception();
+
+
+            if (storage == null) logger.error("no such storage");
 
             Path file = Paths.get(storage.getFilePath());
             logger.error("done");
@@ -98,8 +104,8 @@ public class FileDownload {
                     response.getOutputStream().flush();
                 } catch (IOException e) {
                     try {
-                        response.getWriter().print("");
-                    } catch (IOException e1) {
+                        logger.error("invalid: "+ e.toString());
+                    } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                 }

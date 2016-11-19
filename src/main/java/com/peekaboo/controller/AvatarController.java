@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -79,6 +76,7 @@ public class AvatarController {
         }
     }
 
+    // TODO: 19.11.2016 Do parameter size unneccesary
     @RequestMapping(path = "/avatar/{userId}/{size}", method = RequestMethod.GET)
     public void avatar(HttpServletResponse response, @PathVariable String userId, @PathVariable Integer size) {
         User user = userService.get(userId);
@@ -86,10 +84,10 @@ public class AvatarController {
         response.setContentType("image/jpeg");
         Storage avatar = user.getProfilePhoto();
 
-
         if (avatar == null) {
             try {
                 response.getWriter().print("{\"Fuck you\"}");
+                response.getWriter().close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -104,10 +102,10 @@ public class AvatarController {
                     image = Paths.get(avatarpath);
                     break;
                 case 1:
-                    image = Paths.get(thumbnails + File.separator + "size1");
+                    image = Paths.get(thumbnails + File.separator + "size1.jpeg");
                     break;
                 case 2:
-                    image = Paths.get(thumbnails + File.separator + "size2");
+                    image = Paths.get(thumbnails + File.separator + "size2.jpeg");
                     break;
                 default:
                     image = Paths.get(avatarpath);
@@ -116,19 +114,15 @@ public class AvatarController {
 
             logger.error("image found");
             try {
-
-                Files.copy(image, response.getOutputStream());
+                OutputStream stream = response.getOutputStream();
+                Files.copy(image, stream);
                 logger.error("image copied to output stream");
-                response.getOutputStream().flush();
+                stream.flush();
+                stream.close();
+
             } catch (IOException e) {
-                try {
-                    response.getWriter().print("");
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                logger.error(e);
             }
         }
     }
-
-
 }

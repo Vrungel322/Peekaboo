@@ -61,23 +61,24 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
         }
         //***************************AUDIO--------->>TEXT************************************
         if ((messageType == UserState.AUDIO.getName) && (state == UserState.TEXT.getId)) {
-          logger.debug("processing audio to text")
-          val converter: AudioToTextInterface = new AudioToTextWatson //here is our converter
+          logger.error("processing audio to text")
+          val converter: AudioToTextInterface = new AudioToTextYandex //here is our converter
           //next routine is searching the path of file which were stored using http "upload"
           //todo:rewrite catalina home to build paths in one place
           val rootPath: String = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
           val rootDir = new File(rootPath + File.separator + "tmp")
           //        logger.error(new String(msg.getBody, "UTF-8"))
           val filename = new String(msg.getBody, "UTF-8")
-          val file: Path = java.nio.file.Paths.get(rootDir.getAbsolutePath, destination, filename)
-          logger.debug("Target file:" + file)
+          val audiofolder=JavaPropertiesParser.PARSER.getValue("Audio")
+          val file: Path = java.nio.file.Paths.get(rootDir.getAbsolutePath, destination, audiofolder,  filename)
+          logger.error("Target file:" + file)
 
-          val messageText = converter.RunServiceWithDefaults(file.toFile) //converting audio to txt using watson
-          logger.debug("converted")
+          val messageText :String = converter.RunServiceWithDefaults(file.toFile) //converting audio to txt using watson
+          logger.error("converted")
           val parameters = msg.parameters
           parameters + ("type" -> "text")
           val message = new SendText(messageText, parameters)
-          logger.debug("Converted message text:" + messageText)
+          logger.error("Converted message text:" + messageText)
           val action = message.toMessage(sender)
           sendMessage(action)
         }
@@ -88,17 +89,19 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           try {
             logger.error("processing text2audio")
             val messageText = new String(msg.getBody, "UTF-8")
+            val audiofolder=JavaPropertiesParser.PARSER.getValue("Audio")
             val rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"))
             //todo:we save converted audio to destination folder, but is it right?  Also Timofei have to add creation of file
-            val rootDir = new File(rootPath + File.separator + "tmp" + File.separator + destination)
+            val rootDir = new File(rootPath + File.separator + "tmp" + File.separator + destination+ File.separator+audiofolder)
             if (!rootDir.exists) rootDir.mkdirs()
             val fileName: String = UUID.randomUUID.toString
+
             val uploadedFile = new File(rootDir.getAbsolutePath + File.separator + fileName + ".tmp")
             logger.error(uploadedFile.getPath)
             uploadedFile.createNewFile
             val o = new FileOutputStream(uploadedFile)
             val buffer: Array[Byte] = new Array[Byte](1024)
-            val t = new TextToAudioWatson
+            val t = new TextToAudioYandex
             val in: InputStream = t.RunServiceWithDefaults(messageText)
             IOUtils.copy(in, o)
             o.flush()
@@ -125,6 +128,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
             //          hello.start()
             val headerFixer = new WavHeaderFixer(uploadedFile, target)
             headerFixer.fix()
+            uploadedFile.delete()
             val storage: Storage = new Storage(fileName, target.getAbsolutePath, FileType.AUDIO.`type`())
             val storageService = new StorageRepositoryImpl(new Neo4jSessionFactory)
 
@@ -138,7 +142,7 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
             val action = message.toMessage(sender)
             sendMessage(action)
           } catch {
-            case a: Error => logger.error(a.toString)
+            case a: Error => logger.error(a.printStackTrace())
           }
         }
 
@@ -155,7 +159,8 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           val rootDir = new File(rootPath + File.separator + "tmp" + File.separator + destination)
           if (!rootDir.exists) rootDir.mkdirs()
           val fileName: String = new String(msg.getBody, "UTF-8")
-          val file = new File(rootDir.getAbsolutePath + File.separator + "image" + File.separator + fileName)
+          val imagefolder=JavaPropertiesParser.PARSER.getValue("Image")
+          val file = new File(rootDir.getAbsolutePath + File.separator + imagefolder + File.separator + fileName)
           logger.error(file.getPath)
           val imageReader: ImageReader = new ImageReader(file)
           val messageText = imageReader.detect
@@ -176,7 +181,8 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
           val rootDir = new File(rootPath + File.separator + "tmp" + File.separator + destination)
           if (!rootDir.exists) rootDir.mkdirs()
           val fileName: String = new String(msg.getBody, "UTF-8")
-          val file = new File(rootDir.getAbsolutePath + File.separator + "image" + File.separator + fileName)
+          val imagefolder=JavaPropertiesParser.PARSER.getValue("Image")
+          val file = new File(rootDir.getAbsolutePath + File.separator + imagefolder + File.separator + fileName)
           logger.error(file.getPath)
           val imageReader: ImageReader = new ImageReader(file)
           val messageText = imageReader.detect
@@ -187,7 +193,8 @@ class MessageActor(private val socket: WebSocketSession) extends Actor {
             val rootDir = new File(rootPath + File.separator + "tmp" + File.separator + destination)
             if (!rootDir.exists) rootDir.mkdirs()
             val fileName: String = UUID.randomUUID.toString
-            val uploadedFile = new File(rootDir.getAbsolutePath + File.separator + fileName + ".tmp")
+            val audiofolder=JavaPropertiesParser.PARSER.getValue("Audio")
+            val uploadedFile = new File(rootDir.getAbsolutePath+ File.separator + audiofolder + File.separator + fileName + ".tmp")
             logger.error(uploadedFile.getPath)
             uploadedFile.createNewFile
             val o = new FileOutputStream(uploadedFile)

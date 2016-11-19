@@ -6,8 +6,10 @@
         </Console>
     </Appenders>
     <Loggers>
-
-        <Root level="debug">
+        <logger name="org.springframework.data.neo4j">
+            <level value="ERROR" />
+        </logger>
+        <Root level="error">
             <AppenderRef ref="Console"/>
         </Root>
         <!--<Logger name="com.itea.model" level="trace" additivity="false">-->

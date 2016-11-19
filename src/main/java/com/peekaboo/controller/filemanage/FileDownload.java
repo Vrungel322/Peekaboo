@@ -48,20 +48,50 @@ public class FileDownload {
 
         Storage storage = storageService.findByFileName(fileName);
         try {
+<<<<<<< HEAD
             if (storage == null) throw new Exception();
             if (!receiver.getOwnStorages().contains(storage) &&
                     !receiver.getUsesStorages().contains(storage)) throw new Exception();
+=======
+            Storage storage;
+            try {
+                storage = receiver.getUsesStorages().stream()
+                        .filter(x -> x.getFileName().equals(fileName))
+                        .findFirst().get();
+            } catch (NoSuchElementException ex) {
+                storage = null;
+            }
+
+            try {
+                storage = receiver.getUsesStorages().stream()
+                        .filter(x -> x.getFileName().equals(fileName))
+                        .findFirst().get();
+            } catch (NoSuchElementException ex) {
+                try{
+                    storage = receiver.getOwnStorages().stream()
+                            .filter(x -> x.getFileName().equals(fileName))
+                            .findFirst().get();}
+                catch(NoSuchElementException ex1){   storage = null;}
+                }
+
+
+
+            if (storage == null) logger.error("no such storage");
+>>>>>>> refs/remotes/origin/master
 
             Path file = Paths.get(storage.getFilePath());
             logger.error("done");
             logger.error(Files.exists(file));
 
-            if (!fileType.equals(storage.getFileType())) logger.error("Wrong file type in the path");
+            if (!fileType.equals(storage.getFileType())) {
+                logger.error("Wrong file type in the path: " + fileType + " " + storage.getFileType());
+            }
 
             if (Files.exists(file)) {
                 switch (storage.getFileType()) {
                     case "audio":
                         response.setContentType(FileType.AUDIO.type());
+                        logger.error("I come here");
                         break;
                     case "image":
                         response.setContentType(FileType.IMAGE.type());
@@ -87,8 +117,8 @@ public class FileDownload {
                     response.getOutputStream().flush();
                 } catch (IOException e) {
                     try {
-                        response.getWriter().print("");
-                    } catch (IOException e1) {
+                        logger.error("invalid: "+ e.toString());
+                    } catch (Exception e1) {
                         e1.printStackTrace();
                     }
                 }

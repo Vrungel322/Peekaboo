@@ -212,8 +212,6 @@ http://maven.apache.org/POM/4.0.0 ">
         <!--=============Watson Engine================-->
 
 
-
-
         <dependency>
             <groupId>com.lihaoyi</groupId>
             <artifactId>upickle_2.11</artifactId>
@@ -221,12 +219,15 @@ http://maven.apache.org/POM/4.0.0 ">
         </dependency>
 
 
+        <!-- https://mvnrepository.com/artifact/net.coobird/thumbnailator -->
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>0.4.8</version>
+        </dependency>
 
 
-
-        </dependencies>
-
-
+    </dependencies>
 
 
     <build>

@@ -6,6 +6,7 @@ import com.peekaboo.model.entity.User;
 import com.peekaboo.model.entity.enums.FileType;
 import com.peekaboo.model.service.impl.StorageServiceImpl;
 import com.peekaboo.model.service.impl.UserServiceImpl;
+import net.coobird.thumbnailator.Thumbnailator;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +15,13 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static io.jsonwebtoken.lang.Classes.getResourceAsStream;
 
 @RestController
 public class AvatarController {
@@ -31,14 +33,15 @@ public class AvatarController {
     @Autowired
     private StorageServiceImpl storageService;
 
-    public AvatarController(){
+    public AvatarController() {
         String rootPath = System.getProperty(JavaPropertiesParser.PARSER.getValue("FilesDestination"));
         rootDir = new File(rootPath + File.separator + "tmp");
         if (!rootDir.exists())
             rootDir.mkdirs();
     }
+
     @RequestMapping(path = "/avatar", method = RequestMethod.POST)
-    public String avatar( @RequestParam("image") MultipartFile image){
+    public String avatar(@RequestParam("image") MultipartFile image) {
         if (!image.isEmpty()) {
             try {
                 byte[] bytes = image.getBytes();
@@ -52,6 +55,16 @@ public class AvatarController {
                 BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(uploadedImage));
                 stream.write(bytes);
                 stream.close();
+
+                File thumbnails = new File(parent.getAbsolutePath() + File.separator + "thumbnails");
+                if (!thumbnails.exists()) thumbnails.mkdir();
+                File size1 = new File(thumbnails.getAbsolutePath() + File.separator + "size1");
+                File size2 = new File(thumbnails.getAbsolutePath() + File.separator + "size2");
+
+                Thumbnailator.createThumbnail(uploadedImage, size1, 400, 250);
+
+                Thumbnailator.createThumbnail(uploadedImage, size2, 300, 188);
+
                 Storage profilePhoto = new Storage(imageName, uploadedImage.getAbsolutePath(), FileType.IMAGE.name());
                 storageService.save(profilePhoto);
                 userService.changeProfilePhoto(user, profilePhoto);
@@ -66,37 +79,41 @@ public class AvatarController {
         }
     }
 
-    @RequestMapping(path = "/avatar/{userId}", method = RequestMethod.GET)
-    public void avatar(HttpServletResponse response, @PathVariable String userId) {
+    @RequestMapping(path = "/avatar/{userId}/{size}", method = RequestMethod.GET)
+    public void avatar(HttpServletResponse response, @PathVariable String userId, @PathVariable Integer size) {
         User user = userService.get(userId);
         logger.error(user.toString());
         response.setContentType("image/jpeg");
         Storage avatar = user.getProfilePhoto();
 
 
-
         if (avatar == null) {
             try {
-
-                logger.error("got to null");
-                byte[] buffer = new byte[1024];
-                int bytesread;
-
-
-                InputStream input = AvatarController.class.getResourceAsStream("/defaultfiles/default_profile_photo.jpg");
-                OutputStream output = response.getOutputStream();
-                while ((bytesread = input.read(buffer)) != -1) {
-                    output.write(buffer, 0, bytesread);
-                }
-                response.getOutputStream().flush();
-            } catch (Exception e) {
-               logger.error(e.toString());
+                response.getWriter().print("{\"Fuck you\"}");
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         } else {
             String avatarpath = avatar.getFilePath();
-            Path image = Paths.get(avatarpath);
+            String thumbnails = rootDir.getAbsolutePath() + File.separator + user.getId().toString()
+                    + File.separator + "thumbnails";
 
-//            //TODO: Set correct content type
+            Path image;
+            switch (size) {
+                case 0:
+                    image = Paths.get(avatarpath);
+                    break;
+                case 1:
+                    image = Paths.get(thumbnails + File.separator + "size1");
+                    break;
+                case 2:
+                    image = Paths.get(thumbnails + File.separator + "size2");
+                    break;
+                default:
+                    image = Paths.get(avatarpath);
+                    break;
+            }
+
             logger.error("image found");
             try {
 

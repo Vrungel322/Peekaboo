@@ -76,6 +76,11 @@ public class AvatarController {
         }
     }
 
+    @RequestMapping(path = "/avatar/{userId}", method = RequestMethod.GET)
+    public void avatar(HttpServletResponse response, @PathVariable String userId) {
+        avatar(response, userId, 0);
+    }
+
     // TODO: 19.11.2016 Do parameter size unneccesary
     @RequestMapping(path = "/avatar/{userId}/{size}", method = RequestMethod.GET)
     public void avatar(HttpServletResponse response, @PathVariable String userId, @PathVariable Integer size) {

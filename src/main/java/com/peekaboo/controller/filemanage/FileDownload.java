@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequestMapping("/download")
@@ -48,12 +49,9 @@ public class FileDownload {
 
         Storage storage = storageService.findByFileName(fileName);
         try {
-<<<<<<< HEAD
             if (storage == null) throw new Exception();
             if (!receiver.getOwnStorages().contains(storage) &&
                     !receiver.getUsesStorages().contains(storage)) throw new Exception();
-=======
-            Storage storage;
             try {
                 storage = receiver.getUsesStorages().stream()
                         .filter(x -> x.getFileName().equals(fileName))
@@ -67,17 +65,17 @@ public class FileDownload {
                         .filter(x -> x.getFileName().equals(fileName))
                         .findFirst().get();
             } catch (NoSuchElementException ex) {
-                try{
+                try {
                     storage = receiver.getOwnStorages().stream()
                             .filter(x -> x.getFileName().equals(fileName))
-                            .findFirst().get();}
-                catch(NoSuchElementException ex1){   storage = null;}
+                            .findFirst().get();
+                } catch (NoSuchElementException ex1) {
+                    storage = null;
                 }
-
+            }
 
 
             if (storage == null) logger.error("no such storage");
->>>>>>> refs/remotes/origin/master
 
             Path file = Paths.get(storage.getFilePath());
             logger.error("done");
@@ -117,7 +115,7 @@ public class FileDownload {
                     response.getOutputStream().flush();
                 } catch (IOException e) {
                     try {
-                        logger.error("invalid: "+ e.toString());
+                        logger.error("invalid: " + e.toString());
                     } catch (Exception e1) {
                         e1.printStackTrace();
                     }

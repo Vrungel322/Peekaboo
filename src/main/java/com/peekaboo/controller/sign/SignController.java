@@ -69,14 +69,20 @@ public class SignController {
         SignResponse response = new SignResponse();
         response.setId(user.getId().toString())
                 .setUsername(user.getUsername())
+                .setFirstName(user.getName())
+                .setLastName(user.getSurname())
+                .setCountry(user.getCountry())
+                .setCity(user.getCity())
+                .setEmail(user.getEmail())
+                .setPhone(user.getTelephone())
                 .setRole(user.getRoles())
                 .setEnabled(true)
                 .setState(user.getState());
+
         String token = jwtUtil.generateToken(response);
+        response.setToken(token);
         logger.error(token);
-        return new ResponseEntity(new SigninResponse(user.getId().toString(), token, user.getUsername(), user.getState()), HttpStatus.OK);
-//        return new ResponseEntity(new SigninResponse(user.getId().toString(),
-//                user.getUsername().toString(),user.getAvatar().toString(), token), HttpStatus.OK);
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/signup", method = RequestMethod.POST)
@@ -168,47 +174,6 @@ public class SignController {
             );
         }
         return errorResponses;
-    }
-
-    private class SigninResponse {
-        private String username;
-        private String id;
-        private String token;
-        private int state;
-//        private String username;
-//        private String avatar;
-
-        //        public SigninResponse(String id, String username, String avatar, String token) {
-        public SigninResponse(String id, String token, String username, int state) {
-            this.token = token;
-            this.id = id;
-            this.state = state;
-
-            this.username = username;
-//            this.avatar = avatar;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getToken() {
-            return token;
-        }
-
-        public int getState() {
-            return state;
-        }
-//        public String getAvatar() { return avatar; }
-//        public String getUsername() { return username; }
-
-        public String getUsername() {
-            return username;
-        }
-
-        public void setUsername(String username) {
-            this.username = username;
-        }
     }
 
     private class SignupResponse {

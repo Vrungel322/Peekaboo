@@ -62,25 +62,39 @@ public class UserServiceTest {
 
     @Test
     public void managingWithFriends() {
-        userService.save(new User("maks", "maksim", "sss", "Ratoshnuk", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
-        userService.save(new User("alex1", "sashka1", "sss", "Ratoshnuk", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex2", "sashka2", "sss", "Ratoshnuk", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex3", "sashka3", "sss", "Ratoshnuk", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
-        userService.save(new User("alex4", "sashka4", "sss", "Ratoshnuk", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
-        User user = userService.findByUsername("maks");
-        User user1 = userService.findByUsername("alex1");
-        User user2 = userService.findByUsername("alex2");
-        User user3 = userService.findByUsername("alex3");
-        User user4 = userService.findByUsername("alex4");
-        userService.addNewFriend(user, user1);
-        userService.addNewFriend(user, user2);
-        userService.addNewFriend(user, user3);
-        userService.addNewFriend(user, user4);
-        userService.delete(user);
-        userService.delete(user1);
-        userService.delete(user2);
-        userService.delete(user3);
-        userService.delete(user4);
+//        userService.save(new User("maks", "maksim", "sss", "Ratoshnuk", "asdad", "maksratosh@gmail.com", 0, 0, true, 0));
+//        userService.save(new User("alex1", "sashka1", "sss", "Ratoshnuk", "asdad1", "alex1@gmail.com", 0, 0, false, 0));
+//        userService.save(new User("alex2", "sashka2", "sss", "Ratoshnuk", "asdad2", "alex2@gmail.com", 0, 0, false, 0));
+//        userService.save(new User("alex3", "sashka3", "sss", "Ratoshnuk", "asdad3", "alex3@gmail.com", 0, 0, false, 0));
+//        userService.save(new User("alex4", "sashka4", "sss", "Ratoshnuk", "asdad4", "alex4@gmail.com", 0, 0, false, 0));
+//        User user = userService.findByUsername("maks");
+//        User user1 = userService.findByUsername("alex1");
+//        User user2 = userService.findByUsername("alex2");
+//        User user3 = userService.findByUsername("alex3");
+//        User user4 = userService.findByUsername("alex4");
+//        userService.addNewFriend(user, user1);
+//        userService.addNewFriend(user, user2);
+//        userService.addNewFriend(user, user3);
+//        userService.addNewFriend(user, user4);
+//        userService.delete(user);
+//        userService.delete(user1);
+//        userService.delete(user2);
+//        userService.delete(user3);
+//        userService.delete(user4);
+
+        User user = userService.findById(138l);
+        user.setCity("Kyiv");
+        user.setEmail("6858@i.ua");
+        user.setCountry("Ukraine");
+        user.setName("Nikita");
+        user.setSurname("Romanenko");
+        user.setTelephone("380689647569");
+        userService.update(user);
+        System.out.println(user.toString());
+
+        User user1 = userService.findById(138l);
+
+        System.out.println(user1.toString());
     }
 
     @Test

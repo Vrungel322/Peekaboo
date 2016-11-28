@@ -24,6 +24,8 @@ public class User implements UserDetails {
     private String name;
     private String surname;
     private String password;
+    private String country;
+    private String city;
     private int roles;
     private int state;
     //TODO: male = 0 , female = 1
@@ -45,12 +47,12 @@ public class User implements UserDetails {
     public User() {
     }
 
-    public User(String username, String name,String surname, String password, String telephone,
+    public User(String username, String name, String surname, String password, String telephone,
                 String email, int roles, int gender, boolean enabled, int state
                 /*LocalDate birthdate,*/) {
         this.username = username;
         this.name = name;
-        this.surname=surname;
+        this.surname = surname;
         this.password = password;
         this.telephone = telephone;
         this.email = email;
@@ -65,7 +67,7 @@ public class User implements UserDetails {
         return surname;
     }
 
-    public void setSurname(String name) {
+    public void setSurname(String surname) {
         this.surname = surname;
     }
 
@@ -85,6 +87,22 @@ public class User implements UserDetails {
                 authorities.add(new SimpleGrantedAuthority(role.toString()));
             }
         return authorities;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
     }
 
     @Override
@@ -284,16 +302,19 @@ public class User implements UserDetails {
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("User{");
-        sb.append("id='").append(id).append('\'');
+        sb.append("id=").append(id);
         sb.append(", username='").append(username).append('\'');
-        sb.append(", name='").append(name).append('\'');
-        sb.append(", password='").append(password).append('\'');
         sb.append(", telephone='").append(telephone).append('\'');
         sb.append(", email='").append(email).append('\'');
+        sb.append(", name='").append(name).append('\'');
+        sb.append(", surname='").append(surname).append('\'');
+        sb.append(", password='").append(password).append('\'');
+        sb.append(", country='").append(country).append('\'');
+        sb.append(", city='").append(city).append('\'');
         sb.append(", roles=").append(roles);
+        sb.append(", state=").append(state);
         sb.append(", gender=").append(gender);
         sb.append(", enabled=").append(enabled);
-        sb.append(", avatar=").append(profilePhoto);
         sb.append('}');
         return sb.toString();
     }
